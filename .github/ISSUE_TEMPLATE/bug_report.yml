@@ -1,0 +1,49 @@
+name: Report Bug
+description: Feedback on problems encountered
+labels: [bug]
+title: "[Bug] Edit me!"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        In order for us to better help you, please provide the following information. As well as modify the title above
+  - type: textarea
+    id: desc
+    attributes:
+      label: Issues Description
+      description: What has happened? What are the current conditions? What are the conditions of recurrence?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should happen under normal circumstances
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened
+    validations:
+      required: true
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshot or screen recording
+      description: Screenshot or video recording of the problem being reproduced
+      placeholder: Click on the small long bar below the text box to upload the file
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Browser Environment
+      options:
+        - Google Chrome
+        - Mozilla Firefox
+        - Microsoft Edge
+        - Safari
+        - Other - please add to the issue description
+      description: 目前主要适配Windows10
+    validations:
+      required: true

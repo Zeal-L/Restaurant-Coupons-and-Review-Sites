@@ -1,0 +1,35 @@
+name: Feature Request
+description: Want to request a feature
+labels: [enhancement]
+title: "[Feature Request] Edit me!"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        In order for us to better help you, please provide the following information. As well as modify the title above
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason
+      description: Why do you want this feature
+    validations:
+      required: true
+  - type: textarea
+    id: desc
+    attributes:
+      label: Brief descriptions
+      description: What kind of feature do you want?
+    validations:
+      required: true
+  - type: textarea
+    id: logic
+    attributes:
+      label: Functional Logic
+      description: How to interchange, how to use, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: ref
+    attributes:
+      label: Implementation Reference
+      description: Possible implementations of this feature, or other applications that have implemented this feature, etc.
