@@ -1,7 +1,9 @@
 package com.COMP3900Proj.Database;
 
+import com.COMP3900Proj.ApiFormat.ApiUser;
+import com.COMP3900Proj.Errors.DataBaseError;
+import com.COMP3900Proj.Errors.UserError;
 import com.COMP3900Proj.JWT;
-import com.COMP3900Proj.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -16,31 +18,33 @@ public class UserTable {
     @Autowired
     public UserTable(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        if (!Database.TableExist("users", jdbcTemplate)) {
+            String query = "CREATE TABLE users (id SERIAL PRIMARY KEY, email TEXT UNIQUE, name TEXT, password TEXT, gender TEXT);";
+            jdbcTemplate.execute(query);
+        }
     }
 
-    public String register(String username, String password) {
+    public void register(ApiUser user) throws UserError, DataBaseError {
         try {
-            if(checkIfUserExists(username)) {
-                return null;
+            if(checkIfEmailExists(user.getEmail())) {
+                throw new UserError("User already exists");
             }
-            password = JWT.HashPassword(password,SOLID_KEY);
-            String query = "INSERT INTO Users (Username, Password) VALUES (?, ?)";
+            String password = JWT.HashPassword(user.getPassword(), SOLID_KEY);
+            String query = "INSERT INTO Users (email, name, password, gender) VALUES (?, ?, ?, ?)";
             PreparedStatement statement = jdbcTemplate.getDataSource().getConnection().prepareStatement(query);
-            statement.setString(1, username);
-            statement.setString(2, password);
+            statement.setString(1, user.getEmail());
+            statement.setString(2, user.getUsername());
+            statement.setString(3, password);
+            statement.setString(4, user.getGender());
             statement.executeUpdate();
-
-            query = "SELECT id FROM Users WHERE Username = ?";
-            int id = jdbcTemplate.queryForObject(query, Integer.class, username);
-            return Token.GanerateToken(id).getToken();
         } catch (SQLException e) {
-            return null;
+            throw new DataBaseError("Failed to register user");
         }
     }
 
     public Boolean login(String username, String password) {
         try {
-            password = JWT.HashPassword(password,SOLID_KEY);
+            password = JWT.HashPassword(password, SOLID_KEY);
             if (username == null || password == null) {
                 return false;
             }
@@ -52,10 +56,10 @@ public class UserTable {
         }
     }
 
-    public Boolean checkIfUserExists(String username) {
+    public Boolean checkIfEmailExists(String email) {
         try {
-            String query = "SELECT COUNT(*) FROM Users WHERE Username = ?";
-            int count = jdbcTemplate.queryForObject(query, Integer.class, username);
+            String query = "SELECT COUNT(*) FROM Users WHERE email = ?";
+            int count = jdbcTemplate.queryForObject(query, Integer.class, email);
             return count > 0;
         } catch (NullPointerException e) {
             return false;

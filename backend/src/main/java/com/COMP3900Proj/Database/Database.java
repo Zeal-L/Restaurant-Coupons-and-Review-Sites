@@ -1,5 +1,6 @@
 package com.COMP3900Proj.Database;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
@@ -7,15 +8,13 @@ import java.sql.*;
 @Component
 public class Database {
 
-    static Boolean TableExist(String tableName, String url) {
+    static Boolean TableExist(String tableName, JdbcTemplate jdbcTemplate) {
         try {
-            tableName = tableName.toLowerCase();
-            Connection connection = DriverManager.getConnection(url);
-            DatabaseMetaData metaData = connection.getMetaData();
-            ResultSet resultSet = metaData.getTables(null, null, tableName, null);
-            return resultSet.next();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            String query = "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = ?";
+            int count = jdbcTemplate.queryForObject(query, Integer.class, tableName);
+            return count > 0;
+        } catch (NullPointerException e) {
+            return false;
         }
     }
 }
