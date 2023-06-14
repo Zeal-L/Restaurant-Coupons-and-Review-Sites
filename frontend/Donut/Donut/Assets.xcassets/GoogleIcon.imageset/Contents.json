@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Google__G__Logo.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

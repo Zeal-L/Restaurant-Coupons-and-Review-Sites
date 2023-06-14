@@ -1,0 +1,742 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CD0CE5762A343F2D007F07BA /* DonutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0CE5752A343F2D007F07BA /* DonutApp.swift */; };
+		CD0CE5782A343F2D007F07BA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0CE5772A343F2D007F07BA /* ContentView.swift */; };
+		CD0CE57A2A343F2E007F07BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD0CE5792A343F2E007F07BA /* Assets.xcassets */; };
+		CD0CE57D2A343F2E007F07BA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD0CE57C2A343F2E007F07BA /* Preview Assets.xcassets */; };
+		CD0CE5872A343F2E007F07BA /* DonutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0CE5862A343F2E007F07BA /* DonutTests.swift */; };
+		CD0CE5912A343F2E007F07BA /* DonutUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0CE5902A343F2E007F07BA /* DonutUITests.swift */; };
+		CD0CE5932A343F2E007F07BA /* DonutUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0CE5922A343F2E007F07BA /* DonutUITestsLaunchTests.swift */; };
+		CD38175D2A344E6C00BAA42F /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD38175C2A344E6C00BAA42F /* UserProfile.swift */; };
+		CD38175F2A34589100BAA42F /* EditProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD38175E2A34589100BAA42F /* EditProfile.swift */; };
+		CD3817632A34631500BAA42F /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3817622A34631500BAA42F /* Home.swift */; };
+		CD46E1652A348D2D0054308A /* RestaurantCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD46E1642A348D2D0054308A /* RestaurantCard.swift */; };
+		CD46E16C2A34A5560054308A /* ectensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD46E16B2A34A5560054308A /* ectensions.swift */; };
+		CD6F54872A388B3700472C7B /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6F54862A388B3700472C7B /* Configuration.swift */; };
+		CDB5855B2A3735E80059CCD8 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB5855A2A3735E80059CCD8 /* UserSettings.swift */; };
+		CDB5855D2A374DDB0059CCD8 /* EmailPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB5855C2A374DDB0059CCD8 /* EmailPage.swift */; };
+		CDB5855F2A380BB70059CCD8 /* RestaurantList.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB5855E2A380BB70059CCD8 /* RestaurantList.swift */; };
+		CDB585622A381D670059CCD8 /* FilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB585612A381D670059CCD8 /* FilterSheet.swift */; };
+		CDE9F5D82A35A18F00204653 /* DetailsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE9F5D72A35A18F00204653 /* DetailsPage.swift */; };
+		CDE9F5DA2A3608FF00204653 /* TabNavigationLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE9F5D92A3608FF00204653 /* TabNavigationLink.swift */; };
+		CDE9F5DD2A36A6FF00204653 /* CouponPop.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE9F5DC2A36A6FF00204653 /* CouponPop.swift */; };
+		CDE9F5DF2A36CE3800204653 /* Coupons.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE9F5DE2A36CE3800204653 /* Coupons.swift */; };
+		CDE9F5E32A36D93700204653 /* LogInPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE9F5E22A36D93700204653 /* LogInPage.swift */; };
+		CDE9F5E62A36E16400204653 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = CDE9F5E52A36E16400204653 /* GoogleSignInSwift */; };
+		CDE9F5E82A36FBD000204653 /* SignUpPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE9F5E72A36FBD000204653 /* SignUpPage.swift */; };
+		CDE9F5EA2A371DFC00204653 /* InputBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE9F5E92A371DFC00204653 /* InputBox.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CD0CE5832A343F2E007F07BA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD0CE56A2A343F2D007F07BA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CD0CE5712A343F2D007F07BA;
+			remoteInfo = Donut;
+		};
+		CD0CE58D2A343F2E007F07BA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD0CE56A2A343F2D007F07BA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CD0CE5712A343F2D007F07BA;
+			remoteInfo = Donut;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		CD0CE5722A343F2D007F07BA /* Donut.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Donut.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD0CE5752A343F2D007F07BA /* DonutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonutApp.swift; sourceTree = "<group>"; };
+		CD0CE5772A343F2D007F07BA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		CD0CE5792A343F2E007F07BA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CD0CE57C2A343F2E007F07BA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		CD0CE5822A343F2E007F07BA /* DonutTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DonutTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD0CE5862A343F2E007F07BA /* DonutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonutTests.swift; sourceTree = "<group>"; };
+		CD0CE58C2A343F2E007F07BA /* DonutUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DonutUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD0CE5902A343F2E007F07BA /* DonutUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonutUITests.swift; sourceTree = "<group>"; };
+		CD0CE5922A343F2E007F07BA /* DonutUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonutUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		CD38175C2A344E6C00BAA42F /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		CD38175E2A34589100BAA42F /* EditProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfile.swift; sourceTree = "<group>"; };
+		CD3817622A34631500BAA42F /* Home.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
+		CD46E1642A348D2D0054308A /* RestaurantCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantCard.swift; sourceTree = "<group>"; };
+		CD46E16B2A34A5560054308A /* ectensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ectensions.swift; sourceTree = "<group>"; };
+		CD6F54862A388B3700472C7B /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+		CDB5855A2A3735E80059CCD8 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		CDB5855C2A374DDB0059CCD8 /* EmailPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailPage.swift; sourceTree = "<group>"; };
+		CDB5855E2A380BB70059CCD8 /* RestaurantList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantList.swift; sourceTree = "<group>"; };
+		CDB585612A381D670059CCD8 /* FilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSheet.swift; sourceTree = "<group>"; };
+		CDE9F5D62A3592B400204653 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		CDE9F5D72A35A18F00204653 /* DetailsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsPage.swift; sourceTree = "<group>"; };
+		CDE9F5D92A3608FF00204653 /* TabNavigationLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabNavigationLink.swift; sourceTree = "<group>"; };
+		CDE9F5DC2A36A6FF00204653 /* CouponPop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CouponPop.swift; sourceTree = "<group>"; };
+		CDE9F5DE2A36CE3800204653 /* Coupons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coupons.swift; sourceTree = "<group>"; };
+		CDE9F5E22A36D93700204653 /* LogInPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInPage.swift; sourceTree = "<group>"; };
+		CDE9F5E72A36FBD000204653 /* SignUpPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpPage.swift; sourceTree = "<group>"; };
+		CDE9F5E92A371DFC00204653 /* InputBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBox.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CD0CE56F2A343F2D007F07BA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CDE9F5E62A36E16400204653 /* GoogleSignInSwift in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0CE57F2A343F2E007F07BA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0CE5892A343F2E007F07BA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CD0CE5692A343F2D007F07BA = {
+			isa = PBXGroup;
+			children = (
+				CD0CE5742A343F2D007F07BA /* Donut */,
+				CD0CE5852A343F2E007F07BA /* DonutTests */,
+				CD0CE58F2A343F2E007F07BA /* DonutUITests */,
+				CD0CE5732A343F2D007F07BA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CD0CE5732A343F2D007F07BA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CD0CE5722A343F2D007F07BA /* Donut.app */,
+				CD0CE5822A343F2E007F07BA /* DonutTests.xctest */,
+				CD0CE58C2A343F2E007F07BA /* DonutUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD0CE5742A343F2D007F07BA /* Donut */ = {
+			isa = PBXGroup;
+			children = (
+				CDE9F5DB2A36A6E900204653 /* Components */,
+				CDE9F5D62A3592B400204653 /* Info.plist */,
+				CD46E1662A3495E00054308A /* Helper */,
+				CD38175A2A344E5200BAA42F /* Pages */,
+				CD0CE5752A343F2D007F07BA /* DonutApp.swift */,
+				CD0CE5772A343F2D007F07BA /* ContentView.swift */,
+				CD0CE5792A343F2E007F07BA /* Assets.xcassets */,
+				CD0CE57B2A343F2E007F07BA /* Preview Content */,
+				CDB5855A2A3735E80059CCD8 /* UserSettings.swift */,
+			);
+			path = Donut;
+			sourceTree = "<group>";
+		};
+		CD0CE57B2A343F2E007F07BA /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				CD0CE57C2A343F2E007F07BA /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		CD0CE5852A343F2E007F07BA /* DonutTests */ = {
+			isa = PBXGroup;
+			children = (
+				CD0CE5862A343F2E007F07BA /* DonutTests.swift */,
+			);
+			path = DonutTests;
+			sourceTree = "<group>";
+		};
+		CD0CE58F2A343F2E007F07BA /* DonutUITests */ = {
+			isa = PBXGroup;
+			children = (
+				CD0CE5902A343F2E007F07BA /* DonutUITests.swift */,
+				CD0CE5922A343F2E007F07BA /* DonutUITestsLaunchTests.swift */,
+			);
+			path = DonutUITests;
+			sourceTree = "<group>";
+		};
+		CD38175A2A344E5200BAA42F /* Pages */ = {
+			isa = PBXGroup;
+			children = (
+				CD3817602A3462FF00BAA42F /* Home */,
+				CD38175B2A344E5C00BAA42F /* Profile */,
+			);
+			path = Pages;
+			sourceTree = "<group>";
+		};
+		CD38175B2A344E5C00BAA42F /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				CD38175C2A344E6C00BAA42F /* UserProfile.swift */,
+				CD38175E2A34589100BAA42F /* EditProfile.swift */,
+				CDE9F5E22A36D93700204653 /* LogInPage.swift */,
+				CDE9F5E72A36FBD000204653 /* SignUpPage.swift */,
+				CDE9F5E92A371DFC00204653 /* InputBox.swift */,
+				CDB5855C2A374DDB0059CCD8 /* EmailPage.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		CD3817602A3462FF00BAA42F /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				CDE9F5D32A358E9E00204653 /* JsonStructure */,
+				CD3817622A34631500BAA42F /* Home.swift */,
+				CD46E1642A348D2D0054308A /* RestaurantCard.swift */,
+				CDE9F5D72A35A18F00204653 /* DetailsPage.swift */,
+				CDB585612A381D670059CCD8 /* FilterSheet.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		CD46E1662A3495E00054308A /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				CD46E16B2A34A5560054308A /* ectensions.swift */,
+				CDE9F5D92A3608FF00204653 /* TabNavigationLink.swift */,
+				CD6F54862A388B3700472C7B /* Configuration.swift */,
+			);
+			path = Helper;
+			sourceTree = "<group>";
+		};
+		CDE9F5D32A358E9E00204653 /* JsonStructure */ = {
+			isa = PBXGroup;
+			children = (
+				CDB5855E2A380BB70059CCD8 /* RestaurantList.swift */,
+			);
+			path = JsonStructure;
+			sourceTree = "<group>";
+		};
+		CDE9F5DB2A36A6E900204653 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				CDE9F5DC2A36A6FF00204653 /* CouponPop.swift */,
+				CDE9F5DE2A36CE3800204653 /* Coupons.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CD0CE5712A343F2D007F07BA /* Donut */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD0CE5962A343F2E007F07BA /* Build configuration list for PBXNativeTarget "Donut" */;
+			buildPhases = (
+				CD0CE56E2A343F2D007F07BA /* Sources */,
+				CD0CE56F2A343F2D007F07BA /* Frameworks */,
+				CD0CE5702A343F2D007F07BA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Donut;
+			packageProductDependencies = (
+				CDE9F5E52A36E16400204653 /* GoogleSignInSwift */,
+			);
+			productName = Donut;
+			productReference = CD0CE5722A343F2D007F07BA /* Donut.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CD0CE5812A343F2E007F07BA /* DonutTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD0CE5992A343F2E007F07BA /* Build configuration list for PBXNativeTarget "DonutTests" */;
+			buildPhases = (
+				CD0CE57E2A343F2E007F07BA /* Sources */,
+				CD0CE57F2A343F2E007F07BA /* Frameworks */,
+				CD0CE5802A343F2E007F07BA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CD0CE5842A343F2E007F07BA /* PBXTargetDependency */,
+			);
+			name = DonutTests;
+			productName = DonutTests;
+			productReference = CD0CE5822A343F2E007F07BA /* DonutTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CD0CE58B2A343F2E007F07BA /* DonutUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD0CE59C2A343F2E007F07BA /* Build configuration list for PBXNativeTarget "DonutUITests" */;
+			buildPhases = (
+				CD0CE5882A343F2E007F07BA /* Sources */,
+				CD0CE5892A343F2E007F07BA /* Frameworks */,
+				CD0CE58A2A343F2E007F07BA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CD0CE58E2A343F2E007F07BA /* PBXTargetDependency */,
+			);
+			name = DonutUITests;
+			productName = DonutUITests;
+			productReference = CD0CE58C2A343F2E007F07BA /* DonutUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CD0CE56A2A343F2D007F07BA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					CD0CE5712A343F2D007F07BA = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					CD0CE5812A343F2E007F07BA = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = CD0CE5712A343F2D007F07BA;
+					};
+					CD0CE58B2A343F2E007F07BA = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = CD0CE5712A343F2D007F07BA;
+					};
+				};
+			};
+			buildConfigurationList = CD0CE56D2A343F2D007F07BA /* Build configuration list for PBXProject "Donut" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CD0CE5692A343F2D007F07BA;
+			packageReferences = (
+				CDE9F5E42A36E16400204653 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
+			productRefGroup = CD0CE5732A343F2D007F07BA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CD0CE5712A343F2D007F07BA /* Donut */,
+				CD0CE5812A343F2E007F07BA /* DonutTests */,
+				CD0CE58B2A343F2E007F07BA /* DonutUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CD0CE5702A343F2D007F07BA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD0CE57D2A343F2E007F07BA /* Preview Assets.xcassets in Resources */,
+				CD0CE57A2A343F2E007F07BA /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0CE5802A343F2E007F07BA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0CE58A2A343F2E007F07BA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CD0CE56E2A343F2D007F07BA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CDE9F5EA2A371DFC00204653 /* InputBox.swift in Sources */,
+				CDE9F5E82A36FBD000204653 /* SignUpPage.swift in Sources */,
+				CD46E16C2A34A5560054308A /* ectensions.swift in Sources */,
+				CD6F54872A388B3700472C7B /* Configuration.swift in Sources */,
+				CDE9F5DA2A3608FF00204653 /* TabNavigationLink.swift in Sources */,
+				CD46E1652A348D2D0054308A /* RestaurantCard.swift in Sources */,
+				CD38175D2A344E6C00BAA42F /* UserProfile.swift in Sources */,
+				CDE9F5E32A36D93700204653 /* LogInPage.swift in Sources */,
+				CD0CE5782A343F2D007F07BA /* ContentView.swift in Sources */,
+				CDE9F5DD2A36A6FF00204653 /* CouponPop.swift in Sources */,
+				CD3817632A34631500BAA42F /* Home.swift in Sources */,
+				CD0CE5762A343F2D007F07BA /* DonutApp.swift in Sources */,
+				CD38175F2A34589100BAA42F /* EditProfile.swift in Sources */,
+				CDE9F5D82A35A18F00204653 /* DetailsPage.swift in Sources */,
+				CDB5855B2A3735E80059CCD8 /* UserSettings.swift in Sources */,
+				CDE9F5DF2A36CE3800204653 /* Coupons.swift in Sources */,
+				CDB5855D2A374DDB0059CCD8 /* EmailPage.swift in Sources */,
+				CDB5855F2A380BB70059CCD8 /* RestaurantList.swift in Sources */,
+				CDB585622A381D670059CCD8 /* FilterSheet.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0CE57E2A343F2E007F07BA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD0CE5872A343F2E007F07BA /* DonutTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD0CE5882A343F2E007F07BA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD0CE5912A343F2E007F07BA /* DonutUITests.swift in Sources */,
+				CD0CE5932A343F2E007F07BA /* DonutUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CD0CE5842A343F2E007F07BA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CD0CE5712A343F2D007F07BA /* Donut */;
+			targetProxy = CD0CE5832A343F2E007F07BA /* PBXContainerItemProxy */;
+		};
+		CD0CE58E2A343F2E007F07BA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CD0CE5712A343F2D007F07BA /* Donut */;
+			targetProxy = CD0CE58D2A343F2E007F07BA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CD0CE5942A343F2E007F07BA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CD0CE5952A343F2E007F07BA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CD0CE5972A343F2E007F07BA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Donut/Preview Content\"";
+				DEVELOPMENT_TEAM = 5S6YD5B7F4;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Donut/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Wenqian.Donut;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CD0CE5982A343F2E007F07BA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Donut/Preview Content\"";
+				DEVELOPMENT_TEAM = 5S6YD5B7F4;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Donut/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Wenqian.Donut;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CD0CE59A2A343F2E007F07BA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5S6YD5B7F4;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Wenqian.DonutTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Donut.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Donut";
+			};
+			name = Debug;
+		};
+		CD0CE59B2A343F2E007F07BA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5S6YD5B7F4;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Wenqian.DonutTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Donut.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Donut";
+			};
+			name = Release;
+		};
+		CD0CE59D2A343F2E007F07BA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5S6YD5B7F4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Wenqian.DonutUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Donut;
+			};
+			name = Debug;
+		};
+		CD0CE59E2A343F2E007F07BA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5S6YD5B7F4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Wenqian.DonutUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Donut;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CD0CE56D2A343F2D007F07BA /* Build configuration list for PBXProject "Donut" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD0CE5942A343F2E007F07BA /* Debug */,
+				CD0CE5952A343F2E007F07BA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CD0CE5962A343F2E007F07BA /* Build configuration list for PBXNativeTarget "Donut" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD0CE5972A343F2E007F07BA /* Debug */,
+				CD0CE5982A343F2E007F07BA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CD0CE5992A343F2E007F07BA /* Build configuration list for PBXNativeTarget "DonutTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD0CE59A2A343F2E007F07BA /* Debug */,
+				CD0CE59B2A343F2E007F07BA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CD0CE59C2A343F2E007F07BA /* Build configuration list for PBXNativeTarget "DonutUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD0CE59D2A343F2E007F07BA /* Debug */,
+				CD0CE59E2A343F2E007F07BA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CDE9F5E42A36E16400204653 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CDE9F5E52A36E16400204653 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CDE9F5E42A36E16400204653 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = CD0CE56A2A343F2D007F07BA /* Project object */;
+}
