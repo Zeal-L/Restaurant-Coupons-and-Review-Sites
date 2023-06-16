@@ -1,6 +1,5 @@
 import psycopg2
 from . import config
-from .error import DatabaseError
 import os
 from psycopg2.extras import DictCursor
 
@@ -46,11 +45,11 @@ class Database:
             self.conn.commit()
             self.cur.close()
 
-        except psycopg2.OperationalError as e:
+        except psycopg2.Error as e:
             print(
                 "Unable to create database. Please check your connection information."
             )
-            raise DatabaseError() from e
+            raise e
 
     ############################################################
 
@@ -58,7 +57,7 @@ class Database:
         # Connect to the database
         try:
             self.conn = psycopg2.connect(f"dbname={config.database}")
-        except psycopg2.OperationalError:
+        except psycopg2.Error:
             self.create_database()
 
     ############################################################
@@ -88,9 +87,9 @@ class Database:
 
         except psycopg2.Error as e:
             print("Unable to execute query.")
-            raise DatabaseError() from e
+            raise e
 
-    ############################################################
+    #################################e###########################
 
     def execute_fetchone(self, query):
         """
@@ -115,13 +114,13 @@ class Database:
             self.cur.close()
             return res
 
-        except psycopg2.Error as error:
+        except psycopg2.Error as e:
             print("Unable to execute query.")
-            raise DatabaseError() from error
+            raise e
 
     ############################################################
 
-    def execute_insert(self, query):
+    def execute_alter(self, query):
         """
         Executes an insert query.
 
@@ -146,7 +145,7 @@ class Database:
 
         except psycopg2.Error as e:
             print("Unable to execute query.")
-            raise DatabaseError() from e
+            raise e
 
     ############################################################
 
@@ -158,5 +157,18 @@ class Database:
         self.conn.close()
 
 db = Database()
+# db.execute_insert('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
 
+# for _ in range(100):
+#     db.execute_insert("""INSERT INTO Users (name, gender, photo, email, password_hash)
+# SELECT
+#     CONCAT(first_name, ' ', last_name) AS name,
+#     CASE WHEN RANDOM() < 0.5 THEN 'male' ELSE 'female' END AS gender,
+#     CONCAT('https://randomuser.me/api/portraits/', CASE WHEN RANDOM() < 0.5 THEN 'men/' ELSE 'women/' END, FLOOR(RANDOM() * 99), '.jpg') AS photo,
+#     (SELECT CONCAT(REPLACE(CONCAT(first_name, last_name, FLOOR(RANDOM() * 100), FLOOR(RANDOM() * 100))::text, ' ', ''), '@example.com')) AS email,
+#     'pbkdf2:sha256:600000$7dnk51qYZiEYws3h$d437d95b82fd519cf1b8ac73885516bfa9ad9eef8fb307fd4341fbd362b67a38' AS password_hash
+# FROM
+#     (SELECT first_name FROM (VALUES ('John'), ('Jane'), ('Bob'), ('Alice'), ('David'), ('Mary'), ('Tom'), ('Sara'), ('Peter'), ('Emily')) AS first_names (first_name) ORDER BY RANDOM() LIMIT 1) AS fn,
+#     (SELECT last_name FROM (VALUES ('Doe'), ('Smith'), ('Johnson'), ('Williams'), ('Brown'), ('Lee'), ('Wilson'), ('Taylor'), ('Anderson'), ('Clark')) AS last_names (last_name) ORDER BY RANDOM() LIMIT 1) AS ln
+# LIMIT 1;""")
 
