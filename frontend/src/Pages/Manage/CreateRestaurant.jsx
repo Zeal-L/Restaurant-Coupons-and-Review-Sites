@@ -1,7 +1,7 @@
 import React from 'react';
 import { Context, useContext } from '../../context.js';
 import {useNavigate} from "react-router-dom";
-
+import { ReactComponent as voucherIcon } from '../../Resource/voucher.svg';
 function CreateRestaurant() {
     return (
         <>

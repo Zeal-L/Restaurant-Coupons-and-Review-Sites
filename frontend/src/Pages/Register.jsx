@@ -2,7 +2,7 @@ import React from 'react';
 import {Context, NotificationType, useContext} from '../context.js';
 import {useNavigate} from "react-router-dom";
 import {Button, Card, CardContent, Grid, TextField} from "@mui/material";
-import {ReactComponent as Logo} from '../logo.svg';
+import {ReactComponent as Logo} from '../Resource/logo.svg';
 import {styles} from '../styles.js';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 

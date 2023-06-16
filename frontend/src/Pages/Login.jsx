@@ -2,7 +2,7 @@ import React from 'react';
 import { Context, useContext } from '../context.js';
 import {useNavigate} from "react-router-dom";
 import {Button, Card, CardContent, Grid, Link, TextField} from "@mui/material";
-import { ReactComponent as Logo } from '../logo.svg';
+import { ReactComponent as Logo } from '../Resource/logo.svg';
 import { styles } from '../styles.js';
 function Login(){
     const { getter, setter } = useContext(Context);
