@@ -14,10 +14,11 @@ import CreateRestaurant from "./Pages/Manage/CreateRestaurant";
 import Listing from "./Pages/Listing";
 import Vouchsers from "./Pages/Vouchers";
 import Profile from "./Pages/Profile";
+import {Dialog} from "@mui/material";
 function App() {
 
-  const [errorPopOpen, setErrorPopOpen] = React.useState(initialValue.errorPopOpen);
-  const [errorPopMessage, setErrorPopMessage] = React.useState(initialValue.errorPopMessage);
+  const [popOpen, setPopOpen] = React.useState(initialValue.popOpen);
+  const [popMessage, setPopMessage] = React.useState(initialValue.popMessage);
   const [notificationPopOpen, setNotificationPopOpen] = React.useState(initialValue.notificationPopOpen);
   const [notificationPopMessage, setNotificationPopMessage] = React.useState(initialValue.notificationPopMessage);
   const [notificationType, setNotificationType] = React.useState(initialValue.notificationType);
@@ -32,8 +33,8 @@ function App() {
   }
 
   const getter = {
-    errorPopOpen,
-    errorPopMessage,
+    popOpen,
+    popMessage,
     notificationPopOpen,
     notificationPopMessage,
     notificationType,
@@ -42,8 +43,8 @@ function App() {
     listShow
   }
   const setter = {
-    setErrorPopOpen,
-    setErrorPopMessage,
+    setPopOpen,
+    setPopMessage,
     setNotificationPopOpen,
     setNotificationPopMessage,
     setNotificationType,

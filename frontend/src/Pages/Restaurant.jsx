@@ -3,22 +3,36 @@ import { Context, useContext } from '../context.js';
 import {useNavigate, useParams} from "react-router-dom";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import {ButtonGroup, Link, Rating, ToggleButton, ToggleButtonGroup} from '@mui/material';
+import {
+    BottomNavigation,
+    BottomNavigationAction,
+    ButtonGroup,
+    Link,
+    Rating,
+    ToggleButton,
+    ToggleButtonGroup
+} from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Grid from '@mui/material/Unstable_Grid2';
 import Button from "@mui/material/Button";
 import Menu from "./RestaurantPages/Menu";
 import VoucherRest from "./RestaurantPages/VoucherRest";
+import Review from "./RestaurantPages/Review";
+import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
+import LabelIcon from '@mui/icons-material/Label';
+import ReviewsIcon from '@mui/icons-material/Reviews';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import { CSSTransition } from 'react-transition-group';
 function Restaurant() {
     const { restaurantId } = useParams();
     const [alignment, setAlignment] = React.useState('Menu');
 
     const handleAlignment = (event, newAlignment) => {
         console.log(newAlignment);
-        setAlignment(newAlignment);
+        if (newAlignment !== null){
+            setAlignment(newAlignment);
+        }
     };
-
-    let isMobile = false;
     return (
         <>
             <div style={{ height: '64px' }}></div>
@@ -61,7 +75,7 @@ function Restaurant() {
                         </Typography>
                     </Grid>
                     <Grid item>
-                        <Rating name="customized-10" defaultValue={4.7} max={5} style={{ margin: '10px 0' }} />
+                        <Rating name="customized-10" value={4.7} max={5} style={{ margin: '10px 0' }} readOnly />
                     </Grid>
                     <Grid item>
                         <Typography variant="h6" fontFamily="Helvetica" fontWeight="400">
@@ -88,31 +102,23 @@ function Restaurant() {
                     </Grid>
                 </Grid>
             </Box>
-            <ToggleButtonGroup
+            <BottomNavigation
+                key="BottomNavigation"
+                showLabels
                 value={alignment}
-                exclusive
                 onChange={handleAlignment}
-                aria-label="text alignment"
-                style={{ width: '100vw' }}
             >
-                <ToggleButton style={{ width: 'calc(100% / 3)' }} value="Menu" aria-label="left aligned">
-                    Menu
-                </ToggleButton>
-                <ToggleButton style={{ width: 'calc(100% / 3)' }} value="VoucherRest" aria-label="centered">
-                    VoucherRest
-                </ToggleButton>
-                <ToggleButton style={{ width: 'calc(100% / 3)' }} value="Review" aria-label="right aligned">
-                    Review
-                </ToggleButton>
-            </ToggleButtonGroup>
-
+                <BottomNavigationAction value="Menu" label="Menu" icon={<RestaurantMenuIcon />} />
+                <BottomNavigationAction value="VoucherRest" label="Voucher" icon={<ConfirmationNumberIcon />} />
+                <BottomNavigationAction value="Review" label="Review" icon={<ReviewsIcon />} />
+            </BottomNavigation>
             {
                 alignment === 'Menu' ?
                     <Menu/>
                 : alignment === 'VoucherRest' ?
                     <VoucherRest/>
                 :
-                    <a>r</a>
+                    <Review/>
             }
 
         </>

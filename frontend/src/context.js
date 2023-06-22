@@ -8,8 +8,8 @@ export const NotificationType = {
 };
 export const initialValue = {
     login: false,
-    errorPopOpen: false,
-    errorPopMessage: '',
+    popOpen: false,
+    popMessage: '',
     notificationPopOpen: false,
     notificationPopMessage: '',
     notificationType: NotificationType.Success,

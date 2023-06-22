@@ -4,7 +4,6 @@ import {useNavigate} from "react-router-dom";
 import {Button, Card, CardContent, Grid, TextField} from "@mui/material";
 import {ReactComponent as Logo} from '../Resource/logo.svg';
 import {styles} from '../styles.js';
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 function Register() {
     const {setter, getter} = useContext(Context);
@@ -86,7 +85,8 @@ function Register() {
                                     </>
                                     :
                                     <Grid item>
-                                        <TextField id="code" label="verification code" variant="outlined" type="text" name='code'
+                                        <TextField id="code" label="verification code" variant="outlined" type="text"
+                                                   name='code'
                                                    sx={styles.sameWidth} error={verificationErr} required/>
                                     </Grid>
                                 }
