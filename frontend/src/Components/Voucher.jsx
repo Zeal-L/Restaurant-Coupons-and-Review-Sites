@@ -33,7 +33,7 @@ function Voucher(props) {
     const height = 196 * transform;
     // const havePop = props.pop ? props.pop : true;
     return (
-        <>
+        <div className={props.disabled === true ? 'gray-component' : ''}>
             <Grid container spacing={2} sx={{
                 ...props.sx,
                 width: `${width}px`,
@@ -41,10 +41,15 @@ function Voucher(props) {
                 padding: '24px',
                 backgroundImage: `url(${url})`,
                 backgroundSize: 'contain',
-                cursor:  props.pop === true || props.pop === undefined ? 'pointer' : 'default',
+                cursor:  props.disabled !== true && (props.pop === true || props.pop === undefined)
+                    ? 'pointer' : 'default',
             }}
 
-                  onClick={() => setPopOpen(true)}
+                  onClick={() => {
+                        if (props.disabled !== true && (props.pop === true || props.pop === undefined)) {
+                            setPopOpen(true)
+                        }
+                  }}
             >
                 <Grid item xs={12} sx={{ alignSelf: 'center' }}>
                     <Typography variant="subtitle1" color="white" sx={{ textAlign: 'center' }}>
@@ -62,8 +67,8 @@ function Voucher(props) {
                     </Typography>
                 </Grid>
             </Grid>
-            {(props.pop === true || props.pop === undefined) && <VoucherInfoPop open={popOpen} setOpen={setPopOpen}/>}
-        </>
+            {(props.pop === true || props.pop === undefined || props.disabled === true) && <VoucherInfoPop open={popOpen} setOpen={setPopOpen}/>}
+        </div>
     );
 }
 

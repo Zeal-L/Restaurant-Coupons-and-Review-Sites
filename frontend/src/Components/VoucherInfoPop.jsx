@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 function VoucherInfoPop(props) {
     const { getter, setter } = useContext(Context);
     const navigate = useNavigate();
-    const [isGet, setIsGet] = React.useState(false);
+    const [isGet, setIsGet] = React.useState(true);
     const info = {
         id: "1",
         type: "Percentage",

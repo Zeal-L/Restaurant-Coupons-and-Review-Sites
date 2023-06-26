@@ -178,15 +178,14 @@ const Comment = ({ user, rating, timestamp, content, likes, dislikes, reviews })
                                     marginTop: 1,
                                 }}
                             >
-                                <Avatar src={'https://example.com/avatar2.jpg'} alt={'self'} />
+                                <Avatar src={'https://example.com/avatar2.jpg'} alt={isAnonymous ? 'Anonymous' : 'Jane Smith'} />
                                 <Box marginLeft={2} flexGrow={1}>
-                                    <Typography variant="subtitle2">{'self'}</Typography>
+                                    <Typography variant="subtitle2">{isAnonymous ? 'Anonymous' : 'Jane Smith'}</Typography>
                                     <Box display="flex" alignItems="center">
                                         <Typography variant="body2" color="text.secondary">
                                             {currentDateTime()}
                                         </Typography>
                                         <FormControlLabel control={<Switch value={isAnonymous} onClick={() => {
-                                            console.log(isAnonymous)
                                             setIsAnonymous(!isAnonymous)
                                         }}/>} label="Anonymous" sx={{ marginLeft: 1 }} />
                                     </Box>
@@ -222,7 +221,7 @@ const Review = () => {
     const [isAnonymous, setIsAnonymous] = useState(false);
     const userDetail = {
         name: 'Jane Smith',
-        image: '',
+        image: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/bf/KFC_logo.svg/220px-KFC_logo.svg.png',
     };
     const [userName, setUserName] = useState(userDetail.name);
     const [userImage, setUserImage] = useState(userDetail.image);

@@ -37,10 +37,6 @@ import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from 'dayjs';
 import EditIcon from "@mui/icons-material/Edit";
-
-// const Transition = React.forwardRef(function Transition(props, ref) {
-//     return <Slide direction="up" ref={ref} {...props} />;
-// });
 function VoucherRest() {
     const menuItems = [
         {
@@ -51,6 +47,7 @@ function VoucherRest() {
             expire: "2023-12-31",
             count: 109,
             description: "this is the description of Percentage voucher.",
+            isClaimed: false,
             autoRelease: {
                 range: 102,
                 count: 10,
@@ -66,6 +63,7 @@ function VoucherRest() {
             expire: "2023-12-31",
             count: 10,
             description: "this is the description of Percentage voucher.",
+            isClaimed: true,
         },
         {
             id: "3",
@@ -75,6 +73,7 @@ function VoucherRest() {
             expire: "2023-12-31",
             count: 130,
             description: "this is the description of Percentage voucher.",
+            isClaimed: false,
             autoRelease: {
                 range: 102,
                 count: 10,
@@ -90,12 +89,14 @@ function VoucherRest() {
             expire: "2023-12-31",
             count: 10,
             description: "this is the description of Percentage voucher.",
+            isClaimed: false,
         }
 
     ];
     const [open, setOpen] = useState(false);
     const [popOpen, setPopOpen] = useState(false);
     const [selectVendor, setSelectVendor] = useState(menuItems[0]);
+    const [isOwner, setIsOwner] = useState(true);
     return (
         <>
             <Grid
@@ -113,33 +114,43 @@ function VoucherRest() {
             >
                 {menuItems.map((item) => (
                     <Grid item key={item.id}>
-                        <IconButton sx={{position: 'relative'}} id="iconButtonS">
-                            <EditIcon color="white" onClick={() => {
-                                setSelectVendor(item);
-                                setPopOpen(true);
-                            }}/>
-                        </IconButton>
-                        <IconButton sx={{position: 'relative'}} id="iconButtonS">
-                            <DeleteIcon color="white"/>
-                        </IconButton>
+                        {isOwner &&
+                            <>
+                                <IconButton sx={{position: 'relative'}} id="iconButtonS" onClick={() => {
+                                    setSelectVendor(item);
+                                    setPopOpen(true);
+                                }}>
+                                    <EditIcon color="white"/>
+                                </IconButton>
+                                <IconButton sx={{position: 'relative'}} id="iconButtonS">
+                                    <DeleteIcon color="white"/>
+                                </IconButton>
+                            </>
+                        }
+
                         <Voucher
                             type={item.type}
                             condition={item.condition}
                             discount={item.discount}
                             expire={item.expire}
+                            disabled={item.isClaimed}
                         />
                     </Grid>
                 ))}
             </Grid>
-            <SpeedDial
-                ariaLabel="SpeedDial basic example"
-                sx={{position: 'fixed', bottom: 16, right: 16}}
-                name="newListingBtn"
-                icon={<SpeedDialIcon openIcon={<CreateIcon/>}/>}
-                onClick={() => setOpen(true)}
-            />
-            <CreateVoucher open={open} onClose={() => setOpen(false)}/>
-            <EditVoucher open={popOpen} onClose={() => setPopOpen(false)} defV={selectVendor} setDefV={setSelectVendor}/>
+            {isOwner &&
+                <>
+                    <SpeedDial
+                        ariaLabel="SpeedDial basic example"
+                        sx={{position: 'fixed', bottom: 16, right: 16}}
+                        name="newListingBtn"
+                        icon={<SpeedDialIcon openIcon={<CreateIcon/>}/>}
+                        onClick={() => setOpen(true)}
+                    />
+                    <CreateVoucher open={open} onClose={() => setOpen(false)}/>
+                    <EditVoucher open={popOpen} onClose={() => setPopOpen(false)} defV={selectVendor} setDefV={setSelectVendor}/>
+                </>
+            }
         </>
     );
 };
@@ -201,13 +212,14 @@ const options = {
 const keys = ['Free', 'CFree', 'Fixed_Amount', 'Percentage']
 
 
-const VoucherDialog = (props) => {
+function VoucherDialog(props){
     const [openAutoReleaseDialog, setOpenAutoReleaseDialog] = useState(false);
     const [ReleasePeriod, setReleasePeriod] = useState("H");
     const [ReleasePeriodDay, setReleasePeriodDay] = useState(0);
     const [ReleasePeriodHour, setReleasePeriodHour] = useState(0);
     const [ReleasePeriodMinute, setReleasePeriodMinute] = useState(0);
     useEffect(() => {
+        console.log(props.autoReleaseTimeRange)
         if (props.autoReleaseTimeRange === 30 * 24 * 60) {
             setReleasePeriod("M")
         } else if (props.autoReleaseTimeRange === 7 * 24 * 60) {
@@ -224,8 +236,6 @@ const VoucherDialog = (props) => {
             setReleasePeriodMinute(dayFormat.min)
         }
     }, [props.autoReleaseTimeRange])
-    console.log("210")
-    console.log(props.isAutoRelease)
     return (
         <Dialog open={props.open} TransitionComponent={TransitionUp} onClose={props.onClose}>
             <DialogTitle>Select an Option</DialogTitle>
@@ -280,6 +290,16 @@ const VoucherDialog = (props) => {
                     fullWidth
                     margin="normal"
                 />
+
+                <TextField
+                    label="Description"
+                    value={props.description}
+                    onChange={(e) => {props.setDescription(e.target.value)}}
+                    fullWidth
+                    margin="normal"
+                    multiline
+                />
+
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
                         value={props.expire}
@@ -290,11 +310,10 @@ const VoucherDialog = (props) => {
                 </LocalizationProvider>
 
                 <FormControlLabel control={<Switch checked={props.isAutoRelease} onClick={(event) => {
-                    // console.log(event.target.checked)
                     props.setIsAutoRelease(event.target.checked)
                 }}/>} label="Auto Release" sx={{marginLeft: 1}}/>
-                <FormControlLabel control={<Switch checked={props.isAutoRelease} onClick={(event) => {
-                    props.setIsAutoRelease(event.target.checked)
+                <FormControlLabel control={<Switch checked={props.Shareable} onClick={(event) => {
+                    props.setShareable(event.target.checked)
                 }}/>} label="is Shareable" sx={{marginLeft: 1}}/>
                 {props.isAutoRelease &&
                     <>
@@ -354,6 +373,7 @@ const VoucherDialog = (props) => {
                                 <FormControlLabel value="D" control={<Radio/>} label="1 Day"/>
                                 <FormControlLabel value="H" control={<Radio/>} label="1 Hour"/>
                                 <FormControlLabel value="S" control={<Radio/>} label={`${ReleasePeriodDay} Days ${ReleasePeriodHour} Hours ${ReleasePeriodMinute} Minutes`}
+                                                  onClick={() => {setOpenAutoReleaseDialog(true)}}
                                 />
                             </RadioGroup>
                         </FormControl>
@@ -371,11 +391,11 @@ const VoucherDialog = (props) => {
                                                    value={ReleasePeriodDay}
                                                    onChange={(e) => {
                                                        if (e.target.value < 0) {
-                                                           setReleasePeriodDay(0)
+                                                           props.setAutoReleaseTimeRange(ReleasePeriodHour * 60 + ReleasePeriodMinute)
                                                        } else if (e.target.value > 365) {
-                                                              setReleasePeriodDay(365)
+                                                           props.setAutoReleaseTimeRange(365 * 24 * 60 + ReleasePeriodHour * 60 + ReleasePeriodMinute)
                                                        } else {
-                                                           setReleasePeriodDay(e.target.value)
+                                                           props.setAutoReleaseTimeRange(parseInt(e.target.value) * 1440 + parseInt(ReleasePeriodHour) * 60 + parseInt(ReleasePeriodMinute))
                                                        }
                                                    }}
                                         />
@@ -387,7 +407,8 @@ const VoucherDialog = (props) => {
                                             input={<OutlinedInput label="hour" id="demo-dialog-native-hour"/>}
                                             value={ReleasePeriodHour}
                                             onChange={(e) => {
-                                                setReleasePeriodHour(e.target.value)
+                                                console.log(e.target.value)
+                                                props.setAutoReleaseTimeRange(parseInt(ReleasePeriodDay) * 1440 + parseInt(e.target.value) * 60 + parseInt(ReleasePeriodMinute))
                                             }}
                                         >
                                             {Array.from(Array(24).keys()).map((i) => {
@@ -402,7 +423,7 @@ const VoucherDialog = (props) => {
                                             input={<OutlinedInput label="Minute" id="demo-dialog-native-Minute"/>}
                                             value={ReleasePeriodMinute}
                                             onChange={(e) => {
-                                                setReleasePeriodMinute(e.target.value)
+                                                props.setAutoReleaseTimeRange(((parseInt(ReleasePeriodDay) * 1440) + (parseInt(ReleasePeriodHour) * 60) + parseInt(e.target.value)))
                                             }}
                                         >
                                             {Array.from(Array(60).keys()).map((i) => {
@@ -415,7 +436,7 @@ const VoucherDialog = (props) => {
                             <DialogActions>
                                 <Button onClick={() => {
                                     setOpenAutoReleaseDialog(false)
-                                    props.setAutoReleaseTimeRange(ReleasePeriodDay * 24 * 60 + ReleasePeriodHour * 60 + ReleasePeriodMinute)
+                                    // props.setAutoReleaseTimeRange(ReleasePeriodDay * 24 * 60 + ReleasePeriodHour * 60 + ReleasePeriodMinute)
                                 }}>Ok</Button>
                             </DialogActions>
                         </Dialog>
@@ -444,13 +465,15 @@ const VoucherDialog = (props) => {
     );
 };
 
-const CreateVoucher = (props) => {
+function CreateVoucher(props) {
     const [selectedOption, setSelectedOption] = useState('Free');
     const [condition, setCondition] = useState(options[selectedOption].defV.condition);
     const [discount, setDiscount] = useState(options[selectedOption].defV.discount);
     const [expire, setExpire] = useState(dayjs(options[selectedOption].defV.expire));
     const [count, setCount] = useState(10);
+    const [description, setDescription] = useState('');
     const [isAutoRelease, setIsAutoRelease] = useState(false);
+    const [isShareable, setIsShareable] = useState(false);
     const [autoReleaseTimeRange, setAutoReleaseTimeRange] = useState(dayjs().add(1, 'hour'));
     const [autoReleaseCount, setAutoReleaseCount] = useState(10);
     const [autoReleaseStart, setAutoReleaseStart] = useState(dayjs());
@@ -491,6 +514,10 @@ const CreateVoucher = (props) => {
             handleExpireChange={handleExpireChange}
             handleSubmit={handleSubmit}
             count={count}
+            description={description}
+            setDescription={setDescription}
+            Shareable={isShareable}
+            setShareable={setIsShareable}
             setCount={setCount}
             isAutoRelease={isAutoRelease}
             autoReleaseTimeRange={autoReleaseTimeRange}
@@ -552,15 +579,13 @@ const CreateVoucher = (props) => {
 
 }
 
-const EditVoucher = (props) => {
+function EditVoucher(props){
 
     const handleSubmit = () => {
         // TODO
         // console.log(selectedOption);
     };
-    console.log(455)
-    // console.log(isAutoRelease);
-
+    console.log(props.defV);
     return (
         <VoucherDialog
             open={props.open}
@@ -572,6 +597,10 @@ const EditVoucher = (props) => {
             expire={dayjs(props.defV.expire)}
             handleExpireChange={(newValue) => {props.setDefV({...props.defV, expire: newValue})}}
             handleSubmit={handleSubmit}
+            Shareable={props.defV.shareable}
+            setShareable={(e) => {props.setDefV({...props.defV, shareable: e})}}
+            description={props.defV.description}
+            setDescription={(e) => {props.setDefV({...props.defV, description: e})}}
             count={props.defV.count}
             setCount={(e) => {props.setDefV({...props.defV, count: e})}}
             isAutoRelease={props.defV.autoRelease !== undefined}
@@ -596,13 +625,13 @@ const EditVoucher = (props) => {
             }}
             setAutoReleaseTimeRange={(e) => {
                 props.setDefV({
-                ...props.defV,
-                autoRelease: {
-                    range: e,
-                    count: props.defV.autoRelease.count,
-                    start: dayjs(props.defV.autoRelease.start),
-                    end: dayjs(props.defV.autoRelease.end),
-                }
+                    ...props.defV,
+                    autoRelease: {
+                        range: e,
+                        count: props.defV.autoRelease.count,
+                        start: dayjs(props.defV.autoRelease.start),
+                        end: dayjs(props.defV.autoRelease.end),
+                    }
                 })
             }}
             setAutoReleaseCount={(e) => {
@@ -657,9 +686,11 @@ const EditVoucher = (props) => {
 }
 
 function coverMinuteToHour(minute) {
+    console.log(minute);
     let day = Math.floor(minute / 1440);
     let hour = Math.floor((minute % 1440) / 60);
     let min = (minute % 1440) % 60;
+    console.log(day, hour, min);
     return { day: day, hour: hour, min: min };
 }
 

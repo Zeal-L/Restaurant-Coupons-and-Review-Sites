@@ -14,7 +14,8 @@ import CreateRestaurant from "./Pages/Manage/CreateRestaurant";
 import Listing from "./Pages/Listing";
 import Vouchsers from "./Pages/Vouchers";
 import Profile from "./Pages/Profile";
-import {Dialog} from "@mui/material";
+import {createTheme, Dialog, ThemeProvider} from "@mui/material";
+import * as PropTypes from "prop-types";
 function App() {
 
   const [popOpen, setPopOpen] = React.useState(initialValue.popOpen);
@@ -54,21 +55,32 @@ function App() {
     showNotification
   }
 
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: '#68463a',
+      },
+    }
+  });
+
   return (
-      <Context.Provider value={{ getter, setter }}>
-        <TopBar/>
-        <Routes>
-          <Route path="/" element={<Listing/>}/>
-          <Route path="login" element={<Login/>}/>
-          <Route path="register" element={<Register/>}/>
-          <Route path="tmp" element={<Tmp/>}/>
-          <Route path="/restaurant/:restaurantId" element={<Restaurant/>}/>
-          <Route path="manage/create" element={<CreateRestaurant/>}/>
-          <Route path="vouchers" element={<Vouchsers/>}/>
-          <Route path="profile" element={<Profile/>}/>
-        </Routes>
-        <Notification/>
-      </Context.Provider>
+      <ThemeProvider theme={theme}>
+        <Context.Provider value={{ getter, setter }}>
+            <TopBar/>
+
+              <Routes>
+                <Route path="/" element={<Listing/>}/>
+                <Route path="login" element={<Login/>}/>
+                <Route path="register" element={<Register/>}/>
+                <Route path="tmp" element={<Tmp/>}/>
+                <Route path="/restaurant/:restaurantId" element={<Restaurant/>}/>
+                <Route path="manage/create" element={<CreateRestaurant/>}/>
+                <Route path="vouchers" element={<Vouchsers/>}/>
+                <Route path="profile" element={<Profile/>}/>
+              </Routes>
+            <Notification/>
+        </Context.Provider>
+      </ThemeProvider>
   );
 }
 
