@@ -24,11 +24,9 @@ import {
     TextField,
     Typography
 } from '@mui/material';
-import Voucher_m from "../../Components/Voucher_m";
+import Voucher from "../../Components/Voucher";
 import CreateIcon from '@mui/icons-material/Create';
 import {TransitionUp} from "../../styles.js";
-// import { LocalizationProvider } from '@mui/x-date-pickers';
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import blueVoucher from '../../Resource/voucher/blue.png';
@@ -52,6 +50,7 @@ function VoucherRest() {
             discount: "10% OFF",
             expire: "2023-12-31",
             count: 109,
+            description: "this is the description of Percentage voucher.",
             autoRelease: {
                 range: 102,
                 count: 10,
@@ -61,11 +60,12 @@ function VoucherRest() {
         },
         {
             id: "2",
-            type: "Fixed Amount",
-            condition: "Fixed Amount",
-            discount: dayjs().add(1, 'year').format('YYYY-MM-DD'),
+            type: "CFree",
+            condition: "Spend $50 or more",
+            discount: "10% OFF",
             expire: "2023-12-31",
-            count: 20,
+            count: 10,
+            description: "this is the description of Percentage voucher.",
         },
         {
             id: "3",
@@ -74,6 +74,7 @@ function VoucherRest() {
             discount: "10% OFF",
             expire: "2023-12-31",
             count: 130,
+            description: "this is the description of Percentage voucher.",
             autoRelease: {
                 range: 102,
                 count: 10,
@@ -88,6 +89,7 @@ function VoucherRest() {
             discount: "10% OFF",
             expire: "2023-12-31",
             count: 10,
+            description: "this is the description of Percentage voucher.",
         }
 
     ];
@@ -120,7 +122,7 @@ function VoucherRest() {
                         <IconButton sx={{position: 'relative'}} id="iconButtonS">
                             <DeleteIcon color="white"/>
                         </IconButton>
-                        <Voucher_m
+                        <Voucher
                             type={item.type}
                             condition={item.condition}
                             discount={item.discount}
@@ -291,6 +293,9 @@ const VoucherDialog = (props) => {
                     // console.log(event.target.checked)
                     props.setIsAutoRelease(event.target.checked)
                 }}/>} label="Auto Release" sx={{marginLeft: 1}}/>
+                <FormControlLabel control={<Switch checked={props.isAutoRelease} onClick={(event) => {
+                    props.setIsAutoRelease(event.target.checked)
+                }}/>} label="is Shareable" sx={{marginLeft: 1}}/>
                 {props.isAutoRelease &&
                     <>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -548,29 +553,6 @@ const CreateVoucher = (props) => {
 }
 
 const EditVoucher = (props) => {
-    // const [condition, setCondition] = useState(props.defV.condition);
-    // const [discount, setDiscount] = useState(props.defV.discount);
-    // const [expire, setExpire] = useState(dayjs(props.defV.expire));
-    //
-    // const [count, setCount] = useState(props.defV.count);
-    // const isAutoReleaseP = props.defV.isAutoRelease;
-    // console.log(props.defV);
-    // const [isAutoRelease, setIsAutoRelease] = useState(isAutoReleaseP);
-    // const [autoReleaseTimeRange, setAutoReleaseTimeRange] = useState(isAutoReleaseP ? props.defV.autoRelease.range : 60);
-    // const [autoReleaseCount, setAutoReleaseCount] = useState(isAutoReleaseP ? props.defV.autoRelease.count : 10);
-    // const [autoReleaseStart, setAutoReleaseStart] = useState(isAutoReleaseP ? dayjs(props.defV.autoRelease.start) : dayjs());
-    // const [autoReleaseEnd, setAutoReleaseEnd] = useState(isAutoReleaseP ? dayjs(props.defV.autoRelease.end) : dayjs(props.defV.expire));
-    // const handleConditionChange = (event) => {
-    //     props.setDefV({...props.defV, condition: event.target.value});
-    // };
-    //
-    // const handleDiscountChange = (event) => {
-    //     props.setDefV({...props.defV, discount: event.target.value});
-    // };
-    //
-    // const handleExpireChange = (newValue) => {
-    //     props.setDefV({...props.defV, expire: newValue});
-    // }
 
     const handleSubmit = () => {
         // TODO
@@ -662,7 +644,7 @@ const EditVoucher = (props) => {
             }
         >
             <Grid item key={props.defV.id}>
-                <Voucher_m
+                <Voucher
                     type={props.defV.type}
                     condition={props.defV.condition}
                     discount={props.defV.discount}
