@@ -134,6 +134,7 @@ function VoucherRest() {
                             discount={item.discount}
                             expire={item.expire}
                             disabled={item.isClaimed}
+                            isRestaurant={true}
                         />
                     </Grid>
                 ))}

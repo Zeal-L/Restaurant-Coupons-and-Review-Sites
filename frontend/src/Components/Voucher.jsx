@@ -67,7 +67,7 @@ function Voucher(props) {
                     </Typography>
                 </Grid>
             </Grid>
-            {(props.pop === true || props.pop === undefined || props.disabled === true) && <VoucherInfoPop open={popOpen} setOpen={setPopOpen}/>}
+            {(props.pop === true || props.pop === undefined || props.disabled === true) && <VoucherInfoPop open={popOpen} setOpen={setPopOpen} id={props.id} isRestaurant={props.isRestaurant} />}
         </div>
     );
 }

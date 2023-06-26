@@ -10,6 +10,8 @@ function VoucherInfoPop(props) {
     const { getter, setter } = useContext(Context);
     const navigate = useNavigate();
     const [isGet, setIsGet] = React.useState(true);
+    const isRestaurant = props.isRestaurant;
+    console.log(isRestaurant);
     const info = {
         id: "1",
         type: "Percentage",
