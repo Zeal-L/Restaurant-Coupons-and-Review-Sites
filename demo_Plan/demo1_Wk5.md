@@ -1,6 +1,5 @@
 - Coulor Change:
-According to tutors' recommendation on UI design in wk4, the main theme are adpated from the
-logo. Where deep brown is uesed as the main theme, lighter colour is used as corresponding
+According to tutors' recommendation on UI design in wk4, the main theme are adpated from the logo. Where deep brown is uesed as the main theme, lighter colour is used as corresponding
 design.
 
 - Emais in Registeration:
