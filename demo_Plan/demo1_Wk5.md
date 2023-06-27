@@ -1,9 +1,9 @@
 - Coulor Change:
-According to tutors' recommendation on UI design in wk4, the main theme are adpated from the logo. Where deep brown is uesed as the main theme, lighter colour is used as corresponding
-design.
+According to tutors' recommendation on UI design in wk4, the main theme are adpated from the
+logo. Where deep brown is uesed as the main theme, lighter colour is used as corresponding design.
 
 - Emais in Registeration:
-The website now allows uers to register. Email's format is checked, that is, must contains 
+The website now allows uers to register. Email's format is checked, that is, must contains
 "@" and ".com". Users that fail to provide email address in the correct formats will fail
 to proceede to the next page.
 
