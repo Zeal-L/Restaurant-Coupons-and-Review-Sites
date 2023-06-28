@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 function VoucherInfoPop(props) {
     const { getter, setter } = useContext(Context);
     const navigate = useNavigate();
-    const [isGet, setIsGet] = React.useState(true);
+    const [isGet, setIsGet] = React.useState(false);
     const isRestaurant = props.isRestaurant;
     console.log(isRestaurant);
     const info = {
@@ -95,7 +95,9 @@ function VoucherInfoPop(props) {
                     </Grid>
                     :
                     <Grid item xs={12}>
-                        <Button variant="contained" color="primary" fullWidth>
+                        <Button variant="contained" color="primary" onClick={() => {
+                            navigate('/user/voucher/' + info.id);
+                        }} fullWidth>
                             Use this voucher
                         </Button>
                     </Grid>
