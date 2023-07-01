@@ -9,7 +9,6 @@ import dayjs from 'dayjs';
 function VoucherInfoPop(props) {
     const { getter, setter } = useContext(Context);
     const navigate = useNavigate();
-    const [isGet, setIsGet] = React.useState(false);
     const isRestaurant = props.isRestaurant;
     console.log(isRestaurant);
     const info = {
@@ -54,7 +53,7 @@ function VoucherInfoPop(props) {
                         pop={false}
                     />
                 </Grid>
-                {isGet &&
+                {isRestaurant &&
                     <Grid item>
                         <Chip label={`Total ${info.total} vouchers, ${info.count} left.`} />
                     </Grid>
@@ -87,20 +86,29 @@ function VoucherInfoPop(props) {
                     </Typography>
                 </Grid>
 
-                {isGet ?
+                {isRestaurant ?
                     <Grid item xs={12}>
                         <Button variant="contained" color="primary" fullWidth>
                             Get this voucher
                         </Button>
                     </Grid>
                     :
-                    <Grid item xs={12}>
-                        <Button variant="contained" color="primary" onClick={() => {
-                            navigate('/user/voucher/' + info.id);
-                        }} fullWidth>
-                            Use this voucher
-                        </Button>
-                    </Grid>
+                    <>
+                        <Grid item xs={12}>
+                            <Button variant="contained" color="primary" onClick={() => {
+                                navigate('/user/voucher/' + info.id);
+                            }} fullWidth>
+                                Use this voucher
+                            </Button>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button variant="contained" color="primary" onClick={() => {
+                                navigate('/user/voucher/' + info.id);
+                            }} fullWidth>
+                                Transfer this voucher
+                            </Button>
+                        </Grid>
+                    </>
                 }
                 <Grid item xs={12}>
                     <Button variant="text" color="primary" fullWidth>
