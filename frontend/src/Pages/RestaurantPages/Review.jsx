@@ -178,7 +178,7 @@ const Comment = ({ user, rating, timestamp, content, likes, dislikes, reviews })
                                     marginTop: 1,
                                 }}
                             >
-                                <Avatar src={'https://example.com/avatar2.jpg'} alt={isAnonymous ? 'Anonymous' : 'Jane Smith'} />
+                                <Avatar src={'https://example.com/avatar2.jpg'} alt={isAnonymous ? 'Anonymous' : 'Jane Smith'} /*Anonymous Setting*/ />
                                 <Box marginLeft={2} flexGrow={1}>
                                     <Typography variant="subtitle2">{isAnonymous ? 'Anonymous' : 'Jane Smith'}</Typography>
                                     <Box display="flex" alignItems="center">
@@ -236,7 +236,7 @@ const Review = () => {
                     content={comment.content}
                     likes={comment.likes}
                     dislikes={comment.dislikes}
-                    reviews={comment.reviews} // 添加reviews属性
+                    reviews={comment.reviews} /*Adding Commpents' properties*/
                 />
             ))}
 
