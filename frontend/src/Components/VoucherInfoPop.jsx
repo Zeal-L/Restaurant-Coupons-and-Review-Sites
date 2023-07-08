@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { TransitionUp } from "../styles";
 import {Dialog, DialogTitle, Grid, Link, Typography, Chip, Box, colors, Button} from "@mui/material";
 import Voucher from "./Voucher";
+import TransforPop from './TransferPop.jsx';
 import dayjs from 'dayjs';
 
 function VoucherInfoPop(props) {
     const { getter, setter } = useContext(Context);
+    const [transferOpen, setTransferOpen] = React.useState(false);
     const navigate = useNavigate();
     const isRestaurant = props.isRestaurant;
     console.log(isRestaurant);
@@ -103,7 +105,8 @@ function VoucherInfoPop(props) {
                         </Grid>
                         <Grid item xs={12}>
                             <Button variant="contained" color="primary" onClick={() => {
-                                navigate('/user/voucher/' + info.id);
+                                setTransferOpen(true);
+                                console.log(transferOpen)
                             }} fullWidth>
                                 Transfer this voucher
                             </Button>
@@ -116,6 +119,7 @@ function VoucherInfoPop(props) {
                     </Button>
                 </Grid>
             </Grid>
+            {transferOpen === true && <TransforPop open={transferOpen} setOpen={setTransferOpen} id={props.id} />}
         </Dialog>
     );
 }
