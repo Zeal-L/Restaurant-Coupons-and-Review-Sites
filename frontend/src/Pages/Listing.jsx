@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import {
     Card,
@@ -6,13 +6,20 @@ import {
     Box,
     Tooltip,
     CardMedia,
-    Container,
+    Autocomplete,
     Rating,
+    TextField,
+    RadioGroup,
+    FormControlLabel,
+    Radio,
+    FormControl,
+    MenuIcon,
+    InputBase
 } from "@mui/material";
-import { FavoriteBorderRounded, PinDrop, Favorite, Restaurant } from '@mui/icons-material';
+import { styled, alpha } from '@mui/material/styles';
+import { FavoriteBorderRounded, PinDrop, Favorite, Restaurant, Search as SearchIcon  } from '@mui/icons-material';
 import { pink } from '@mui/material/colors';
 import Voucher from '../Components/Voucher.jsx';
-import noPicture from '../Resource/image/no-upload-picture.png'
 import restaurant1 from '../Resource/image/restaurant1.png';
 import restaurant2 from '../Resource/image/restaurant2.png';
 import restaurant3 from '../Resource/image/restaurant3.png';
@@ -26,16 +33,16 @@ import './index.css';
 const defaultRestaurantsList = [
     {
         id: 1,
-        name: 'test1', // name
-        rate: '4', // rate
-        evaluationsNum: 153, // number of review
-        address: 'testAddress1111111111111111111111111111111111111111', // address
-        image: restaurant1, // image
-        favourite: false, // collect
+        name: '测试餐厅1', // 餐厅名称
+        rate: '4', // 评分
+        evaluationsNum: 153, // 评价数量
+        address: 'testAddress1111111111111111111111111111111111111111', // 地址
+        image: restaurant1, // 图片
+        favourite: false, // 是否收藏，针对于当前用户
     },
     {
         id: 2,
-        name: 'test2', 
+        name: '测试餐厅2', 
         rate: '5',
         evaluationsNum: 34,
         address: 'address2222222222222222222222222',
@@ -44,8 +51,8 @@ const defaultRestaurantsList = [
     },
     {
         id: 3,
-        name: 'test3',
-        rate: '5',
+        name: '测试餐厅3',
+        rate: '3',
         evaluationsNum: 1123,
         address: 'Sydney',
         image: restaurant3,
@@ -69,7 +76,7 @@ const defaultRestaurantsList = [
     },
     {
         id: 4,
-        name: 'test4',
+        name: '测试餐厅4',
         rate: '3',
         evaluationsNum: 179,
         address: 'address444...',
@@ -78,7 +85,7 @@ const defaultRestaurantsList = [
     },
     {
         id: 5,
-        name: 'test5',
+        name: '测试餐厅5',
         rate: '5',
         evaluationsNum: 8,
         address: 'address......',
@@ -87,15 +94,16 @@ const defaultRestaurantsList = [
     },
     {
         id: 6,
-        name: 'test6',
+        name: '测试餐厅6',
         rate: '3',
         evaluationsNum: 99,
         address: 'address......',
+        image: restaurant6,
         favourite: false
     },
     {
         id: 7,
-        name: 'test7',
+        name: '测试餐厅7',
         rate: '1',
         evaluationsNum: 1,
         address: 'address......',
@@ -104,10 +112,93 @@ const defaultRestaurantsList = [
     }
 ]
 
+const Search = styled('div')(({ theme }) => ({
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(1),
+      width: 'auto',
+    },
+  }));
+  
+  const SearchIconWrapper = styled('div')(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }));
+  
+  const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: 'inherit',
+    '& .MuiInputBase-input': {
+      padding: theme.spacing(1, 1, 1, 0),
+      // vertical padding + font size from searchIcon
+      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+      transition: theme.transitions.create('width'),
+      width: '100%',
+      [theme.breakpoints.up('sm')]: {
+        width: '12ch',
+        '&:focus': {
+          width: '20ch',
+        },
+      }
+    },
+  }));
+
 function Listing() {
     const [restaurantsList, setRestaurantsList] = useState(defaultRestaurantsList)
+    const [maxWidth, setMaxWidth] = useState(1051)
+    const [width, setWidth] = useState()
 
-    // collect/uncollect
+    const [sortValue, setSortValue] = React.useState('default');
+
+    const handleSort = (event, data) => {
+        setSortValue(data)
+        if (data === 'default') return setRestaurantsList([...defaultRestaurantsList])
+        const newRestaurantsList = [...restaurantsList].sort((a, b) => {
+            if (data === 'rate') {
+                return parseFloat(b.rate) - parseFloat(a.rate)
+            } else if (data === 'count') {
+                return b.evaluationsNum - a.evaluationsNum
+            }
+        })
+        setRestaurantsList(newRestaurantsList)
+    };
+
+    const resizeWidth = (e) => {
+        const w = e.target.innerWidth
+        setWidth(w)
+    }
+
+    useEffect(() => {
+        const w = window.innerWidth
+        setWidth(w)
+        window.addEventListener("resize", resizeWidth)
+        return () => {
+          window.removeEventListener("resize", resizeWidth)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (width >= 1051) {
+            setMaxWidth(1051)
+        } else if (width < 1051 && width >=716) {
+            setMaxWidth(716)
+        } else {
+            setMaxWidth(360)
+        }
+    }, [width])
+
+    // collect or delete
     const collect = ({id, favourite}) => {
         const newList = [...restaurantsList].map(item => {
             if (item.id === id) return {
@@ -124,25 +215,84 @@ function Listing() {
         console.log('id:', id)
     }
 
+    const debounceFilter = (func, wait) => {
+        let timeout;
+        return function () {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            func(arguments);
+          }, wait);
+        };
+      };
+
+    // filter
+    const handleChange = debounceFilter((data) => {
+        if (data[0]) {
+            const newRestaurantsList = [...defaultRestaurantsList].filter((i) => i.name.includes(data[0])).filter(i => i)
+            setRestaurantsList(newRestaurantsList)
+        } else {
+            setRestaurantsList([...defaultRestaurantsList])
+        }
+    }, 800)
+
+    const sortBoxStyle = {
+        background: '#fff',
+        margin: '7px 10px -5px 10px',
+        borderRadius: '10px',
+        paddingLeft: '10px'
+    }
+
     return (
-        <>
-            {/* <div style={{ height: '64px' }}></div>
-            <a>展示所有的餐厅，图片，地址，评分，评论数，还有优惠卷，还有一个收藏按钮，点击收藏</a>
-            <></> */}
-            <Container maxWidth="md" sx={{background: 'rgb(255, 243, 209)'}}>
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <div style={{background: 'rgb(255, 243, 209)', width: `${maxWidth}px`}}>
                 <Box sx={styles.sameColor} style={{ height: 'calc(100vh - 64px)', marginTop: '64px', overflow: 'auto' }} >
                     <div style={{ height: 'calc(100% - 5px)', width: '100%', paddingTop: '5px' }}>
-                        <div className='list-nav'>
-                            <div className='list-nav-icon'>
-                                <Restaurant sx={{color: '#ff8400'}} />
+                        <div className='list-nav' style={{ margin: '0 10px', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <div className='list-nav-icon'>
+                                    <Restaurant sx={{color: '#ff8400'}} />
+                                </div>
+                                <h2>美食</h2>
                             </div>
-                            <h2>美食</h2>
+                            {/* <Autocomplete
+                                id="combo-box-demo"
+                                options={defaultRestaurantsList.map(i => ({ label: i.name, value: i.id }))}
+                                sx={{ width: 300 }}
+                                renderInput={(params) => <TextField {...params} label="Search for restaurants" />}
+                                onChange={handleChange}
+                            /> */}
+                            <Search>
+                                <SearchIconWrapper>
+                                <SearchIcon />
+                                </SearchIconWrapper>
+                                <StyledInputBase
+                                    placeholder="Search…"
+                                    inputProps={{ 'aria-label': 'search' }}
+                                    onChange={(e) => handleChange(e.target.value) }
+                                />
+                            </Search>
                         </div>
+                        <div style={sortBoxStyle}>
+                        <FormControl>
+                            <RadioGroup
+                                row
+                                aria-labelledby="demo-row-radio-buttons-group-label"
+                                name="row-radio-buttons-group"
+                                value={sortValue}
+                                onChange={handleSort}
+                            >
+                                <FormControlLabel value="default" control={<Radio />} label="Default sorting" />
+                                <FormControlLabel value="rate" control={<Radio />} label="High rating" />
+                                <FormControlLabel value="count" control={<Radio />} label="High comment count" />
+                            </RadioGroup>
+                            </FormControl>
+                        </div>
+                        <div>
                         {
                             restaurantsList.map((item) => (
-                            <Card sx={{ width: '100%', display: 'inline-block', boxShadow: 'none' }}>
+                            <Card sx={{ width: '320px', height: '388px', display: 'inline-block', boxShadow: 'none', margin: '10px' }}>
                                 <Grid container>
-                                    <Grid item xs={4} sx={{ height: 200, padding: '10px' }}>
+                                    <Grid item xs={12} sx={{ height: 200, padding: '10px' }}>
                                         <CardMedia
                                             component="img"
                                             image={item.image}
@@ -150,8 +300,8 @@ function Listing() {
                                             sx={{ cursor: 'pointer', maxHeight: '100%', maxWidth: '100%' }}
                                         />
                                     </Grid>
-                                    <Grid item xs={8} className='restaurant-introduction'>
-                                        <div style={{display: 'flex', alignItems: 'center'}}>
+                                    <Grid item xs={12} className='restaurant-introduction'>
+                                        <div style={{display: 'flex', alignItems: 'end'}}>
                                             <div
                                                 style={{ overflow: 'hidden', textOverflow: 'ellipsis', cursor: 'pointer', fontSize: 'x-large' }}
                                                 onClick={() => restaurantDetail(item.id)}
@@ -162,11 +312,11 @@ function Listing() {
                                                 item.favourite ?
                                                 <Favorite
                                                     onClick={() => collect(item)}
-                                                    sx={{ width: '0.9rem', marginLeft: '10px', color: pink[500], cursor: 'pointer' }}
+                                                    sx={{ width: '1.2em', height: '1.2em', marginLeft: '10px', color: pink[500], cursor: 'pointer' }}
                                                 /> :
                                                 <FavoriteBorderRounded
                                                     onClick={() => collect(item)}
-                                                    sx={{ width: '0.9rem', marginLeft: '10px', cursor: 'pointer' }}
+                                                    sx={{ width: '1.2em', height: '1.2em', marginLeft: '10px', cursor: 'pointer' }}
                                                 />
                                             }
                                         </div>
@@ -204,10 +354,11 @@ function Listing() {
                             </Card>
                             ))
                         }
+                        </div>
                     </div>
                 </Box>
-            </Container>
-        </>
+            </div>
+        </div>
     )
 }
 
