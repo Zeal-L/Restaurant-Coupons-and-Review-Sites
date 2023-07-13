@@ -1,0 +1,60 @@
+from flask import Flask
+from flask_restx import Api, Resource
+from flask_jwt_extended import JWTManager
+from . import users
+from app.models import UserORM
+
+############################################################
+
+jwt = JWTManager()
+
+
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header: dict, jwt_data: dict) -> UserORM or None:
+    """Callback function for JWTManager to get user from token
+
+    Args:
+        _jwt_header (dict): JWT header
+        jwt_data (dict): JWT data
+
+    Returns:
+        UserORM: User object if user exists, None otherwise
+    """
+
+    identity = jwt_data["sub"]
+    return UserORM.query.filter_by(email=identity).one_or_none()
+
+
+############################################################
+
+api = Api(
+    title="API Doc",
+    version="1.0",
+    description="3900Project API Doc",
+)
+
+
+def init_app(app: Flask) -> None:
+    jwt.init_app(app)
+
+    api.add_namespace(users.api)
+    api.init_app(app)
+
+
+############################################################
+
+
+@api.route("/database/size")
+@api.response(200, "Success")
+class DatabaseSize(Resource):
+    @api.doc("get_database_size")
+    def get(self) -> tuple[dict, int]:
+        """Get database size
+
+        Returns:
+            dict: Database size
+        """
+
+        from app.models import get_database_size
+
+        return {"message": f"The size of the database is {get_database_size()}"}, 200
