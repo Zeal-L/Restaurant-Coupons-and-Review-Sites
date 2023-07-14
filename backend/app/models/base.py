@@ -168,6 +168,34 @@ class Database:
         self.cur.close()
         self.conn.close()
 
+    # def __fake_users(self):
+#     fake = Faker()
+#     fake.add_provider(FoodProvider)
+
+#     # Open the CSV file for writing
+#     with open("backend/users.csv", "w", newline="", encoding="utf-8") as csvfile:
+#         # Create a CSV writer object
+#         writer = csv.writer(csvfile)
+
+#         # Write the header row
+#         writer.writerow(["Name", "Email", "Password"])
+#         print("Generating fake users...")
+#         for _ in tqdm(range(100)):
+#             name = fake.name()
+#             gender = random.choice(["male", "female", "other"])
+#             photo = people_url = requests.get(
+#                 "https://loremflickr.com/500/500/people", allow_redirects=True
+#             ).url
+#             email = fake.email()
+#             password = fake.password()
+#             password_hash = generate_password_hash(password)
+
+#             self.execute_alter(
+#                 f"INSERT INTO Users (name, gender, photo, email, password_hash) VALUES ('{name}', '{gender}', '{photo}', '{email}', '{password_hash}');"
+#             )
+
+#             # Write the data rows
+#             writer.writerow([name, email, password])
 
 
 

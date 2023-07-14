@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restx import Api, Resource
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, decode_token
 from . import users
 from app.models import UserORM
 
@@ -10,7 +10,7 @@ jwt = JWTManager()
 
 
 @jwt.user_lookup_loader
-def user_lookup_callback(_jwt_header: dict, jwt_data: dict) -> UserORM or None:
+def user_lookup_callback(_jwt_header: dict, jwt_payload: dict) -> UserORM or None:
     """Callback function for JWTManager to get user from token
 
     Args:
@@ -21,8 +21,29 @@ def user_lookup_callback(_jwt_header: dict, jwt_data: dict) -> UserORM or None:
         UserORM: User object if user exists, None otherwise
     """
 
-    identity = jwt_data["sub"]
+    identity = jwt_payload["sub"]
     return UserORM.query.filter_by(email=identity).one_or_none()
+
+
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blocklist(_jwt_header: dict, jwt_payload: dict) -> bool:
+    """
+    Callback function for JWTManager to check if token is in blocklist.
+    Determine if you are blacklisted by matching the expiration time to the user token.
+    Args:
+        _jwt_header (dict): JWT header
+        jwt_payload (dict): JWT data
+
+    Returns:
+        bool: True if token is in blocklist, False otherwise
+    """
+
+    identity = jwt_payload["sub"]
+    user = UserORM.query.filter_by(email=identity).one_or_none()
+    if user is None:
+        return True
+
+    return jwt_payload["exp"] != decode_token(user.token)["exp"]
 
 
 ############################################################

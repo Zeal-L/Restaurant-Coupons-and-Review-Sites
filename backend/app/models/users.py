@@ -15,12 +15,17 @@ class UserORM(db.Model):
     email: Column = Column(Text, nullable=False)
     email_reset_code = Column(Text)
     password_hash: Column = Column(Text, nullable=False)
+    password_reset_code = Column(Text)
     photo: Column = Column(Text)
     token: Column = Column(Text)
     saved_restaurants: Column = Column(ARRAY(Integer))
 
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
+
+    def set_password(self, new_password: str) -> None:
+        self.password_hash = generate_password_hash(new_password)
+        db.session.commit()
 
     def refresh_token(self) -> str:
         self.token = create_access_token(identity=self.email)
@@ -29,6 +34,10 @@ class UserORM(db.Model):
 
     def delete(self) -> None:
         db.session.delete(self)
+        db.session.commit()
+
+    def set_name(self, name: str) -> None:
+        self.name = name
         db.session.commit()
 
     def set_gender(self, gender: str) -> None:
@@ -43,10 +52,13 @@ class UserORM(db.Model):
         self.email_reset_code = code
         db.session.commit()
 
+    def set_password_reset_code(self, code: str) -> None:
+        self.password_reset_code = code
+        db.session.commit()
+
     def set_photo(self, photo: str) -> None:
         self.photo = photo
         db.session.commit()
-
 
     ############################################################
 
