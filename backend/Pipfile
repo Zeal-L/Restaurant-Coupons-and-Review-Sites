@@ -21,6 +21,8 @@ faker = "*"
 ipykernel = "*"
 faker-food = "*"
 tqdm = "*"
+pytest = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.11"

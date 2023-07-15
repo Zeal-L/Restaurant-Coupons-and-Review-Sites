@@ -1,12 +1,11 @@
-import json
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import create_access_token
 from sqlalchemy import ARRAY, Column, Integer, Text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from . import db
 
 
-class UserORM(db.Model):
+class Users(db.Model):
     __tablename__: str = "Users"
 
     user_id: Column = Column(Integer, primary_key=True)
@@ -19,6 +18,8 @@ class UserORM(db.Model):
     photo: Column = Column(Text)
     token: Column = Column(Text)
     saved_restaurants: Column = Column(ARRAY(Integer))
+
+    ############################################################
 
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
@@ -63,8 +64,8 @@ class UserORM(db.Model):
     ############################################################
 
     @staticmethod
-    def create_user(name: str, gender: str, email: str, password: str) -> "UserORM":
-        new_user = UserORM(
+    def create_user(name: str, gender: str, email: str, password: str) -> "Users":
+        new_user = Users(
             name=name,
             gender=gender,
             email=email,
@@ -76,9 +77,3 @@ class UserORM(db.Model):
         db.session.add(new_user)
         db.session.commit()
         return new_user
-
-    @staticmethod
-    def delete_user_by_email(email: str) -> None:
-        user = UserORM.query.filter_by(email=email).first()
-        db.session.delete(user)
-        db.session.commit()

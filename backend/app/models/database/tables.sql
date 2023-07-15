@@ -3,7 +3,9 @@ create table Users (
     name Text not null,
     gender Text not null,
     email Text not null,
+    email_reset_code Text,
     password_hash Text not null,
+    password_reset_code Text,
     photo Text,
     token Text,
     saved_restaurants Integer []

@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restx import Api, Resource
 from flask_jwt_extended import JWTManager, decode_token
 from . import users
-from app.models import UserORM
+from app.models import Users
 
 ############################################################
 
@@ -10,7 +10,7 @@ jwt = JWTManager()
 
 
 @jwt.user_lookup_loader
-def user_lookup_callback(_jwt_header: dict, jwt_payload: dict) -> UserORM or None:
+def user_lookup_callback(_jwt_header: dict, jwt_payload: dict) -> Users or None:
     """Callback function for JWTManager to get user from token
 
     Args:
@@ -22,7 +22,7 @@ def user_lookup_callback(_jwt_header: dict, jwt_payload: dict) -> UserORM or Non
     """
 
     identity = jwt_payload["sub"]
-    return UserORM.query.filter_by(email=identity).one_or_none()
+    return Users.query.filter_by(email=identity).one_or_none()
 
 
 @jwt.token_in_blocklist_loader
@@ -39,7 +39,7 @@ def check_if_token_in_blocklist(_jwt_header: dict, jwt_payload: dict) -> bool:
     """
 
     identity = jwt_payload["sub"]
-    user = UserORM.query.filter_by(email=identity).one_or_none()
+    user = Users.query.filter_by(email=identity).one_or_none()
     if user is None:
         return True
 

@@ -1,4 +1,4 @@
-from app.models import UserORM
+from app.models import Users
 from app.services.users import (
     check_email_exists_v1,
     check_email_format_v1,
@@ -216,7 +216,7 @@ class GetById(Resource):
             user: The user information.
         """
 
-        if user := UserORM.query.filter_by(user_id=user_id).first():
+        if user := Users.query.filter_by(user_id=user_id).first():
             return user, 200
         else:
             return {"message": "User not found"}, 404
@@ -240,7 +240,7 @@ class GetByEmail(Resource):
             user: The user information.
         """
 
-        if user := UserORM.query.filter_by(email=email).first():
+        if user := Users.query.filter_by(email=email).first():
             return user, 200
         else:
             return {"message": "User not found"}, 404
@@ -262,7 +262,7 @@ class UserList(Resource):
             users: A list of users.
         """
 
-        if users := UserORM.query.all():
+        if users := Users.query.all():
             return {"Users": users}, 200
         else:
             return {"message": "Internal Server Error"}, 500
@@ -280,7 +280,6 @@ class UserList(Resource):
     _in="header",
 )
 @api.response(200, "Success")
-@api.response(400, "Invalid email format or email not been registered")
 @api.response(401, "Unauthorized, invalid JWT token")
 class DeleteUser(Resource):
     @api.doc("delete_user")
@@ -292,12 +291,7 @@ class DeleteUser(Resource):
         Returns:
             message: A message indicating whether the deletion was successful.
         """
-        user: UserORM = current_user
-
-        if not check_email_format_v1(user.email) or not check_email_exists_v1(
-            user.email
-        ):
-            return {"message": "Invalid email format or email not been registered"}, 400
+        user: Users = current_user
 
         user.delete()
 
@@ -328,7 +322,7 @@ class ResetName(Resource):
         Returns:
             message: A message indicating whether the reset was successful.
         """
-        user: UserORM = current_user
+        user: Users = current_user
         user.set_name(new_name)
 
         return {"message": "Name reset successfully"}, 200
@@ -358,7 +352,7 @@ class ResetGender(Resource):
         Returns:
             message: A message indicating whether the reset was successful.
         """
-        user: UserORM = current_user
+        user: Users = current_user
         user.set_gender(new_gender)
 
         return {"message": "Gender reset successfully"}, 200
@@ -394,7 +388,7 @@ class ResetPhoto(Resource):
         if not check_photo_format_v1(new_photo):
             return {"message": "Invalid photo format, must be base64"}, 400
 
-        user: UserORM = current_user
+        user: Users = current_user
         user.set_photo(new_photo)
 
         return {"message": "Photo reset successfully"}, 200
@@ -430,7 +424,7 @@ class SendEmailResetCode(Resource):
             A tuple containing a dictionary with a message indicating whether the reset was successful and an integer status code.
         """
 
-        user: UserORM = current_user
+        user: Users = current_user
 
         res = send_email_reset_code_v1(user, new_email)
 
@@ -476,7 +470,7 @@ class VerifyEmailResetCode(Resource):
             A tuple containing a dictionary with a message indicating whether the email reset was successful and a new JWT token if applicable, and an integer status code.
         """
 
-        user: UserORM = current_user
+        user: Users = current_user
 
         res = verify_and_reset_email_v1(user, reset_code)
 
@@ -521,7 +515,7 @@ class ResetPassword(Resource):
         """
 
         info = api.payload
-        user: UserORM = current_user
+        user: Users = current_user
 
         res = reset_password_v1(user, info["old_password"], info["new_password"])
 
