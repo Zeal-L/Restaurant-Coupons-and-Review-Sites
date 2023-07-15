@@ -12,7 +12,7 @@ import Tmp from "./Pages/tmp";
 import Restaurant from "./Pages/Restaurant";
 import CreateRestaurant from "./Pages/Manage/CreateRestaurant";
 import Listing from "./Pages/Listing";
-import Vouchsers from "./Pages/Vouchers";
+import VoucherUse from "./Pages/Use";
 import Profile from "./Pages/Profile";
 import {createTheme, Dialog, ThemeProvider} from "@mui/material";
 import * as PropTypes from "prop-types";
@@ -75,7 +75,7 @@ function App() {
                 <Route path="tmp" element={<Tmp/>}/>
                 <Route path="/restaurant/:restaurantId" element={<Restaurant/>}/>
                 <Route path="manage/create" element={<CreateRestaurant/>}/>
-                <Route path="vouchers" element={<Vouchsers/>}/>
+                <Route path="/user/voucher/:voucherId" element={<VoucherUse/>}/>
                 <Route path="profile" element={<Profile/>}/>
               </Routes>
             <Notification/>

@@ -1,12 +1,11 @@
 import {Avatar, Button, Card, CardContent} from "@mui/material";
 import {styles } from '../styles.js';
 import ProfileEditPop from '../Components/ProfileEditPop.jsx';
-import ChangePasswordPop  from "../Components/ChangePasswordPop";
 import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from 'react';
 import {styled, alpha } from '@mui/material/styles';
-import {Search as SearchIcon} from '@mui/icons-material';
-import Divider from '@mui/material/Divider';
+import {Search as SearchIcon  } from '@mui/icons-material';
+
 import {
     Box,
     FormControl,
@@ -26,118 +25,71 @@ import dayjs from 'dayjs';
 import BadgeIcon from '@mui/icons-material/Badge';
 import EmailIcon from '@mui/icons-material/Email';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
-
-const voucherItems = [
-    {
-        id: "1",
-        type: "Percentage",
-        condition: "Percentage",
-        discount: "10% OFF",
-        expire: "2023-12-31",
-        count: 109,
-        description: "this is the description of Percentage voucher.",
-        isClaimed: false,
-        autoRelease: {
-            range: 102,
-            count: 10,
-            start: dayjs().format('YYYY-MM-DD'),
-            end: dayjs().add(1, 'year').format('YYYY-MM-DD')
+function VoucherUse() {
+    const [editPopOpen, setEditPopopen] = React.useState(false);
+    const { voucherId } = useParams();
+    //const [voucherList, setVoucherList] = React.useState([]);
+    const [days, setDays] = useState(0);
+    const [hours, setHours] = useState(0);
+    const [minutes, setMinutes] = useState(0);
+    const [seconds, setSeconds] = useState(0);
+  
+    const deadline = "December, 31, 2023";
+  
+    const getTime = () => {
+      const time = Date.parse(deadline) - Date.now();
+  
+      setDays(Math.floor(time / (1000 * 60 * 60 * 24)));
+      setHours(Math.floor((time / (1000 * 60 * 60)) % 24));
+      setMinutes(Math.floor((time / 1000 / 60) % 60));
+      setSeconds(Math.floor((time / 1000) % 60));
+    };
+  
+    useEffect(() => {
+      const interval = setInterval(() => getTime(deadline), 1000);
+      return () => clearInterval(interval);
+    }, []);
+    const Search = styled('div')(({ theme }) => ({
+        position: 'relative',
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: alpha(theme.palette.common.white, 0.15),
+        '&:hover': {
+          backgroundColor: alpha(theme.palette.common.white, 0.25),
         },
-        Restaurants:"Restaurant1"
-    },
-    {
-        id: "2",
-        type: "CFree",
-        condition: "Spend $50 or more",
-        discount: "10% OFF",
-        expire: "2023-12-31",
-        count: 10,
-        description: "this is the description of Percentage voucher.",
-        isClaimed: true,
-        Restaurants:"Restaurant1"
-    },
-    {
-        id: "3",
-        type: "Free",
-        condition: "Spend $50 or more",
-        discount: "10% OFF",
-        expire: "2023-12-31",
-        count: 130,
-        description: "this is the description of Percentage voucher.",
-        isClaimed: false,
-        autoRelease: {
-            range: 102,
-            count: 10,
-            start: dayjs().format('YYYY-MM-DD'),
-            end: dayjs().add(1, 'year').format('YYYY-MM-DD')
+        marginLeft: 0,
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+          marginLeft: theme.spacing(1),
+          width: 'auto',
         },
-        Restaurants:"Restaurant2"
-    },
-    {
-        id: "4",
-        type: "CFree",
-        condition: "Spend $60 or more",
-        discount: "10% OFF",
-        expire: "2023-12-31",
-        count: 10,
-        description: "this is the description of Percentage voucher.",
-        isClaimed: false,
-        Restaurants:"Restaurant2"
-    }
-
-];
-
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: 'auto',
+      }));
+      const SearchIconWrapper = styled('div')(({ theme }) => ({
+        padding: theme.spacing(0, 2),
+        height: '100%',
+        position: 'absolute',
+        pointerEvents: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }));
+    const StyledInputBase = styled(InputBase)(({ theme }) => ({
+        color: 'inherit',
+        '& .MuiInputBase-input': {
+      padding: theme.spacing(1, 1, 1, 0),
+      // vertical padding + font size from searchIcon
+      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+      transition: theme.transitions.create('width'),
+      width: '100%',
+      [theme.breakpoints.up('sm')]: {
+        width: '12ch',
+        '&:focus': {
+          width: '20ch',
+        },
+      }
     },
   }));
-  
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-color: 'inherit',
-'& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-    width: '12ch',
-    '&:focus': {
-        width: '20ch',
-    },
-    }
-},
-}));
-
-
-function Profile() {
-    const [editPopOpen, setEditPopopen] = React.useState(false);
-    const [ChangePasswordOpen, setChangePasswordOpen] = React.useState(false);
-    const { voucherId } = useParams();
-    const [voucherList, setVoucherList] = React.useState(voucherItems);
-    //const [voucherList, setVoucherList] = React.useState([]);
     const [voucherFilterType, setVoucherFilter] = useState('All'); 
-    const [open, setOpen] = useState(false);
     const [deletePopOpen, setDeletePopOpen] = useState(false);
     // const [selectVendor, setSelectVendor] = useState(voucherItems[0]);
     const [isOwner, setIsOwner] = useState(true);
@@ -147,41 +99,67 @@ function Profile() {
         avatar: 'https://media-cdn.tripadvisor.com/media/photo-s/1b/99/44/8e/kfc-faxafeni.jpg',
         email: 'test@test.com',
         gender: 'male',
-        password: 'Dlf123456@'
+        password: '111'
     })
-    
-    
+    const voucherItems = [
+        {
+            id: "1",
+            type: "Percentage",
+            condition: "Percentage",
+            discount: "10% OFF",
+            expire: "2023-12-31",
+            count: 109,
+            description: "this is the description of Percentage voucher.",
+            isClaimed: false,
+            autoRelease: {
+                range: 102,
+                count: 10,
+                start: dayjs().format('YYYY-MM-DD'),
+                end: dayjs().add(1, 'year').format('YYYY-MM-DD')
+            }
+        },
+        {
+            id: "2",
+            type: "CFree",
+            condition: "Spend $50 or more",
+            discount: "10% OFF",
+            expire: "2023-12-31",
+            count: 10,
+            description: "this is the description of Percentage voucher.",
+            isClaimed: true,
+        },
+        {
+            id: "3",
+            type: "Free",
+            condition: "Spend $50 or more",
+            discount: "10% OFF",
+            expire: "2023-12-31",
+            count: 130,
+            description: "this is the description of Percentage voucher.",
+            isClaimed: false,
+            autoRelease: {
+                range: 102,
+                count: 10,
+                start: dayjs().format('YYYY-MM-DD'),
+                end: dayjs().add(1, 'year').format('YYYY-MM-DD')
+            }
+        },
+        {
+            id: "4",
+            type: "CFree",
+            condition: "Spend $60 or more",
+            discount: "10% OFF",
+            expire: "2023-12-31",
+            count: 10,
+            description: "this is the description of Percentage voucher.",
+            isClaimed: false,
+        }
+
+    ];
     const handleFilter = (event) => {
         console.log(event.target.value);
         setVoucherFilter(event.target.value);
     }
-    const handleDelete = (event) => {
-        console.log("aaa")
-        setDeletePopOpen(true);
-    }
-
-    const debounceFilter = (func, wait) => {
-        let timeout;
-        return function () {
-          clearTimeout(timeout);
-          timeout = setTimeout(() => {
-            func(arguments);
-          }, wait);
-        };
-      };
-
-    // filter
-    const handSearch = debounceFilter((data) => {
-        if (data[0]) {
-            const newVoucherList = [...voucherItems].filter((i) => i.type.includes(data[0])).filter(i => i);
-            setVoucherList(newVoucherList);
-        } else {
-            console.log(1);
-            setVoucherList(voucherItems);
-        }
-    }, 800);
-
-    
     return (
         <>
             
@@ -205,6 +183,7 @@ function Profile() {
                         Profile
                         </Typography>
                         <Grid container direction="column" justifyContent="center" alignItems="left" spacing={2} marginTop='10px'>
+                            
                             <Grid item sx={{width: '30%',marginLeft:'10px'}}>
                                 <BadgeIcon color="white" marginTop='2px'/> 
                                 <Typography variant="h7" fontFamily="Helvetica" fontWeight="500"> Name: {profileInfo.name}
@@ -220,14 +199,11 @@ function Profile() {
                                 <PermIdentityIcon color="white" marginTop='2px'/> Gender: {profileInfo.gender}
                                 </Typography>
                             </Grid>
-                            <Grid item container direction="column">
-                                    <Button type="button" variant="contained" sx={styles.sameWidth} onClick={() => {setEditPopopen(true)}}>Edit</Button>
-                            </Grid> 
-                            <Grid item container direction="column">                    
-                                    <Button type="button" variant="contained" sx={styles.sameWidth} onClick={() => {setChangePasswordOpen(true)}}>Change Password</Button>
-                            </Grid> 
+                            <Grid item sx={{marginTop:'15px'}}>
+                                <Button type="button" variant="contained" sx={styles.sameWidth} onClick={() => {setEditPopopen(true)}}>Edit</Button>
+                            </Grid>
                             {editPopOpen && <ProfileEditPop open={editPopOpen} profileInfo={profileInfo} setOpen={setEditPopopen} setProfileInfo={setProfileInfo} />}
-                            {ChangePasswordOpen && <ChangePasswordPop open={ChangePasswordOpen} profileInfo={profileInfo} setOpen={setChangePasswordOpen} setProfileInfo={setProfileInfo} />}
+            {/* <a>展示所有的优惠卷, group by 餐厅名，添加搜索与过滤功能，可以删除优惠卷，点击Vouchser可以转让这个Vouchsers，输入目标邮箱转让</a> */}
             <Box
                 component="div"
                 style={{
@@ -239,18 +215,12 @@ function Profile() {
                     variant: 'h2',
                 }}
             >
-                <Box height='20px'>
-                </Box>
-                <Divider/>
-            <Typography variant="h5" fontFamily="Helvetica" fontWeight="bold" display='flex' justifyContent='center' sx={{
-                marginTop:'8px',
-                marginLeft:'25px',
-                
+            <Typography variant="h5" fontFamily="Helvetica" fontWeight="bold" sx={{
+                marginTop:'40px',
+                marginLeft:'25px'
             }}>
-                
                 Vouchers
             </Typography>
-            
             </Box>
             <Box margin='25px' display="flex" alignItems="center" justifyContent="left">
                 <FormControl style={{width: '30%'}}>
@@ -276,9 +246,18 @@ function Profile() {
                     <StyledInputBase
                         placeholder="Search…"
                         inputProps={{ 'aria-label': 'search' }}
-                        onChange={(e) => handSearch(e.target.value) }
+                        //onChange={(e) => handleChange(e.target.value) }
                     />
                 </Search>
+                <Box width="40%">
+                    <Typography>
+                        {(days > 0 || hours > 0 || minutes > 0 || seconds > 0)?`Remaining time: ${days} days ${hours} hours ${minutes} minutes ${seconds} seconds`: "Voucher Expired!"}
+                    </Typography>
+                    <Grid item container direction="column">
+                        <Button variant="contained" justifyContent='flex-end'>Re-Gain</Button>
+                    </Grid>
+                </Box>
+                
             </Box>
             <Grid
                 container
@@ -292,8 +271,9 @@ function Profile() {
                     justifyContent: 'space-evenly',
                     marginTop: 1,
                 }}
+                
             >
-            {voucherList.map((item) => (
+            {voucherItems.map((item) => (
                 (voucherFilterType === "All" || item.type === voucherFilterType) &&
                     <Grid item key={item.id}>
                         {isOwner &&
@@ -331,4 +311,4 @@ function Profile() {
     
     }
 
-export default Profile;
+export default VoucherUse;
