@@ -42,39 +42,49 @@ function ChangePasswordPop(props) {
     return (
         <Dialog open={props.open} TransitionComponent={TransitionUp} onClose={() => props.setOpen(false)} fullWidth>
             <DialogTitle>Change Password</DialogTitle>
-            <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{ padding: '50px' }}>
-            <TextField
-                label="Old Password"
-                variant="filled"
-                fullWidth
-                onChange={(e) => {
-                    setOldPassword(e.target.value);
-                }}
-                error={oldpasswordErr}
-            />
-            <TextField
-                label="New Password"
-                variant="filled"
-                fullWidth
-                onChange={(e) => {
-                    setPassword(e.target.value);
-                }}
-                error={passwordErr}
-            />
-            <TextField
-                label="Confirm Password"
-                variant="filled"
-                fullWidth
-                onChange={(e) => {
-                    setCpassword(e.target.value);
-                }}
-                error={confirmPasswordErr}
-            />
+            <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{ padding: '30px' }}>
+                <Grid item xs={12}>
+                    <TextField
+                        label="Old Password"
+                        variant="filled"
+                        fullWidth
+                        onChange={(e) => {
+                            setOldPassword(e.target.value);
+                        }}
+                        error={oldpasswordErr}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        label="New Password"
+                        variant="filled"
+                        fullWidth
+                        onChange={(e) => {
+                            setPassword(e.target.value);
+                        }}
+                        error={passwordErr}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        label="Confirm Password"
+                        variant="filled"
+                        fullWidth
+                        onChange={(e) => {
+                            setCpassword(e.target.value);
+                        }}
+                        error={confirmPasswordErr}
+                    />
+                </Grid>
+            </Grid> 
+            
             
             <Grid item xs={12}>
                 <Button fullWidth  variant="contained" onClick={editProfile}>Edit</Button>
+            
+           
             </Grid>
-        </Grid>    
+        
             
         </Dialog>
     );

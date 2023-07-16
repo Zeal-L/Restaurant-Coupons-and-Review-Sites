@@ -15,11 +15,11 @@ function DeletePop(props) {
     return (
         <Dialog open={props.open} TransitionComponent={TransitionUp} onClose={() => props.setOpen(false)} fullWidth>
             <DialogTitle>Do you want to delete this voucher?</DialogTitle>
-            <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{ padding: '24px' }}>
-                <Grid item xs={6}>
+            <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{ padding: '15px' }}>
+                <Grid item xs={7}>
                     <Button variant="contained" fullWidth onClick={deleteYes}>Yes</Button>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={7}>
                     <Button variant="contained" fullWidth onClick={deleteNo}>Cancel</Button>
                 </Grid>
             </Grid>
