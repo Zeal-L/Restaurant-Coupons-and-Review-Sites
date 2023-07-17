@@ -6,14 +6,11 @@ import {
     Box,
     Tooltip,
     CardMedia,
-    Autocomplete,
     Rating,
-    TextField,
     RadioGroup,
     FormControlLabel,
     Radio,
     FormControl,
-    MenuIcon,
     InputBase
 } from "@mui/material";
 import { styled, alpha } from '@mui/material/styles';

@@ -2,17 +2,15 @@ import React from 'react';
 import { Context, useContext } from '../context.js';
 import { useNavigate } from "react-router-dom";
 import { TransitionUp } from "../styles";
-import {Dialog, DialogTitle, Grid, Link, Typography, Chip, Box, colors, Button} from "@mui/material";
+import {Dialog, DialogTitle, Grid, Link, Typography, Chip, colors, Button} from "@mui/material";
 import Voucher from "./Voucher";
 import TransforPop from './TransferPop.jsx';
-import dayjs from 'dayjs';
 
 function VoucherInfoPop(props) {
     const { getter, setter } = useContext(Context);
     const [transferOpen, setTransferOpen] = React.useState(false);
     const navigate = useNavigate();
     const isRestaurant = props.isRestaurant;
-    console.log(isRestaurant);
     const info = {
         id: "1",
         type: "Percentage",

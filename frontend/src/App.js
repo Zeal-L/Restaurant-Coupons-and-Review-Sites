@@ -8,11 +8,11 @@ import Login from "./Pages/Login"
 import TopBar from "./Components/TopBar";
 import Register from "./Pages/Register";
 import { Notification } from './Components/Notification.js';
-import Tmp from "./Pages/tmp";
+import VoucherVerify from "./Pages/tmp";
 import Restaurant from "./Pages/Restaurant";
 import CreateRestaurant from "./Pages/Manage/CreateRestaurant";
 import Listing from "./Pages/Listing";
-import Vouchsers from "./Pages/Vouchers";
+import VoucherUse from "./Pages/Use";
 import Profile from "./Pages/Profile";
 import {createTheme, Dialog, ThemeProvider} from "@mui/material";
 import * as PropTypes from "prop-types";
@@ -75,10 +75,10 @@ function App() {
                 <Route path="register" element={<Register/>}/>
                 <Route path="/findPassword/identity" element={<EMailVerification/>}/>
                 <Route path="/findPassword/reset" element={<ResetPassword/>}/>
-                <Route path="/manage/voucher" element={<Tmp/>}/>
+                <Route path="/manage/voucher" element={<VoucherVerify/>}/>
                 <Route path="/restaurant/:restaurantId" element={<Restaurant/>}/>
-                <Route path="/manage/create" element={<CreateRestaurant/>}/>
-                <Route path="vouchers" element={<Vouchsers/>}/>
+                <Route path="manage/create" element={<CreateRestaurant/>}/>
+                <Route path="/user/voucher/:voucherId" element={<VoucherUse/>}/>
                 <Route path="profile" element={<Profile/>}/>
               </Routes>
             <Notification/>
