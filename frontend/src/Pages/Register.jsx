@@ -1,7 +1,7 @@
 import React from 'react';
 import {Context, NotificationType, useContext} from '../context.js';
 import {useNavigate} from "react-router-dom";
-import {Button, Card, CardContent, Grid, TextField} from "@mui/material";
+import {Button, Card, CardContent, Grid, Link, TextField} from "@mui/material";
 import {ReactComponent as Logo} from '../Resource/logo.svg';
 import {styles} from '../styles.js';
 
@@ -92,6 +92,11 @@ function Register() {
                                 }
                                 <Grid item>
                                     <Button type="submit" variant="contained" sx={styles.sameWidth}>Sign Up</Button>
+                                </Grid>
+                                <Grid item>
+                                    <Link href="/login">
+                                        Already have an account? Sign in
+                                    </Link>
                                 </Grid>
                             </Grid>
                         </form>

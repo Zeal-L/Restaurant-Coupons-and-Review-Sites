@@ -151,6 +151,7 @@ function CreateRestaurant() {
 
     return (
         <Fragment>
+        {/*<div style={{ height: '64px' }}></div>*/}
         <Grid container direction="column" alignItems="center" justifyContent="center" style={{minHeight: '100vh'}}>
             <Grid item xs={8} sx={styles.sameColor}>
                 <Card variant="outlined" sx={{maxWidth: 600, backgroundColor: 'rgb(255, 243, 209)', minWidth: 600}}>

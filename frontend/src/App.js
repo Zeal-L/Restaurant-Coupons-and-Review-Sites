@@ -16,6 +16,7 @@ import Vouchsers from "./Pages/Vouchers";
 import Profile from "./Pages/Profile";
 import {createTheme, Dialog, ThemeProvider} from "@mui/material";
 import * as PropTypes from "prop-types";
+import {EMailVerification,ResetPassword} from "./Pages/FindPassword";
 function App() {
 
   const [popOpen, setPopOpen] = React.useState(initialValue.popOpen);
@@ -72,9 +73,11 @@ function App() {
                 <Route path="/" element={<Listing/>}/>
                 <Route path="login" element={<Login/>}/>
                 <Route path="register" element={<Register/>}/>
-                <Route path="tmp" element={<Tmp/>}/>
+                <Route path="/findPassword/identity" element={<EMailVerification/>}/>
+                <Route path="/findPassword/reset" element={<ResetPassword/>}/>
+                <Route path="/manage/voucher" element={<Tmp/>}/>
                 <Route path="/restaurant/:restaurantId" element={<Restaurant/>}/>
-                <Route path="manage/create" element={<CreateRestaurant/>}/>
+                <Route path="/manage/create" element={<CreateRestaurant/>}/>
                 <Route path="vouchers" element={<Vouchsers/>}/>
                 <Route path="profile" element={<Profile/>}/>
               </Routes>
