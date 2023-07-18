@@ -13,7 +13,7 @@ import { Edit, Delete } from '@mui/icons-material'
 import noPicture from '../Resource/image/no-upload-picture.png'
 
 function MenuCard(props) {
-    const { name, price, image, onEdit, onDelete } = props;
+    const { name, price, image, onEdit, onDelete, desc } = props;
 
     return (
         <Card sx={{ width: 163, display: 'inline-block', marginRight: '5px' }}>
@@ -21,9 +21,10 @@ function MenuCard(props) {
                 component="img"
                 height="100"
                 image={image || noPicture}
-                alt={name}
-            />
-            <CardContent sx={{ padding: '5px', display: 'flex', justifyContent: 'space-between' }}>
+            /> 
+
+            <CardContent sx={{ padding: '5px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+
                 <Tooltip title={name} placement="top">
                     <Typography variant="body2" color="text.secondary" sx={{ maxWidth: '65%', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {name}
@@ -32,16 +33,30 @@ function MenuCard(props) {
                 <Typography variant="body2" color="text.secondary" >
                     ${price}
                 </Typography>
+                <Tooltip title={desc} placement="top">
+                    <div
+                        style={{
+                            fontSize: '12px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            height: '35px',
+                            color: '#afabab',
+                            width: '100%'
+                        }}
+                    >
+                        {desc}
+                    </div>
+                </Tooltip>
             </CardContent>
             <CardActions disableSpacing sx={{ display: 'flex', justifyContent: 'flex-end', padding: 0 }}>
                 <Tooltip title="edit" placement="top">
                 <IconButton aria-label="edit" sx={{ padding: '0 5px' }} onClick={onEdit}>
-                    <Edit sx={{width: '0.5em'}} />
+                    <Edit sx={{width: '0.8em'}} />
                 </IconButton>
                 </Tooltip>
                 <Tooltip title="delete" placement="top">
                 <IconButton aria-label="delete" sx={{padding: '0 5px'}} onClick={onDelete}>
-                    <Delete sx={{width: '0.5em'}} />
+                    <Delete sx={{width: '0.8em'}} />
                 </IconButton>
                 </Tooltip>
             </CardActions>

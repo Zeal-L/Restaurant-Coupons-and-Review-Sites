@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from "react-router-dom";
 import {
     Card,
     Grid,
@@ -14,7 +13,7 @@ import {
     InputBase
 } from "@mui/material";
 import { styled, alpha } from '@mui/material/styles';
-import { FavoriteBorderRounded, PinDrop, Favorite, Restaurant, Search as SearchIcon  } from '@mui/icons-material';
+import { FavoriteBorderRounded, PinDrop, Favorite, Restaurant, Search as SearchIcon, Sort  } from '@mui/icons-material';
 import { pink } from '@mui/material/colors';
 import Voucher from '../Components/Voucher.jsx';
 import restaurant1 from '../Resource/image/restaurant1.png';
@@ -30,16 +29,16 @@ import './index.css';
 const defaultRestaurantsList = [
     {
         id: 1,
-        name: '测试餐厅1', // 餐厅名称
-        rate: '4', // 评分
-        evaluationsNum: 153, // 评价数量
-        address: 'testAddress1111111111111111111111111111111111111111', // 地址
-        image: restaurant1, // 图片
-        favourite: false, // 是否收藏，针对于当前用户
+        name: 'test1',
+        rate: '4',
+        evaluationsNum: 153,
+        address: 'testAddress1111111111111111111111111111111111111111',
+        image: restaurant1,
+        favourite: false,
     },
     {
         id: 2,
-        name: '测试餐厅2', 
+        name: 'test2',
         rate: '5',
         evaluationsNum: 34,
         address: 'address2222222222222222222222222',
@@ -48,7 +47,7 @@ const defaultRestaurantsList = [
     },
     {
         id: 3,
-        name: '测试餐厅3',
+        name: 'test3',
         rate: '3',
         evaluationsNum: 1123,
         address: 'Sydney',
@@ -73,7 +72,7 @@ const defaultRestaurantsList = [
     },
     {
         id: 4,
-        name: '测试餐厅4',
+        name: 'test4',
         rate: '3',
         evaluationsNum: 179,
         address: 'address444...',
@@ -82,7 +81,7 @@ const defaultRestaurantsList = [
     },
     {
         id: 5,
-        name: '测试餐厅5',
+        name: 'test5',
         rate: '5',
         evaluationsNum: 8,
         address: 'address......',
@@ -91,7 +90,7 @@ const defaultRestaurantsList = [
     },
     {
         id: 6,
-        name: '测试餐厅6',
+        name: 'test6',
         rate: '3',
         evaluationsNum: 99,
         address: 'address......',
@@ -100,7 +99,7 @@ const defaultRestaurantsList = [
     },
     {
         id: 7,
-        name: '测试餐厅7',
+        name: 'test7',
         rate: '1',
         evaluationsNum: 1,
         address: 'address......',
@@ -157,7 +156,7 @@ function Listing() {
     const [width, setWidth] = useState()
 
     const [sortValue, setSortValue] = React.useState('default');
-    const navigate = useNavigate();
+
     const handleSort = (event, data) => {
         setSortValue(data)
         if (data === 'default') return setRestaurantsList([...defaultRestaurantsList])
@@ -195,7 +194,7 @@ function Listing() {
         }
     }, [width])
 
-    // collect or delete
+    // collect/delete collect
     const collect = ({id, favourite}) => {
         const newList = [...restaurantsList].map(item => {
             if (item.id === id) return {
@@ -210,7 +209,6 @@ function Listing() {
     // enter detail page
     const restaurantDetail = (id) => {
         console.log('id:', id)
-        navigate(`/restaurant/${id}`)
     }
 
     const debounceFilter = (func, wait) => {
@@ -234,10 +232,12 @@ function Listing() {
     }, 800)
 
     const sortBoxStyle = {
+        display: 'flex',
         background: '#fff',
         margin: '7px 10px -5px 10px',
         borderRadius: '10px',
-        paddingLeft: '10px'
+        paddingLeft: '10px',
+        alignItems: 'center',
     }
 
     return (
@@ -250,7 +250,7 @@ function Listing() {
                                 <div className='list-nav-icon'>
                                     <Restaurant sx={{color: '#ff8400'}} />
                                 </div>
-                                <h2>美食</h2>
+                                <h2>food</h2>
                             </div>
                             {/* <Autocomplete
                                 id="combo-box-demo"
@@ -271,6 +271,7 @@ function Listing() {
                             </Search>
                         </div>
                         <div style={sortBoxStyle}>
+                        <Sort sx={{ marginRight: '10px' }} />
                         <FormControl>
                             <RadioGroup
                                 row

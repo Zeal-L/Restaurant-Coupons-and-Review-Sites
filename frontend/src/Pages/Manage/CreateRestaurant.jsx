@@ -63,7 +63,7 @@ function CreateRestaurant() {
     const [confirmPasswordErr, setConfirmPasswordErr] = React.useState(false);
     const [emailVerified, setEmailVerified] = React.useState(false);
     const [verificationErr, setVerificationErr] = React.useState(false);
-    const [menuList, setMenuList] = useState([{ id: Math.random(), name: 'DongPo Pork', price: '20', image:sampleMenuImage }])
+    const [menuList, setMenuList] = useState([{ id: Math.random(), name: 'DongPo Pork', price: '20', image:sampleMenuImage, describe: 'Top quality pork topped with secret sauce...' }])
     const [updateMenuVis, setUpdateMenuVis] = useState(false)
     const [isAdd, setIsAdd] = useState(true)
     const [editMenu, setEditMenu] = useState({})
@@ -89,6 +89,7 @@ function CreateRestaurant() {
                 id: Math.random(),
                 name: form.target.name.value,
                 price: form.target.price.value,
+                describe: form.target.describe.value,
                 image: menuImgUrl
             }])
         } else {
@@ -97,6 +98,7 @@ function CreateRestaurant() {
                     ...item,
                     name: form.target.name.value,
                     price: form.target.price.value,
+                    describe: form.target.describe.value,
                     image: menuImgUrl
                 }
                 return item
@@ -151,7 +153,6 @@ function CreateRestaurant() {
 
     return (
         <Fragment>
-        {/*<div style={{ height: '64px' }}></div>*/}
         <Grid container direction="column" alignItems="center" justifyContent="center" style={{minHeight: '100vh'}}>
             <Grid item xs={8} sx={styles.sameColor}>
                 <Card variant="outlined" sx={{maxWidth: 600, backgroundColor: 'rgb(255, 243, 209)', minWidth: 600}}>
@@ -238,6 +239,7 @@ function CreateRestaurant() {
                                             name={item.name}
                                             price={item.price}
                                             image={item.image}
+                                            desc={item.describe}
                                             onDelete={() => onDelete(item, index)}
                                             onEdit={() => {
                                                 setIsAdd(false)
@@ -295,6 +297,16 @@ function CreateRestaurant() {
                                 sx={styles.sameWidth}
                                 required
                                 defaultValue={isAdd ? '': editMenu.price}
+                            />
+                        </Grid>
+                        <Grid item>
+                            <TextField
+                                id="describe"
+                                label="describe"
+                                multiline
+                                rows={3}
+                                sx={styles.sameWidth}
+                                defaultValue={isAdd ? '': editMenu.describe}
                             />
                         </Grid>
                         <Grid item sx={{ paddingLeft: '10px', height: '253px' }}>
