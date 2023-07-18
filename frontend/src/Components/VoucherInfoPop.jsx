@@ -2,16 +2,15 @@ import React from 'react';
 import { Context, useContext } from '../context.js';
 import { useNavigate } from "react-router-dom";
 import { TransitionUp } from "../styles";
-import {Dialog, DialogTitle, Grid, Link, Typography, Chip, Box, colors, Button} from "@mui/material";
+import {Dialog, DialogTitle, Grid, Link, Typography, Chip, colors, Button} from "@mui/material";
 import Voucher from "./Voucher";
-import dayjs from 'dayjs';
+import TransforPop from './TransferPop.jsx';
 
 function VoucherInfoPop(props) {
     const { getter, setter } = useContext(Context);
+    const [transferOpen, setTransferOpen] = React.useState(false);
     const navigate = useNavigate();
-    const [isGet, setIsGet] = React.useState(true);
     const isRestaurant = props.isRestaurant;
-    console.log(isRestaurant);
     const info = {
         id: "1",
         type: "Percentage",
@@ -54,7 +53,7 @@ function VoucherInfoPop(props) {
                         pop={false}
                     />
                 </Grid>
-                {isGet &&
+                {isRestaurant &&
                     <Grid item>
                         <Chip label={`Total ${info.total} vouchers, ${info.count} left.`} />
                     </Grid>
@@ -87,18 +86,30 @@ function VoucherInfoPop(props) {
                     </Typography>
                 </Grid>
 
-                {isGet ?
+                {isRestaurant ?
                     <Grid item xs={12}>
                         <Button variant="contained" color="primary" fullWidth>
                             Get this voucher
                         </Button>
                     </Grid>
                     :
-                    <Grid item xs={12}>
-                        <Button variant="contained" color="primary" fullWidth>
-                            Use this voucher
-                        </Button>
-                    </Grid>
+                    <>
+                        <Grid item xs={12}>
+                            <Button variant="contained" color="primary" onClick={() => {
+                                navigate('/user/voucher/' + info.id);
+                            }} fullWidth>
+                                Use this voucher
+                            </Button>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button variant="contained" color="primary" onClick={() => {
+                                setTransferOpen(true);
+                                console.log(transferOpen)
+                            }} fullWidth>
+                                Transfer this voucher
+                            </Button>
+                        </Grid>
+                    </>
                 }
                 <Grid item xs={12}>
                     <Button variant="text" color="primary" fullWidth>
@@ -106,6 +117,7 @@ function VoucherInfoPop(props) {
                     </Button>
                 </Grid>
             </Grid>
+            {transferOpen === true && <TransforPop open={transferOpen} setOpen={setTransferOpen} id={props.id} />}
         </Dialog>
     );
 }

@@ -39,6 +39,11 @@ function Login(){
                                         Do not have an account? Sign up here!
                                     </Link>
                                 </Grid>
+                                <Grid item>
+                                    <Link href="/findPassword/identity">
+                                        Forgot password?
+                                    </Link>
+                                </Grid>
                             </Grid>
                         </form>
                     </CardContent>

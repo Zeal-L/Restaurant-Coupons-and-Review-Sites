@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     Box,
     Typography,
@@ -47,24 +47,29 @@ function Menu() {
     const [popPrice, setPopPrice] = React.useState(0);
     const [popDescription, setPopDescription] = React.useState('');
     const [popOpen, setPopOpen] = React.useState(false);
+    const [isOwner, setIsOwner] = useState(true);
 
     return (
         <>
             <Grid container spacing={2} style={{ padding: '24px' }}>
                 {menuItems.map((item, index) => (
                     <Grid item xs={12} sm={6} md={4} key={index}>
-                        <IconButton sx={{ position: 'relative'}} id="iconButtonS">
-                            <EditIcon color="white" onClick={() => {
-                                setPopImage(item.image);
-                                setPopName(item.name);
-                                setPopPrice(item.price);
-                                setPopDescription(item.description);
-                                setPopOpen(true);
-                            }}/>
-                        </IconButton>
-                        <IconButton sx={{ position: 'relative'}} id="iconButtonS">
-                            <DeleteIcon color="white" />
-                        </IconButton>
+                        {isOwner &&
+                            <>
+                                <IconButton sx={{ position: 'relative'}} id="iconButtonS">
+                                    <EditIcon color="white" onClick={() => {
+                                        setPopImage(item.image);
+                                        setPopName(item.name);
+                                        setPopPrice(item.price);
+                                        setPopDescription(item.description);
+                                        setPopOpen(true);
+                                    }}/>
+                                </IconButton>
+                                <IconButton sx={{ position: 'relative'}} id="iconButtonS">
+                                    <DeleteIcon color="white" />
+                                </IconButton>
+                            </>
+                        }
                         <Card>
                             <CardMedia component="img" src={item.image} alt={item.name} height="200" />
                             <CardContent>
@@ -82,6 +87,9 @@ function Menu() {
                     </Grid>
                 ))}
             </Grid>
+
+            {isOwner &&
+                <>
             <SpeedDial
                 ariaLabel="SpeedDial basic example"
                 sx={{position: 'fixed', bottom: 16, right: 16}}
@@ -108,6 +116,8 @@ function Menu() {
                 description={popDescription}
                 setDescription={setPopDescription}
             />
+       </>
+}
         </>
     );
 };

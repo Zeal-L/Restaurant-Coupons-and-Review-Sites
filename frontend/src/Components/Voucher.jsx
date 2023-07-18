@@ -16,7 +16,7 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import VoucherInfoPop from "./VoucherInfoPop";
 function Voucher(props) {
-    const { type, condition, discount, expire } = props;
+    const { type, condition, discount, expire, isListing = false } = props;
     let url = '';
     if (type === 'Fixed Amount') {
         url = blueVoucher;
@@ -33,23 +33,18 @@ function Voucher(props) {
     const height = 196 * transform;
     // const havePop = props.pop ? props.pop : true;
     return (
-        <div className={props.disabled === true ? 'gray-component' : ''}>
-            <Grid container spacing={2} sx={{
+        <>
+            {!isListing ? <Grid container sx={{
                 ...props.sx,
                 width: `${width}px`,
                 height: `${height}px`,
                 padding: '24px',
                 backgroundImage: `url(${url})`,
                 backgroundSize: 'contain',
-                cursor:  props.disabled !== true && (props.pop === true || props.pop === undefined)
-                    ? 'pointer' : 'default',
+                cursor:  props.pop === true || props.pop === undefined ? 'pointer' : 'default',
             }}
 
-                  onClick={() => {
-                        if (props.disabled !== true && (props.pop === true || props.pop === undefined)) {
-                            setPopOpen(true)
-                        }
-                  }}
+                  onClick={() => setPopOpen(true)}
             >
                 <Grid item xs={12} sx={{ alignSelf: 'center' }}>
                     <Typography variant="subtitle1" color="white" sx={{ textAlign: 'center' }}>
@@ -57,7 +52,7 @@ function Voucher(props) {
                     </Typography>
                 </Grid>
                 <Grid item xs={12} sx={{ alignSelf: 'center' }}>
-                    <Typography variant="h3" component="h1" color="white" sx={{ textAlign: 'center', fontWeight: 600 }}>
+                    <Typography variant={isListing ? "body2" : "h3"} component="h1" color="white" sx={{ textAlign: 'center', fontWeight: 600 }}>
                         {discount}
                     </Typography>
                 </Grid>
@@ -66,9 +61,41 @@ function Voucher(props) {
                         {expire}
                     </Typography>
                 </Grid>
-            </Grid>
-            {(props.pop === true || props.pop === undefined || props.disabled === true) && <VoucherInfoPop open={popOpen} setOpen={setPopOpen} id={props.id} isRestaurant={props.isRestaurant} />}
-        </div>
+            </Grid> : 
+            <Grid
+                container
+                sx={{
+                    ...props.sx,
+                    width: `${width}px`,
+                    height: `${height}px`,
+                    backgroundImage: `url(${url})`,
+                    backgroundSize: 'contain',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    cursor:  props.pop === true || props.pop === undefined ? 'pointer' : 'default',
+                }}
+                onClick={() => setPopOpen(true)}
+            >
+                <Grid item xs={12} sx={{ alignSelf: 'center' }}>
+                    <Typography color="white" sx={{ textAlign: 'center', fontSize: 'x-small', transform: 'scale(0.7)' }}>
+                        {condition}
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <Typography color="white" sx={{ textAlign: 'center' }}>
+                        {discount}
+                    </Typography>
+                </Grid>
+                <Grid item xs={12} sx={{ alignSelf: 'center' }}>
+                    <Typography color="white" sx={{ textAlign: 'center', fontSize: 'x-small', transform: 'scale(0.7)' }}>
+                        {expire}
+                    </Typography>
+                </Grid>
+            </Grid>}
+            {(props.pop === true || props.pop === undefined) && <VoucherInfoPop open={popOpen} setOpen={setPopOpen}/>}
+        </>
     );
 }
 
@@ -77,7 +104,8 @@ Voucher.protoType = {
     condition: PropTypes.string.isRequired,
     discount: PropTypes.string.isRequired,
     expire: PropTypes.string.isRequired,
-    transform: PropTypes.string
+    transform: PropTypes.string,
+    isListing: PropTypes.bool,
 }
 
 
