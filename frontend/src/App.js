@@ -77,7 +77,7 @@ function App() {
                 <Route path="/findPassword/reset" element={<ResetPassword/>}/>
                 <Route path="/manage/voucher" element={<VoucherVerify/>}/>
                 <Route path="/restaurant/:restaurantId" element={<Restaurant/>}/>
-                <Route path="manage/create" element={<CreateRestaurant/>}/>
+                <Route path="/manage/create" element={<CreateRestaurant/>}/>
                 <Route path="/user/voucher/:voucherId" element={<VoucherUse/>}/>
                 <Route path="profile" element={<Profile/>}/>
               </Routes>

@@ -127,7 +127,6 @@ function VoucherRest() {
                                 </IconButton>
                             </>
                         }
-
                         <Voucher
                             type={item.type}
                             condition={item.condition}

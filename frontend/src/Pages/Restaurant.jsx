@@ -35,7 +35,6 @@ function Restaurant() {
     };
     return (
         <>
-            <div style={{ height: '64px' }}></div>
             <Box
                 component="div"
                 style={{

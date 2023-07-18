@@ -1,23 +1,26 @@
-import {Avatar, Button, Card, CardContent} from "@mui/material";
-import {styles } from '../styles.js';
-import ProfileEditPop from '../Components/ProfileEditPop.jsx';
-import ChangePasswordPop  from "../Components/ChangePasswordPop";
-import {useNavigate, useParams} from "react-router-dom";
-import React, {useEffect, useState} from 'react';
-import {styled, alpha } from '@mui/material/styles';
-import {Search as SearchIcon} from '@mui/icons-material';
-import Divider from '@mui/material/Divider';
 import {
+    Avatar,
     Box,
+    Button,
+    Card,
+    CardContent,
     FormControl,
     Grid,
     IconButton,
+    InputBase,
     InputLabel,
     MenuItem,
     Select,
-    Typography,
-    InputBase
-} from '@mui/material';
+    Typography
+} from "@mui/material";
+import {styles} from '../styles.js';
+import ProfileEditPop from '../Components/ProfileEditPop.jsx';
+import ChangePasswordPop from "../Components/ChangePasswordPop";
+import {useParams} from "react-router-dom";
+import React, {useState} from 'react';
+import {alpha, styled} from '@mui/material/styles';
+import {Search as SearchIcon} from '@mui/icons-material';
+import Divider from '@mui/material/Divider';
 import Voucher from "../Components/Voucher";
 import DeletePop from '../Components/DeletePop.jsx';
 
@@ -43,7 +46,7 @@ const voucherItems = [
             start: dayjs().format('YYYY-MM-DD'),
             end: dayjs().add(1, 'year').format('YYYY-MM-DD')
         },
-        Restaurants:"Restaurant1"
+        Restaurants: "Restaurant1"
     },
     {
         id: "2",
@@ -54,7 +57,7 @@ const voucherItems = [
         count: 10,
         description: "this is the description of Percentage voucher.",
         isClaimed: true,
-        Restaurants:"Restaurant1"
+        Restaurants: "Restaurant1"
     },
     {
         id: "3",
@@ -71,7 +74,7 @@ const voucherItems = [
             start: dayjs().format('YYYY-MM-DD'),
             end: dayjs().add(1, 'year').format('YYYY-MM-DD')
         },
-        Restaurants:"Restaurant2"
+        Restaurants: "Restaurant2"
     },
     {
         id: "4",
@@ -82,27 +85,27 @@ const voucherItems = [
         count: 10,
         description: "this is the description of Percentage voucher.",
         isClaimed: false,
-        Restaurants:"Restaurant2"
+        Restaurants: "Restaurant2"
     }
 
 ];
 
-const Search = styled('div')(({ theme }) => ({
+const Search = styled('div')(({theme}) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),
     '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
+        backgroundColor: alpha(theme.palette.common.white, 0.25),
     },
     marginLeft: 0,
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: 'auto',
+        marginLeft: theme.spacing(1),
+        width: 'auto',
     },
-  }));
-  
-const SearchIconWrapper = styled('div')(({ theme }) => ({
+}));
+
+const SearchIconWrapper = styled('div')(({theme}) => ({
     padding: theme.spacing(0, 2),
     height: '100%',
     position: 'absolute',
@@ -112,31 +115,31 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
     justifyContent: 'center',
 }));
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-color: 'inherit',
-'& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-    width: '12ch',
-    '&:focus': {
-        width: '20ch',
+const StyledInputBase = styled(InputBase)(({theme}) => ({
+    color: 'inherit',
+    '& .MuiInputBase-input': {
+        padding: theme.spacing(1, 1, 1, 0),
+        // vertical padding + font size from searchIcon
+        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+        transition: theme.transitions.create('width'),
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+            width: '12ch',
+            '&:focus': {
+                width: '20ch',
+            },
+        }
     },
-    }
-},
 }));
 
 
 function Profile() {
     const [editPopOpen, setEditPopopen] = React.useState(false);
     const [ChangePasswordOpen, setChangePasswordOpen] = React.useState(false);
-    const { voucherId } = useParams();
+    const {voucherId} = useParams();
     const [voucherList, setVoucherList] = React.useState(voucherItems);
     //const [voucherList, setVoucherList] = React.useState([]);
-    const [voucherFilterType, setVoucherFilter] = useState('All'); 
+    const [voucherFilterType, setVoucherFilter] = useState('All');
     const [open, setOpen] = useState(false);
     const [deletePopOpen, setDeletePopOpen] = useState(false);
     // const [selectVendor, setSelectVendor] = useState(voucherItems[0]);
@@ -149,8 +152,8 @@ function Profile() {
         gender: 'male',
         password: 'Dlf123456@'
     })
-    
-    
+
+
     const handleFilter = (event) => {
         console.log(event.target.value);
         setVoucherFilter(event.target.value);
@@ -163,12 +166,12 @@ function Profile() {
     const debounceFilter = (func, wait) => {
         let timeout;
         return function () {
-          clearTimeout(timeout);
-          timeout = setTimeout(() => {
-            func(arguments);
-          }, wait);
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                func(arguments);
+            }, wait);
         };
-      };
+    };
 
     // filter
     const handSearch = debounceFilter((data) => {
@@ -181,154 +184,225 @@ function Profile() {
         }
     }, 800);
 
-    
+
     return (
         <>
-            
-            {deletePopOpen && <DeletePop open = {deletePopOpen} setOpen={setDeletePopOpen}/>}
-            <div style={{ height: '64px' }}></div>
+
+            {deletePopOpen && <DeletePop open={deletePopOpen} setOpen={setDeletePopOpen}/>}
             {/* <a>展示用户信息，用户名，用户图片，性别，邮箱，都可以更改，密码不显示，但是也可以更改</a> */}
-            <Grid container direction="column" alignItems="center" justifyContent="center" style={{ minHeight: '80vh'}}>
-                <Card variant="outlined" sx={{ width:'80%',  maxWidth: 900 ,backgroundColor: 'rgb(255, 243, 209)'}} >
+            <Grid container direction="column" alignItems="center" justifyContent="center" style={{minHeight: '80vh'}}>
+                <Card variant="outlined" sx={{width: '80%', maxWidth: 900, backgroundColor: 'rgb(255, 243, 209)'}}>
                     <CardContent>
-                        <Grid container justifyContent="center" >
-                        <Avatar 
-                            alt={profileInfo.name}
-                            src={profileInfo.avatar}
-                            sx={{ width: 150, height: 150 }}/>
+                        <Grid container justifyContent="center">
+                            <Avatar
+                                alt={profileInfo.name}
+                                src={profileInfo.avatar}
+                                sx={{width: 150, height: 150}}/>
                         </Grid>
-                        <div style={{ height: '20px' }}></div>
+                        <div style={{height: '20px'}}></div>
                         <Typography variant="h5" fontFamily="Helvetica" fontWeight="bold" sx={{
-                            marginLeft:'15px',
+                            marginLeft: '15px',
                             justifyContent: 'left'
                         }}>
-                        Profile
+                            Profile
                         </Typography>
-                        <Grid container direction="column" justifyContent="center" alignItems="left" spacing={2} marginTop='10px'>
-                            <Grid item sx={{width: '30%',marginLeft:'10px'}}>
-                                <BadgeIcon color="white" marginTop='2px'/> 
-                                <Typography variant="h7" fontFamily="Helvetica" fontWeight="500"> Name: {profileInfo.name}
+                        <Grid container direction="column" justifyContent="center" alignItems="left" spacing={2}
+                              marginTop='10px'>
+                            <Grid item sx={{width: '30%', marginLeft: '10px'}}>
+                                <BadgeIcon color="white" marginTop='2px'/>
+                                <Typography variant="h7" fontFamily="Helvetica"
+                                            fontWeight="500"> Name: {profileInfo.name}
                                 </Typography>
                             </Grid>
-                            <Grid item sx={{width: '30%',marginLeft:'10px'}}>
+                            <Grid item sx={{width: '30%', marginLeft: '10px'}}>
                                 <Typography variant="h7" fontFamily="Helvetica" fontWeight="500">
-                                <EmailIcon color="white" marginTop='2px'/> Email: {profileInfo.email}
+                                    <EmailIcon color="white" marginTop='2px'/> Email: {profileInfo.email}
                                 </Typography>
                             </Grid>
-                            <Grid item sx={{width: '30%',marginLeft:'10px'}}>
-                                <Typography variant="h7" fontFamily="Helvetica" fontWeight="500"> 
-                                <PermIdentityIcon color="white" marginTop='2px'/> Gender: {profileInfo.gender}
+                            <Grid item sx={{width: '30%', marginLeft: '10px'}}>
+                                <Typography variant="h7" fontFamily="Helvetica" fontWeight="500">
+                                    <PermIdentityIcon color="white" marginTop='2px'/> Gender: {profileInfo.gender}
                                 </Typography>
                             </Grid>
                             <Grid item container direction="column">
-                                    <Button type="button" variant="contained" sx={styles.sameWidth} onClick={() => {setEditPopopen(true)}}>Edit</Button>
-                            </Grid> 
-                            <Grid item container direction="column">                    
-                                    <Button type="button" variant="contained" sx={styles.sameWidth} onClick={() => {setChangePasswordOpen(true)}}>Change Password</Button>
-                            </Grid> 
-                            {editPopOpen && <ProfileEditPop open={editPopOpen} profileInfo={profileInfo} setOpen={setEditPopopen} setProfileInfo={setProfileInfo} />}
-                            {ChangePasswordOpen && <ChangePasswordPop open={ChangePasswordOpen} profileInfo={profileInfo} setOpen={setChangePasswordOpen} setProfileInfo={setProfileInfo} />}
-            <Box
-                component="div"
-                style={{
-                    position: 'relative',
-                    width: '100%',
-                    height: '80px',
-                    fontWeight: "500" ,
-                    overflow: 'hidden',
-                    variant: 'h2',
-                }}
-            >
-                <Box height='20px'>
-                </Box>
-                <Divider/>
-            <Typography variant="h5" fontFamily="Helvetica" fontWeight="bold" display='flex' justifyContent='center' sx={{
-                marginTop:'8px',
-                marginLeft:'25px',
-                
-            }}>
-                
-                Vouchers
-            </Typography>
-            
-            </Box>
-            <Box margin='25px' display="flex" alignItems="center" justifyContent="left">
-                <FormControl style={{width: '30%'}}>
-                    <InputLabel id="demo-simple-select-label">Type</InputLabel>
-                    <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={voucherFilterType}
-                    label="voucherFilterType"
-                    onChange={handleFilter}
-                    >
-                    <MenuItem value={'Fixed Amount'}>Fixed Amount</MenuItem>
-                    <MenuItem value={'Percentage'}>Percentage</MenuItem>
-                    <MenuItem value={'Free'}>Free</MenuItem>
-                    <MenuItem value={'CFree'}>CFree</MenuItem>
-                    <MenuItem value={'All'}>All</MenuItem>
-                    </Select>
-                </FormControl>
-                <Search>
-                    <SearchIconWrapper>
-                    <SearchIcon />
-                    </SearchIconWrapper>
-                    <StyledInputBase
-                        placeholder="Search…"
-                        inputProps={{ 'aria-label': 'search' }}
-                        onChange={(e) => handSearch(e.target.value) }
-                    />
-                </Search>
-            </Box>
-            <Grid
-                container
-                rowSpacing={4}
-                columnSpacing={2}
-                name="listings"
-                alignItems="center"
-                sx={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'space-evenly',
-                    marginTop: 1,
-                }}
-            >
-            {voucherList.map((item) => (
-                (voucherFilterType === "All" || item.type === voucherFilterType) &&
-                    <Grid item key={item.id}>
-                        {isOwner &&
-                            <>
-                                <IconButton sx={{position: 'relative'}} id="iconButtonS" onClick={()=>{
-                                    setDeletePopOpen(true);
-                                }}>
-                                    <DeleteIcon color="white" />
-                                </IconButton>
-                            </>
-                        }
+                                <Button type="button" variant="contained" sx={styles.sameWidth} onClick={() => {
+                                    setEditPopopen(true)
+                                }}>Edit</Button>
+                            </Grid>
+                            <Grid item container direction="column">
+                                <Button type="button" variant="contained" sx={styles.sameWidth} onClick={() => {
+                                    setChangePasswordOpen(true)
+                                }}>Change Password</Button>
+                            </Grid>
+                            {editPopOpen &&
+                                <ProfileEditPop open={editPopOpen} profileInfo={profileInfo} setOpen={setEditPopopen}
+                                                setProfileInfo={setProfileInfo}/>}
+                            {ChangePasswordOpen &&
+                                <ChangePasswordPop open={ChangePasswordOpen} profileInfo={profileInfo}
+                                                   setOpen={setChangePasswordOpen} setProfileInfo={setProfileInfo}/>}
+                            <Box
+                                component="div"
+                                style={{
+                                    position: 'relative',
+                                    width: '100%',
+                                    height: '80px',
+                                    fontWeight: "500",
+                                    overflow: 'hidden',
+                                    variant: 'h2',
+                                }}
+                            >
+                                <Box height='20px'>
+                                </Box>
+                                <Divider/>
+                                <Typography variant="h5" fontFamily="Helvetica" fontWeight="bold" display='flex'
+                                            justifyContent='center' sx={{
+                                    marginTop: '8px',
+                                    marginLeft: '25px',
 
-                        <Voucher
-                            type={item.type}
-                            condition={item.condition}
-                            discount={item.discount}
-                            expire={item.expire}
-                            disabled={item.isClaimed}
-                            isRestaurant={false}
-                        />
-                    </Grid>
-                ))}
-            </Grid>
+                                }}>
+                                    Vouchers
+                                </Typography>
+
+                            </Box>
+                            <Box margin='25px' display="flex" alignItems="center" justifyContent="left">
+                                <FormControl style={{width: '30%'}}>
+                                    <InputLabel id="demo-simple-select-label">Type</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        value={voucherFilterType}
+                                        label="voucherFilterType"
+                                        onChange={handleFilter}
+                                    >
+                                        <MenuItem value={'Fixed Amount'}>Fixed Amount</MenuItem>
+                                        <MenuItem value={'Percentage'}>Percentage</MenuItem>
+                                        <MenuItem value={'Free'}>Free</MenuItem>
+                                        <MenuItem value={'CFree'}>CFree</MenuItem>
+                                        <MenuItem value={'All'}>All</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <Search>
+                                    <SearchIconWrapper>
+                                        <SearchIcon/>
+                                    </SearchIconWrapper>
+                                    <StyledInputBase
+                                        placeholder="Search…"
+                                        inputProps={{'aria-label': 'search'}}
+                                        onChange={(e) => handSearch(e.target.value)}
+                                    />
+                                </Search>
+                            </Box>
+                            <Grid
+                                container
+                                rowSpacing={4}
+                                columnSpacing={2}
+                                name="listings"
+                                alignItems="center"
+                                sx={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    justifyContent: 'space-evenly',
+                                    marginTop: 1,
+                                }}
+                            >
+                                {voucherList.map((item) => (
+                                    (voucherFilterType === "All" || item.type === voucherFilterType) &&
+                                    <Grid item key={item.id}>
+                                        {isOwner &&
+                                            <>
+                                                <IconButton sx={{position: 'relative'}} id="iconButtonS"
+                                                            onClick={() => {
+                                                                setDeletePopOpen(true);
+                                                            }}>
+                                                    <DeleteIcon color="white"/>
+                                                </IconButton>
+                                            </>
+                                        }
+
+                                        <Voucher
+                                            type={item.type}
+                                            condition={item.condition}
+                                            discount={item.discount}
+                                            expire={item.expire}
+                                            disabled={item.isClaimed}
+                                            isRestaurant={false}
+                                        />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                            <Box
+                                component="div"
+                                style={{
+                                    position: 'relative',
+                                    width: '100%',
+                                    height: '80px',
+                                    fontWeight: "500",
+                                    overflow: 'hidden',
+                                    variant: 'h2',
+                                }}
+                            >
+                                <Box height='20px'>
+                                </Box>
+                                <Divider/>
+                                <Typography variant="h5" fontFamily="Helvetica" fontWeight="bold" display='flex'
+                                            justifyContent='center' sx={{
+                                    marginTop: '8px',
+                                    marginLeft: '25px',
+
+                                }}>
+                                    Used Vouchers
+                                </Typography>
+                            </Box>
+
+                            <Grid
+                                container
+                                rowSpacing={4}
+                                columnSpacing={2}
+                                name="listings"
+                                alignItems="center"
+                                sx={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    justifyContent: 'space-evenly',
+                                    marginTop: 1,
+                                }}
+                            >
+                                {voucherList.map((item) => (
+                                    (voucherFilterType === "All" || item.type === voucherFilterType) &&
+                                    <Grid item key={item.id*10}>
+                                        {isOwner &&
+                                            <>
+                                                <IconButton sx={{position: 'relative'}} id="iconButtonS"
+                                                            onClick={() => {
+                                                                setDeletePopOpen(true);
+                                                            }}>
+                                                    <DeleteIcon color="white"/>
+                                                </IconButton>
+                                            </>
+                                        }
+                                        <Voucher
+                                            type={item.type}
+                                            condition={item.condition}
+                                            discount={item.discount}
+                                            expire={item.expire}
+                                            disabled={true}
+                                            isRestaurant={false}
+                                            used={true}
+                                        />
+                                    </Grid>
+                                ))}
+                            </Grid>
                         </Grid>
                     </CardContent>
                 </Card>
-                
-        </Grid>
-        
+
+            </Grid>
+
         </>
-        
+
     )
-            
-    
-    
-    }
+
+
+}
 
 export default Profile;

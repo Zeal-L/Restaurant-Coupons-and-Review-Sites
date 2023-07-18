@@ -15,14 +15,25 @@ import AdbIcon from '@mui/icons-material/Adb';
 import {useNavigate} from "react-router-dom";
 import { ReactComponent as Logo } from '../Resource/logo.svg';
 import {Divider} from "@mui/material";
-const pages = ['My Restaurant','Voucher verify']
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 export default function TopBar() {
 
+    // const pages = ['My Restaurant','Voucher verify']
+    const [pages, setPages] = React.useState(['My Restaurant','Voucher verify']);
+    // const settings = ['Profile', 'Logout'];
+    const [settings, setSettings] = React.useState(['Profile', 'Logout']);
     const navigate = useNavigate();
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const [haveRestaurant, setHaveRestaurant] = React.useState(true);
 
+    React.useEffect(() => {
+        if(haveRestaurant){
+            setPages(['My Restaurant','Voucher verify']);
+        }else{
+            setPages(['Create Restaurant']);
+        }
+
+    }, [haveRestaurant])
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
     };
@@ -46,6 +57,24 @@ export default function TopBar() {
                 break;
             case 'Voucher verify':
                 navigate('/manage/voucher')
+                break;
+            case 'Create Restaurant':
+                navigate('/manage/create')
+                break;
+            default:
+                break;
+        }
+    }
+
+    const onClickSetting = (page) => {
+        handleCloseUserMenu();
+        switch (page) {
+            case 'Profile':
+                navigate('/profile')
+                break;
+            case 'Logout':
+                localStorage.removeItem('token');
+                navigate('/login')
                 break;
             default:
                 break;
@@ -177,7 +206,7 @@ export default function TopBar() {
                                 onClose={handleCloseUserMenu}
                             >
                                 {settings.map((setting) => (
-                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                    <MenuItem key={setting} onClick={() => onClickSetting(setting)}>
                                         <Typography textAlign="center">
                                             {setting}
                                         </Typography>

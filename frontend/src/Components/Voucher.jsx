@@ -28,6 +28,8 @@ function Voucher(props) {
         url = yellowVoucher;
     }
     const [popOpen, setPopOpen] = React.useState(false);
+    const disabled = props.disabled ? props.disabled : false;
+    const used = false ? props.used===undefined : props.used;
     const transform = props.transform ? props.transform : '1';
     const width = 366 * transform;
     const height = 196 * transform;
@@ -42,6 +44,7 @@ function Voucher(props) {
                 backgroundImage: `url(${url})`,
                 backgroundSize: 'contain',
                 cursor:  props.pop === true || props.pop === undefined ? 'pointer' : 'default',
+                filter:  disabled || used ? 'grayscale(100%)' : 'none',
             }}
 
                   onClick={() => setPopOpen(true)}
@@ -75,6 +78,7 @@ function Voucher(props) {
                     flexDirection: 'column',
                     justifyContent: 'center',
                     cursor:  props.pop === true || props.pop === undefined ? 'pointer' : 'default',
+                    filter:  disabled || used ? 'grayscale(100%)' : 'none',
                 }}
                 onClick={() => setPopOpen(true)}
             >
@@ -94,7 +98,13 @@ function Voucher(props) {
                     </Typography>
                 </Grid>
             </Grid>}
-            {(props.pop === true || props.pop === undefined) && <VoucherInfoPop open={popOpen} setOpen={setPopOpen}/>}
+            {(props.pop === true || props.pop === undefined) && <VoucherInfoPop
+                open={popOpen}
+                setOpen={setPopOpen}
+                id={props.id}
+                isRestaurant={props.isRestaurant}
+                used={used}
+            />}
         </>
     );
 }
@@ -106,6 +116,9 @@ Voucher.protoType = {
     expire: PropTypes.string.isRequired,
     transform: PropTypes.string,
     isListing: PropTypes.bool,
+    disabled: PropTypes.bool,
+    isRestaurant: PropTypes.bool,
+    used: PropTypes.bool,
 }
 
 

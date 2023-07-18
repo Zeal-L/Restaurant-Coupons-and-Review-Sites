@@ -1,16 +1,18 @@
 import React from 'react';
-import { Context, useContext } from '../context.js';
-import { useNavigate } from "react-router-dom";
-import { TransitionUp } from "../styles";
-import {Dialog, DialogTitle, Grid, Link, Typography, Chip, colors, Button} from "@mui/material";
+import {Context, useContext} from '../context.js';
+import {useNavigate} from "react-router-dom";
+import {TransitionUp} from "../styles";
+import {Button, Chip, colors, Dialog, DialogTitle, Grid, Link, Typography} from "@mui/material";
 import Voucher from "./Voucher";
 import TransforPop from './TransferPop.jsx';
 
 function VoucherInfoPop(props) {
-    const { getter, setter } = useContext(Context);
+    const {getter, setter} = useContext(Context);
     const [transferOpen, setTransferOpen] = React.useState(false);
     const navigate = useNavigate();
     const isRestaurant = props.isRestaurant;
+    const used = false ? props.used === undefined : props.used;
+    console.log(used);
     const info = {
         id: "1",
         type: "Percentage",
@@ -43,7 +45,7 @@ function VoucherInfoPop(props) {
     return (
         <Dialog open={props.open} TransitionComponent={TransitionUp} onClose={() => props.setOpen(false)} fullWidth>
             <DialogTitle>Voucher Information</DialogTitle>
-            <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{ padding: '24px' }}>
+            <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: '24px'}}>
                 <Grid item alignItems="center">
                     <Voucher
                         type={info.type}
@@ -55,7 +57,7 @@ function VoucherInfoPop(props) {
                 </Grid>
                 {isRestaurant &&
                     <Grid item>
-                        <Chip label={`Total ${info.total} vouchers, ${info.count} left.`} />
+                        <Chip label={`Total ${info.total} vouchers, ${info.count} left.`}/>
                     </Grid>
                 }
                 <Grid item xs={12}>
@@ -77,7 +79,7 @@ function VoucherInfoPop(props) {
                 </Grid>
                 <Grid item xs={12}>
                     <Typography variant="body2" style={descriptionStyle}>
-                        This voucher will expire on {info.expire}.
+                        This voucher expires on {info.expire}.
                     </Typography>
                 </Grid>
                 <Grid item xs={12}>
@@ -85,30 +87,33 @@ function VoucherInfoPop(props) {
                         *{info.description}
                     </Typography>
                 </Grid>
-
-                {isRestaurant ?
-                    <Grid item xs={12}>
-                        <Button variant="contained" color="primary" fullWidth>
-                            Get this voucher
-                        </Button>
-                    </Grid>
-                    :
+                {!used &&
                     <>
-                        <Grid item xs={12}>
-                            <Button variant="contained" color="primary" onClick={() => {
-                                navigate('/user/voucher/' + info.id);
-                            }} fullWidth>
-                                Use this voucher
-                            </Button>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Button variant="contained" color="primary" onClick={() => {
-                                setTransferOpen(true);
-                                console.log(transferOpen)
-                            }} fullWidth>
-                                Transfer this voucher
-                            </Button>
-                        </Grid>
+                        {isRestaurant ?
+                            <Grid item xs={12}>
+                                <Button variant="contained" color="primary" fullWidth>
+                                    Get this voucher
+                                </Button>
+                            </Grid>
+                            :
+                            <>
+                                <Grid item xs={12}>
+                                    <Button variant="contained" color="primary" onClick={() => {
+                                        navigate('/user/voucher/' + info.id);
+                                    }} fullWidth>
+                                        Use this voucher
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Button variant="contained" color="primary" onClick={() => {
+                                        setTransferOpen(true);
+                                        console.log(transferOpen)
+                                    }} fullWidth>
+                                        Transfer this voucher
+                                    </Button>
+                                </Grid>
+                            </>
+                        }
                     </>
                 }
                 <Grid item xs={12}>
@@ -117,7 +122,7 @@ function VoucherInfoPop(props) {
                     </Button>
                 </Grid>
             </Grid>
-            {transferOpen === true && <TransforPop open={transferOpen} setOpen={setTransferOpen} id={props.id} />}
+            {transferOpen === true && <TransforPop open={transferOpen} setOpen={setTransferOpen} id={props.id}/>}
         </Dialog>
     );
 }
