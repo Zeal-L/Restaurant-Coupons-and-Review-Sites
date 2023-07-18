@@ -12,7 +12,7 @@ import VoucherVerify from "./Pages/tmp";
 import Restaurant from "./Pages/Restaurant";
 import CreateRestaurant from "./Pages/Manage/CreateRestaurant";
 import Listing from "./Pages/Listing";
-import VoucherUse from "./Pages/Use";
+import VoucherUse from "./Pages/VoucherUse";
 import Profile from "./Pages/Profile";
 import {createTheme, Dialog, ThemeProvider} from "@mui/material";
 import * as PropTypes from "prop-types";

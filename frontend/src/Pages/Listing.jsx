@@ -157,7 +157,7 @@ function Listing() {
     const [width, setWidth] = useState()
 
     const [sortValue, setSortValue] = React.useState('default');
-
+    const navigate = useNavigate();
     const handleSort = (event, data) => {
         setSortValue(data)
         if (data === 'default') return setRestaurantsList([...defaultRestaurantsList])
@@ -210,6 +210,7 @@ function Listing() {
     // enter detail page
     const restaurantDetail = (id) => {
         console.log('id:', id)
+        navigate(`/restaurant/${id}`)
     }
 
     const debounceFilter = (func, wait) => {
