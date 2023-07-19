@@ -25,6 +25,7 @@ import restaurant6 from '../Resource/image/restaurant6.png';
 import restaurant7 from '../Resource/image/restaurant7.png';
 import { styles } from '../styles.js';
 import './index.css';
+import {useNavigate} from "react-router-dom";
 
 const defaultRestaurantsList = [
     {
@@ -156,7 +157,7 @@ function Listing() {
     const [width, setWidth] = useState()
 
     const [sortValue, setSortValue] = React.useState('default');
-
+    const navigate = useNavigate();
     const handleSort = (event, data) => {
         setSortValue(data)
         if (data === 'default') return setRestaurantsList([...defaultRestaurantsList])
@@ -209,6 +210,7 @@ function Listing() {
     // enter detail page
     const restaurantDetail = (id) => {
         console.log('id:', id)
+        navigate(`/restaurant/${id}`)
     }
 
     const debounceFilter = (func, wait) => {
@@ -243,7 +245,7 @@ function Listing() {
     return (
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
             <div style={{background: 'rgb(255, 243, 209)', width: `${maxWidth}px`}}>
-                <Box sx={styles.sameColor} style={{ height: 'calc(100vh - 64px)', marginTop: '64px', overflow: 'auto' }} >
+                <Box sx={styles.sameColor} style={{ height: 'calc(100vh - 64px)', overflow: 'auto' }} >
                     <div style={{ height: 'calc(100% - 5px)', width: '100%', paddingTop: '5px' }}>
                         <div className='list-nav' style={{ margin: '0 10px', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>

@@ -41,7 +41,7 @@ function VoucherUse() {
             setTimeLeft(prevTimeLeft => prevTimeLeft - 1000);
         }, 1000);
         if (timeLeft <= 0) {
-            setCode("####");
+            setCode("****");
         }
         return () => clearTimeout(timer);
     }, [timeLeft]);

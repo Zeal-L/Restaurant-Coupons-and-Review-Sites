@@ -117,7 +117,7 @@ function VoucherInfoPop(props) {
                     </>
                 }
                 <Grid item xs={12}>
-                    <Button variant="text" color="primary" fullWidth>
+                    <Button variant="text" color="primary" fullWidth onClick={() => props.setOpen(false)}>
                         Cancel
                     </Button>
                 </Grid>

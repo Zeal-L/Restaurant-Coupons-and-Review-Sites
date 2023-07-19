@@ -56,7 +56,7 @@ const voucherItems = [
         expire: "2023-12-31",
         count: 10,
         description: "this is the description of Percentage voucher.",
-        isClaimed: true,
+        isClaimed: false,
         Restaurants: "Restaurant1"
     },
     {
