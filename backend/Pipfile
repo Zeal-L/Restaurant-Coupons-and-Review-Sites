@@ -12,6 +12,7 @@ flask-restx = "*"
 flask-jwt-extended = "*"
 flask-sqlalchemy = "*"
 sqlalchemy-utils = "*"
+psycopg2 = "*"
 
 [dev-packages]
 rich = "*"
