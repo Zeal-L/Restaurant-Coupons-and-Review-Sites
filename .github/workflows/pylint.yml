@@ -21,4 +21,5 @@ jobs:
         sh setup.sh
     - name: Analysing the code with pylint
       run: |
+        cd backend
         pipenv run pylint $(git ls-files '*.py')
