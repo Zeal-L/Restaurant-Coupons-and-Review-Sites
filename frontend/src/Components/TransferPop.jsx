@@ -32,6 +32,11 @@ function TransforPop(props) {
                         variant="contained" onClick={transferVoucher} fullWidth>Transfer</Button>
                     {/* <div style={{ height: '10px' }}></div> */}
                 </Grid>
+                <Grid item xs={12}>
+                    <Button variant="text" color="primary" fullWidth onClick={() => props.setOpen(false)}>
+                        Cancel
+                    </Button>
+                </Grid>
             </Grid>
         </Dialog>
     );
