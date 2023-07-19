@@ -17,6 +17,7 @@ def init_app(app: Flask) -> None:
 
 
 from .users import Users
+from .restaurants import Restaurants
 
 ############################################################
 

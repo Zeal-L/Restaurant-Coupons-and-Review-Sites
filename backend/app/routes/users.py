@@ -5,12 +5,12 @@ from app.services.users import (
     reset_password_v1,
     user_login_v1,
     user_register_v1,
-    check_photo_format_v1,
     send_email_reset_code_v1,
     verify_and_reset_email_v1,
     send_password_reset_code_v1,
     verify_and_reset_password_v1,
 )
+from app.services.util import check_photo_format_v1
 from flask_jwt_extended import current_user, jwt_required
 from flask_restx import Namespace, Resource, fields
 
@@ -283,7 +283,7 @@ class UserList(Resource):
 @api.response(401, "Unauthorized, invalid JWT token")
 class DeleteUser(Resource):
     @api.doc("delete_user")
-    @jwt_required()  # requires JWT authentication
+    @jwt_required()
     def delete(self) -> tuple[dict, int]:
         """
         Deletes the user account associated with the JWT token in the Authorization header.

@@ -1,17 +1,15 @@
-import base64
-import binascii
-import datetime
+import email as Email
+import imaplib
 import json
 import random
 import re
 import smtplib
 import string
-from email.header import Header
+import time
+from email.header import Header, decode_header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from smtplib import SMTP_SSL
-import time
-from werkzeug.security import generate_password_hash
 
 import app.config as config
 from app.models import Users
@@ -123,26 +121,6 @@ def user_login_v1(email: str, password: str) -> str or int:
     user.refresh_token()
 
     return user.token
-
-
-############################################################
-
-
-def check_photo_format_v1(photo: str) -> bool:
-    """Check if photo is in base64 format
-
-    Args:
-        photo (str): User photo
-
-    Returns:
-        bool: True if photo is in correct format, False otherwise
-    """
-
-    try:
-        base64.b64decode(photo)
-        return True
-    except binascii.Error:
-        return False
 
 
 ############################################################
@@ -353,6 +331,8 @@ def _send_email(receiver: str, content: dict) -> None:
     Returns:
         None
     """
+
+
     host_server = "smtp.gmail.com"
 
     msg = MIMEMultipart()
@@ -368,11 +348,8 @@ def _send_email(receiver: str, content: dict) -> None:
     stmp.sendmail(config.email_address, receiver, msg.as_string())
     stmp.quit()
 
-import imaplib
-import email
-from email.header import decode_header
 
-def read_email_v1():
+def _read_latest_email():
     """
     Reads the latest email from the Gmail inbox using the IMAP protocol.
 
@@ -397,7 +374,7 @@ def read_email_v1():
 
     # fetch the email message by ID
     _, message_raw = imap.fetch(latest_message_number, "(RFC822)")
-    message = email.message_from_bytes(message_raw[0][1])
+    message = Email.message_from_bytes(message_raw[0][1])
 
     # decode the email subject and sender
     subject = decode_header(message["Subject"])[0][0]

@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_restx import Api, Resource
 from flask_jwt_extended import JWTManager, decode_token
-from . import users
+from . import users, restaurants
 from app.models import Users
 
 ############################################################
@@ -59,6 +59,7 @@ def init_app(app: Flask) -> None:
     jwt.init_app(app)
 
     api.add_namespace(users.api)
+    api.add_namespace(restaurants.api)
     api.init_app(app)
 
 
