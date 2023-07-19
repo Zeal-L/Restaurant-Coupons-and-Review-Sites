@@ -16,8 +16,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        cd backend
         python -m pip install --upgrade pip
-        sh backend/setup.sh
+        sh setup.sh
     - name: Analysing the code with pylint
       run: |
         pipenv run pylint $(git ls-files '*.py')
