@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restx import Api, Resource
 from flask_jwt_extended import JWTManager, decode_token
 from . import users, restaurants
-from app.models import Users
+from app.models import Users, get_database_size
 
 ############################################################
 
@@ -76,7 +76,5 @@ class DatabaseSize(Resource):
         Returns:
             dict: Database size
         """
-
-        from app.models import get_database_size
 
         return {"message": f"The size of the database is {get_database_size()}"}, 200

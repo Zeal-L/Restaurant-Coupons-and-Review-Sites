@@ -42,3 +42,17 @@ class Restaurants(db.Model):
         db.session.add(restaurant)
         db.session.commit()
         return restaurant
+
+    @staticmethod
+    def get_restaurant_by_id(restaurant_id: int) -> "Restaurants" or None:
+        return Restaurants.query.filter_by(restaurant_id=restaurant_id).one_or_none()
+
+    @staticmethod
+    def get_restaurant_by_owner(owner_id: int) -> "Restaurants" or None:
+        return Restaurants.query.filter_by(owner_id=owner_id).one_or_none()
+
+    @staticmethod
+    def delete_restaurant(restaurant_id: int) -> None:
+        restaurant = Restaurants.get_restaurant_by_id(restaurant_id)
+        db.session.delete(restaurant)
+        db.session.commit()

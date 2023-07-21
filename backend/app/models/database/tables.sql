@@ -46,7 +46,7 @@ create table Replies (
     report_num Integer not null,
     anonymity Boolean not null
 );
-create table Voucher_template (
+create table VoucherTemplate (
     voucher_id Serial primary key,
     restaurant_id Serial not null references Restaurants(restaurant_id),
     type Text not null,
@@ -60,7 +60,7 @@ create table Voucher_template (
 );
 create table Vouchers (
     voucher_id Serial primary key,
-    voucher_template Serial not null references Voucher_template(voucher_id),
+    VoucherTemplate Serial not null references VoucherTemplate(voucher_id),
     owner_id Serial not null references Users(user_id),
     is_used Boolean not null,
     used_time Date,
@@ -70,8 +70,7 @@ create table Vouchers (
 create table VouchersAutoReleaseTimer (
     timer_id Serial primary key,
     restaurant_id Serial not null references Restaurants(restaurant_id),
-    voucher_template Serial not null references Voucher_template(voucher_id),
-    -- Timer task info
+    VoucherTemplate Serial not null references VoucherTemplate(voucher_id),
     amount Integer not null,
     start_date Date not null,
     end_date Date not null,

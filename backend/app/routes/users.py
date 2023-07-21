@@ -179,7 +179,7 @@ class Login(Resource):
 
 
 @api.route("/check/email_available/<string:email>")
-@api.param("email", "The user email", type="string")
+@api.param("email", "The user email", type="string", required=True)
 @api.response(200, "Email available")
 @api.response(400, "Invalid email format or Email already registered")
 class CheckEmailAvailable(Resource):
@@ -226,7 +226,7 @@ class GetById(Resource):
 
 
 @api.route("/get/by_email/<string:email>")
-@api.param("email", "The user email", type="string")
+@api.param("email", "The user email", type="string", required=True)
 @api.response(200, "Success")
 @api.response(404, "User not found")
 class GetByEmail(Resource):
@@ -302,7 +302,7 @@ class DeleteUser(Resource):
 
 
 @api.route("/reset/name/<string:new_name>")
-@api.param("new_name", "The new user name", type="string")
+@api.param("new_name", "The new user name", type="string", required=True)
 @api.param(
     "Authorization",
     "JWT Authorization header",
@@ -315,7 +315,7 @@ class DeleteUser(Resource):
 class ResetName(Resource):
     @api.doc("reset_name")
     @jwt_required()
-    def post(self, new_name: str) -> tuple[dict, int]:
+    def put(self, new_name: str) -> tuple[dict, int]:
         """
         Resets the user name associated with the JWT token in the Authorization header.
 
@@ -332,7 +332,7 @@ class ResetName(Resource):
 
 
 @api.route("/reset/gender/<string:new_gender>")
-@api.param("new_gender", "The new user gender", type="string")
+@api.param("new_gender", "The new user gender", type="string", required=True)
 @api.param(
     "Authorization",
     "JWT Authorization header",
@@ -345,7 +345,7 @@ class ResetName(Resource):
 class ResetGender(Resource):
     @api.doc("reset_gender")
     @jwt_required()
-    def post(self, new_gender: str) -> tuple[dict, int]:
+    def put(self, new_gender: str) -> tuple[dict, int]:
         """
         Resets the user gender associated with the JWT token in the Authorization header.
 
@@ -375,7 +375,7 @@ class ResetGender(Resource):
 class ResetPhoto(Resource):
     @api.doc("reset_photo", body=photo_model)
     @jwt_required()
-    def post(self) -> tuple[dict, int]:
+    def put(self) -> tuple[dict, int]:
         """
         Resets the user photo associated with the JWT token in the Authorization header.
 
@@ -398,7 +398,7 @@ class ResetPhoto(Resource):
 
 
 @api.route("/reset/email/send_reset_code/<string:new_email>")
-@api.param("new_email", "The new user email", type="string")
+@api.param("new_email", "The new user email", type="string", required=True)
 @api.param(
     "Authorization",
     "JWT Authorization header",
@@ -413,7 +413,7 @@ class ResetPhoto(Resource):
 class SendEmailResetCode(Resource):
     @api.doc("send_email_reset_code")
     @jwt_required()
-    def post(self, new_email: str) -> tuple[dict, int]:
+    def put(self, new_email: str) -> tuple[dict, int]:
         """
         Sends an email with a reset code to the new email.
 
@@ -440,7 +440,7 @@ class SendEmailResetCode(Resource):
 
 
 @api.route("/reset/email/verify_reset_code/<string:reset_code>")
-@api.param("reset_code", "The reset code", type="string")
+@api.param("reset_code", "The reset code", type="string", required=True)
 @api.param(
     "Authorization",
     "JWT Authorization header",
@@ -459,7 +459,7 @@ class SendEmailResetCode(Resource):
 class VerifyEmailResetCode(Resource):
     @api.doc("verify_email_reset_code")
     @jwt_required()
-    def post(self, reset_code: str) -> tuple[dict, int]:
+    def put(self, reset_code: str) -> tuple[dict, int]:
         """
         Verify and reset the user's email using the reset code.
 
@@ -507,7 +507,7 @@ class VerifyEmailResetCode(Resource):
 class ResetPassword(Resource):
     @api.doc("reset_password", body=reset_password_model)
     @jwt_required()
-    def post(self):
+    def put(self):
         """Reset the user's password using the old password.
 
         Returns:
@@ -537,20 +537,21 @@ class ResetPassword(Resource):
 
 
 @api.route("/reset/password/send_reset_code/<string:email>")
-@api.param("email", "The user email", type="string")
+@api.param("email", "The user email", type="string", required=True)
 @api.response(200, "Success")
 @api.response(403, "Invalid email format")
 @api.response(404, "Email not been registered")
 @api.response(500, "Internal Server Error")
 class SendPasswordResetCode(Resource):
     @api.doc("send_password_reset_code")
-    def post(self, email: str) -> tuple[dict, int]:
+    def put(self, email: str) -> tuple[dict, int]:
         """Send password reset code to user email
         Args:
             email (str): User email
 
         Returns:
-            A tuple containing a dictionary with a message indicating whether the password reset code send was successful and an integer status code.
+            A tuple containing a dictionary with a message indicating whether
+            the password reset code send was successful and an integer status code.
         """
         res = send_password_reset_code_v1(email)
 
@@ -586,7 +587,7 @@ class SendPasswordResetCode(Resource):
 @api.response(406, "Reset code expired")
 class VerifyPasswordResetCode(Resource):
     @api.doc("verify_password_reset_code", body=verify_and_reset_password_model)
-    def post(self) -> tuple[dict, int]:
+    def put(self) -> tuple[dict, int]:
         """Verify password reset code and reset password
 
         Args:

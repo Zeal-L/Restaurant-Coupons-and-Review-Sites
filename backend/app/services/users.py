@@ -39,7 +39,8 @@ def check_email_format_v1(email: str) -> bool:
 def check_password_format_v1(password: str) -> bool:
     """Check if password is in correct format
 
-    Correct format: At least 8 characters, at least 1 uppercase letter, at least 1 lowercase letter, at least 1 number
+    Correct format: At least 8 characters, at least 1 uppercase letter,
+                    at least 1 lowercase letter, at least 1 number
 
     Args:
         password (str): User password
@@ -108,7 +109,8 @@ def user_login_v1(email: str, password: str) -> str or int:
         password (str): User password
 
     Returns:
-        str: User token if login is successful, 400 if email is invalid, 401 if password is incorrect
+        str: User token if login is successful, 400 if email is invalid,
+            401 if password is incorrect
     """
 
     if not check_email_format_v1(email) or not check_email_exists_v1(email):
@@ -150,11 +152,14 @@ def send_email_reset_code_v1(user: Users, new_email: str) -> str or int:
     user.set_email_reset_code(json.dumps(reset_json))
 
     try:
+        body = f"Your reset code is {reset_code}.\n"
+        body += "Please use this code to reset your email.\n"
+        body += "This code will expire in 5 minutes."
         _send_email(
             new_email,
             {
                 "header": "Donut Voucher E-mail Reset Code",
-                "body": f"Your reset code is {reset_code}.\nPlease use this code to reset your email.\nThis code will expire in 5 minutes.",
+                "body": body,
             },
         )
     except smtplib.SMTPResponseException:
@@ -187,9 +192,7 @@ def verify_and_reset_email_v1(user: Users, reset_code):
 ############################################################
 
 
-def reset_password_v1(
-    user: Users, old_password: str, new_password: str
-) -> str or int:
+def reset_password_v1(user: Users, old_password: str, new_password: str) -> str or int:
     """
     Resets the user's password if the old password is correct and the new password is valid.
 
@@ -199,7 +202,8 @@ def reset_password_v1(
         new_password (str): The user's new password.
 
     Returns:
-        str or int: If the password reset is successful, returns the user's refreshed token. Otherwise, returns an error code.
+        str or int: If the password reset is successful, returns the user's refreshed token.
+                    Otherwise, returns an error code.
     """
 
     if not user.check_password(old_password):
@@ -226,7 +230,8 @@ def send_password_reset_code_v1(email: str) -> str or int:
         email (str): The email to send the password reset code to.
 
     Returns:
-        str or int: If the email is valid and the code is successfully sent, returns the reset code. Otherwise, returns an error code.
+        str or int: If the email is valid and the code is successfully sent, returns the reset code.
+                    Otherwise, returns an error code.
     """
     if not check_email_format_v1(email):
         return 403
@@ -245,11 +250,14 @@ def send_password_reset_code_v1(email: str) -> str or int:
     user.set_password_reset_code(json.dumps(reset_json))
 
     try:
+        body = f"Your password reset code is {reset_code}.\n"
+        body += "Please use this code to reset your password.\n"
+        body += "This code will expire in 5 minutes."
         _send_email(
             email,
             {
                 "header": "Donut Voucher Password Reset Code",
-                "body": f"Your password reset code is {reset_code}.\nPlease use this code to reset your password.\nThis code will expire in 5 minutes.",
+                "body": body,
             },
         )
     except smtplib.SMTPResponseException:
@@ -273,7 +281,8 @@ def verify_and_reset_password_v1(
         new_password (str): The new password to set.
 
     Returns:
-        str or int: If the reset code is valid and the password is successfully reset, returns the user's refresh token. Otherwise, returns an error code.
+        str or int: If the reset code is valid and the password is successfully reset,
+                    returns the user's refresh token. Otherwise, returns an error code.
     """
     user: Users = Users.query.filter_by(email=email).one_or_none()
     if not user:
@@ -306,6 +315,7 @@ def verify_and_reset_password_v1(
 # Private helper functions
 ############################################################
 
+
 def _generate_random_number(length: int) -> str:
     """
     Generates a random string of digits with the specified length.
@@ -331,7 +341,6 @@ def _send_email(receiver: str, content: dict) -> None:
     Returns:
         None
     """
-
 
     host_server = "smtp.gmail.com"
 
@@ -405,5 +414,3 @@ def _read_latest_email():
     imap.logout()
 
     return subject, sender, body
-
-
