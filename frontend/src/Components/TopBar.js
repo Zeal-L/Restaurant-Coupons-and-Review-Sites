@@ -25,7 +25,7 @@ export default function TopBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   // eslint-disable-next-line no-unused-vars
-  const [haveRestaurant, setHaveRestaurant] = React.useState(true);
+  const [haveRestaurant, setHaveRestaurant] = React.useState(false);
 
   React.useEffect(() => {
     if(haveRestaurant){
