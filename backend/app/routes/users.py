@@ -20,7 +20,6 @@ register_model = api.model(
     "Register",
     {
         "name": fields.String(required=True, description="The user name"),
-        "gender": fields.String(required=True, description="The user gender"),
         "email": fields.String(required=True, description="The user email"),
         "password": fields.String(required=True, description="The user password"),
     },
@@ -31,7 +30,6 @@ user_model = api.model(
     {
         "user_id": fields.Integer(required=True, description="The user identifier"),
         "name": fields.String(required=True, description="The user name"),
-        "gender": fields.String(required=True, description="The user gender"),
         "photo": fields.String(required=True, description="The user photo"),
         "email": fields.String(required=True, description="The user email"),
     },
@@ -118,7 +116,6 @@ class Register(Resource):
 
         token = services.users.user_register_v1(
             name=info["name"],
-            gender=info["gender"],
             email=info["email"],
             password=info["password"],
         )
@@ -319,36 +316,6 @@ class ResetName(Resource):
         user.set_name(new_name)
 
         return {"message": "Name reset successfully"}, 200
-
-
-############################################################
-
-
-@api.route("/reset/gender/<string:new_gender>")
-@api.param("new_gender", "The new user gender", type="string", required=True)
-@api.param(
-    "Authorization",
-    "JWT Authorization header",
-    type="string",
-    required=True,
-    _in="header",
-)
-@api.response(200, "Success")
-@api.response(401, "Unauthorized, invalid JWT token")
-class ResetGender(Resource):
-    @api.doc("reset_gender")
-    @jwt_required()
-    def put(self, new_gender: str) -> tuple[dict, int]:
-        """
-        Resets the user gender associated with the JWT token in the Authorization header.
-
-        Returns:
-            message: A message indicating whether the reset was successful.
-        """
-        user: models.Users = current_user
-        user.set_gender(new_gender)
-
-        return {"message": "Gender reset successfully"}, 200
 
 
 ############################################################

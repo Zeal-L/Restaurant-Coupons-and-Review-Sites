@@ -111,3 +111,47 @@ class DeleteDishById(Resource):
             }, 404
 
         return {"message": "Success"}, 200
+
+
+############################################################
+
+@api.route("/reset/name/<int:dish_id>/<string:name>")
+@api.param("dish_id", "Dish ID", type="int", required=True)
+@api.param("name", "The new name of the dish", type="string", required=True)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(404, "User does not own the dish")
+class ResetDishName(Resource):
+    @api.doc("reset_dish_name")
+    @jwt_required()
+    def put(self, dish_id: int, name: str) -> tuple[dict, int]:
+        """Reset the name of the dish.
+
+        Returns:
+            A tuple containing a dictionary with the dish's name, price, description, and image if found, and an integer status code.
+        """
+
+        user: models.Users = current_user
+
+        if dish := models.Dishes.get_dish_by_id(dish_id):
+            if dish.restaurant.owner_id == user.user_id:
+                dish.set_name(name)
+                return {"message": "Success"}, 200
+            else:
+                return {"message": "User does not own the dish"}, 404
+        else:
+            return {"message": "Dish not found"}, 404
+
+
+############################################################
+
+############################################################
+
+############################################################

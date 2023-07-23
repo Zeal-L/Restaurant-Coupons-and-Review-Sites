@@ -74,12 +74,11 @@ def check_email_exists_v1(email: str) -> bool:
 ############################################################
 
 
-def user_register_v1(name: str, gender: str, email: str, password: str) -> str or int:
-    """Registers a new user with the given name, gender, email and password.
+def user_register_v1(name: str, email: str, password: str) -> str or int:
+    """Registers a new user with the given name, email and password.
 
     Args:
         name (str): User name
-        gender (str): User gender
         email (str): User email
         password (str): User password
 
@@ -93,7 +92,7 @@ def user_register_v1(name: str, gender: str, email: str, password: str) -> str o
     if not check_password_format_v1(password):
         return 403
 
-    new_user = models.Users.create_user(name, gender, email, password)
+    new_user = models.Users.create_user(name, email, password)
 
     return new_user.token
 

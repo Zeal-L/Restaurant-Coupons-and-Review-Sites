@@ -16,7 +16,6 @@ class Users(db.Model):
 
     user_id: Column = Column(Integer, primary_key=True)
     name: Column = Column(Text, nullable=False)
-    gender: Column = Column(Text, nullable=False)
     email: Column = Column(Text, nullable=False)
     email_reset_code = Column(Text)
     password_hash: Column = Column(Text, nullable=False)
@@ -77,16 +76,6 @@ class Users(db.Model):
         self.name = name
         db.session.commit()
 
-    def set_gender(self, gender: str) -> None:
-        """
-        Set the user's gender.
-
-        Args:
-            gender (str): The new gender to set.
-        """
-        self.gender = gender
-        db.session.commit()
-
     def set_email(self, email: str) -> None:
         """
         Set the user's email.
@@ -130,13 +119,12 @@ class Users(db.Model):
     ############################################################
 
     @staticmethod
-    def create_user(name: str, gender: str, email: str, password: str) -> "Users":
+    def create_user(name: str, email: str, password: str) -> "Users":
         """
         Create a new user.
 
         Args:
             name (str): The user's name.
-            gender (str): The user's gender.
             email (str): The user's email.
             password (str): The user's password.
 
@@ -145,7 +133,6 @@ class Users(db.Model):
         """
         new_user = Users(
             name=name,
-            gender=gender,
             email=email,
             password_hash=generate_password_hash(password),
             photo=None,
