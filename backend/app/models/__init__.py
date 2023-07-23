@@ -16,7 +16,7 @@ def init_app(app: Flask) -> None:
         db.create_all()
         app.db = db
 
-
+from .unconfirmedUsers import UnconfirmedUsers
 from .users import Users
 from .restaurants import Restaurants
 from .dishes import Dishes

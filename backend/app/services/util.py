@@ -1,5 +1,7 @@
 import base64
 import binascii
+import random
+import string
 
 
 def check_photo_format_v1(photo: str) -> bool:
@@ -20,3 +22,17 @@ def check_photo_format_v1(photo: str) -> bool:
         return True
     except binascii.Error:
         return False
+
+
+def generate_random_number(length: int) -> str:
+    """
+    Generates a random string of digits with the specified length.
+
+    Args:
+        length (int): The length of the random string to generate.
+
+    Returns:
+        str: A random string of digits with the specified length.
+    """
+    letters = string.digits
+    return "".join(random.choice(letters) for _ in range(length))
