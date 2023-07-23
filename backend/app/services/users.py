@@ -49,10 +49,19 @@ def check_password_format_v1(password: str) -> bool:
         bool: True if password is in correct format, False otherwise
     """
 
-    return bool(
-        password is not None
-        and re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$", password)
-    )
+    if password is None:
+        return False
+
+    if len(password) < 8:
+        return False
+
+    if not re.search(r"[A-Z]", password):
+        return False
+
+    if not re.search(r"[a-z]", password):
+        return False
+
+    return bool(re.search(r"[0-9]", password))
 
 
 ############################################################
@@ -100,6 +109,108 @@ def user_register_v1(name: str, email: str, password: str) -> str or int:
 ############################################################
 
 
+def user_register_sent_code_v1(name: str, email: str, password: str) -> str or int:
+    """
+    Registers a new user with the given name, email and password and sends a confirmation code to the user's email. It also deletes any unconfirmed users that have expired confirmation codes.
+
+    Args:
+        name (str): User name
+        email (str): User email
+        password (str): User password
+
+    Returns:
+        str: 200 if registration is successful, 400 if email is invalid or already exists, 403 if password is invalid, 500 if email fails to send
+    """
+
+    clear_unconfirmed_user_v1()
+
+    if not check_email_format_v1(email) or check_email_exists_v1(email):
+        return 400
+
+    if not check_password_format_v1(password):
+        return 403
+
+    unconfirmed_user: models.UnconfirmedUsers = (
+        models.UnconfirmedUsers.create_unconfirmed_user(name, email, password)
+    )
+
+    confirm_code = services.util.generate_random_number(6)
+
+    confirm_json = {
+        "code": confirm_code,
+        "expiration": time.time() + 5 * 60,
+    }
+
+    unconfirmed_user.set_confirm_code(json.dumps(confirm_json))
+
+    try:
+        body = f"Your reset code is {confirm_code}.\n"
+        body += "Please use this code to confirm your registration.\n"
+        body += "This code will expire in 5 minutes."
+        _send_email(
+            email,
+            {
+                "header": "Donut Voucher Registration confirm Code",
+                "body": body,
+            },
+        )
+    except smtplib.SMTPResponseException:
+        return 500
+
+    return 200
+
+
+############################################################
+
+
+def verify_user_register_sent_code_v1(email: str, confirm_code: str) -> str or int:
+    unconfirmed_user: models.UnconfirmedUsers = models.UnconfirmedUsers.query.filter_by(
+        email=email
+    ).one_or_none()
+    if unconfirmed_user is None:
+        return 404
+
+    confirm_json = json.loads(unconfirmed_user.confirm_code)
+
+    if confirm_code != confirm_json["code"]:
+        return 403
+
+    if time.time() > confirm_json["expiration"]:
+        return 406
+
+    token = user_register_v1(
+        unconfirmed_user.name, unconfirmed_user.email, unconfirmed_user.password_hash
+    )
+
+    user: models.Users = models.Users.query.filter_by(email=email).one_or_none()
+    user.password_hash = unconfirmed_user.password_hash
+
+    models.UnconfirmedUsers.delete_unconfirmed_user_by_id(unconfirmed_user.user_id)
+
+    return token
+
+
+############################################################
+
+
+def clear_unconfirmed_user_v1() -> None:
+    """Clears unconfirmed users that have expired confirmation codes.
+
+    Returns:
+        None
+    """
+    for unconfirmed_user in models.UnconfirmedUsers.query.all():
+        if time.time() > unconfirmed_user.confirm_code["expiration"] and (
+            models.Users.query.filter_by(email=unconfirmed_user.email).first() is None
+        ):
+            models.UnconfirmedUsers.delete_unconfirmed_user_by_id(
+                unconfirmed_user.user_id
+            )
+
+
+############################################################
+
+
 def user_login_v1(email: str, password: str) -> str or int:
     """Logs in a user with the given email and password.
 
@@ -140,7 +251,7 @@ def send_email_reset_code_v1(user: models.Users, new_email: str) -> str or int:
     if not check_email_format_v1(new_email) or check_email_exists_v1(new_email):
         return 400
 
-    reset_code = _generate_random_number(6)
+    reset_code = services.util.generate_random_number(6)
 
     reset_json = {
         "code": reset_code,
@@ -241,7 +352,7 @@ def send_password_reset_code_v1(email: str) -> str or int:
     if not user:
         return 404
 
-    reset_code = _generate_random_number(6)
+    reset_code = services.util.generate_random_number(6)
 
     reset_json = {
         "code": reset_code,
@@ -334,20 +445,6 @@ def delete_user_v1(user: models.Users) -> None:
 ############################################################
 # Private helper functions
 ############################################################
-
-
-def _generate_random_number(length: int) -> str:
-    """
-    Generates a random string of digits with the specified length.
-
-    Args:
-        length (int): The length of the random string to generate.
-
-    Returns:
-        str: A random string of digits with the specified length.
-    """
-    letters = string.digits
-    return "".join(random.choice(letters) for _ in range(length))
 
 
 def _send_email(receiver: str, content: dict) -> None:

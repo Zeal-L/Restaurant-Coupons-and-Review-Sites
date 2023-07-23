@@ -91,6 +91,15 @@ verify_and_reset_password_model = api.model(
     },
 )
 
+register_verify_code_model = api.model(
+    "RegisterVerifyCode",
+    {
+        "email": fields.String(required=True, description="The user email"),
+        "confirm_code": fields.String(required=True, description="The reset code"),
+    },
+)
+
+
 ############################################################
 
 
@@ -105,7 +114,7 @@ class Register(Resource):
     @api.doc("register", body=register_model)
     def post(self) -> tuple[dict, int]:
         """
-        Register a new user.
+        Register a new user, without email verification.
 
         Returns:
             message: A message indicating whether the registration was successful.
@@ -129,6 +138,85 @@ class Register(Resource):
             }, 403
 
         return {"message": "User registered successfully", "token": token}, 200
+
+
+############################################################
+
+
+@api.route("/register/send_code")
+@api.response(200, "User registration code send successfully")
+@api.response(400, "Invalid email format or Email already registered")
+@api.response(
+    403,
+    "Invalid password format, At least 8 characters, at least 1 uppercase letter, at least 1 lowercase letter, at least 1 number",
+)
+class Register_send_code(Resource):
+    @api.doc("register_send_code", body=register_model)
+    def post(self) -> tuple[dict, int]:
+        """
+        Register a new user, without email verification.
+
+        Returns:
+            message: A message indicating whether the registration was successful.
+            token: A token for authentication.
+        """
+
+        info = api.payload
+
+        res = services.users.user_register_sent_code_v1(
+            name=info["name"],
+            email=info["email"],
+            password=info["password"],
+        )
+
+        if res == 400:
+            return {"message": "Invalid email format or Email already registered"}, 400
+
+        elif res == 403:
+            return {
+                "message": "Invalid password format, At least 8 characters, at least 1 uppercase letter, at least 1 lowercase letter, at least 1 number"
+            }, 403
+
+        return {"message": "User registration code send successfully"}, 200
+
+
+############################################################
+
+
+@api.route("/register/verify_code")
+@api.response(200, "Success", model=token_model)
+@api.response(403, "Confirm code incorrect")
+@api.response(
+    404,
+    "Invalid Request, the provided email does not apply to the registration",
+)
+@api.response(406, "Confirm code expired")
+class VerifyRegisterCode(Resource):
+    @api.doc("verify_register_code", body=register_verify_code_model)
+    def post(self) -> tuple[dict, int]:
+        """Verifies the registration code sent to the user's email.
+
+        Returns:
+            message: A message indicating whether the verification was successful.
+            token: A token for authentication.
+        """
+
+        info = api.payload
+
+        res = services.users.verify_user_register_sent_code_v1(
+            info["email"], info["confirm_code"]
+        )
+
+        if res == 404:
+            return {
+                "message": "Invalid Request, the provided email does not apply to the registration"
+            }, 404
+        elif res == 403:
+            return {"message": "Confirm code incorrect"}, 403
+        elif res == 406:
+            return {"message": "Confirm code expired"}, 406
+
+        return {"message": "User registered successfully", "token": res}, 200
 
 
 ############################################################
@@ -373,7 +461,7 @@ class ResetPhoto(Resource):
 class SendEmailResetCode(Resource):
     @api.doc("send_email_reset_code")
     @jwt_required()
-    def put(self, new_email: str) -> tuple[dict, int]:
+    def post(self, new_email: str) -> tuple[dict, int]:
         """
         Sends an email with a reset code to the new email.
 
