@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { TextField, Grid } from "@mui/material";
+import React, {useState} from "react";
+import {Grid, TextField} from "@mui/material";
 
 const VerificationCodeInput = () => {
   const [code, setCode] = useState("");
@@ -28,7 +28,7 @@ const VerificationCodeInput = () => {
             onKeyDown={handleKeyDown}
             inputProps={{
               maxLength: 1,
-              style: { textAlign: "center", fontSize: "18px" },
+              style: {textAlign: "center", fontSize: "18px"},
             }}
           />
         </Grid>
