@@ -1,7 +1,6 @@
 create table Users (
     user_id Serial primary key,
     name Text not null,
-    gender Text not null,
     email Text not null,
     email_reset_code Text,
     password_hash Text not null,

@@ -118,7 +118,6 @@ def test_get_user_randomy_id_success(client: FlaskClient) -> None:
 
     assert res.status_code == 200
     assert user["name"] == res.json["name"]
-    assert user["gender"] == res.json["gender"]
     assert user["email"] == res.json["email"]
 
 
@@ -140,7 +139,6 @@ def test_get_user_randomy_email_success(client: FlaskClient) -> None:
 
     assert res.status_code == 200
     assert user["name"] == res.json["name"]
-    assert user["gender"] == res.json["gender"]
     assert user["email"] == res.json["email"]
 
 
@@ -229,33 +227,6 @@ def test_reset_name_unauthorized(client: FlaskClient) -> None:
     client.post("/users/register", json=next(user_random()))
     new_name = "New Name"
     res = client.put(f"/users/reset/name/{new_name}")
-
-    assert res.status_code == 401
-
-
-############################################################
-# /reset/gender/<string:new_gender>
-############################################################
-
-
-def test_reset_gender_success(client: FlaskClient) -> None:
-    token = client.post("/users/register", json=next(user_random())).json["token"]
-    new_gender = "Female"
-    headers = {"Authorization": f"Bearer {token}"}
-    res = client.put(f"/users/reset/gender/{new_gender}", headers=headers)
-
-    assert res.status_code == 200
-
-    res = client.get("/users/get/by_id/1")
-
-    assert res.status_code == 200
-    assert res.json["gender"] == new_gender
-
-
-def test_reset_gender_unauthorized(client: FlaskClient) -> None:
-    client.post("/users/register", json=next(user_random()))
-    new_gender = "Female"
-    res = client.put(f"/users/reset/gender/{new_gender}")
 
     assert res.status_code == 401
 
