@@ -1,7 +1,16 @@
 import psycopg2
-from . import config
+from .. import config
 import os
 from psycopg2.extras import DictCursor
+
+import csv
+import random
+import requests
+from faker import Faker
+from faker_food import FoodProvider
+from werkzeug.security import generate_password_hash
+from tqdm import tqdm
+
 
 class Database:
     def __init__(self):
@@ -44,6 +53,9 @@ class Database:
                 self.cur.execute(f.read())
             self.conn.commit()
             self.cur.close()
+
+            # Create fake users
+            # self.__fake_users()
 
         except psycopg2.Error as e:
             print(
@@ -156,19 +168,35 @@ class Database:
         self.cur.close()
         self.conn.close()
 
+    def __fake_users(self):
+        fake = Faker()
+        fake.add_provider(FoodProvider)
+
+        # Open the CSV file for writing
+        with open("backend/users.csv", "w", newline="", encoding="utf-8") as csvfile:
+            # Create a CSV writer object
+            writer = csv.writer(csvfile)
+
+            # Write the header row
+            writer.writerow(["Name", "Email", "Password"])
+            print("Generating fake users...")
+            for _ in tqdm(range(100)):
+                name = fake.name()
+                gender = random.choice(["male", "female", "other"])
+                photo = people_url = requests.get(
+                    "https://loremflickr.com/500/500/people", allow_redirects=True
+                ).url
+                email = fake.email()
+                password = fake.password()
+                password_hash = generate_password_hash(password)
+
+                self.execute_alter(
+                    f"INSERT INTO Users (name, gender, photo, email, password_hash) VALUES ('{name}', '{gender}', '{photo}', '{email}', '{password_hash}');"
+                )
+
+                # Write the data rows
+                writer.writerow([name, email, password])
+
+
+
 db = Database()
-# db.execute_insert('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
-
-# for _ in range(100):
-#     db.execute_insert("""INSERT INTO Users (name, gender, photo, email, password_hash)
-# SELECT
-#     CONCAT(first_name, ' ', last_name) AS name,
-#     CASE WHEN RANDOM() < 0.5 THEN 'male' ELSE 'female' END AS gender,
-#     CONCAT('https://randomuser.me/api/portraits/', CASE WHEN RANDOM() < 0.5 THEN 'men/' ELSE 'women/' END, FLOOR(RANDOM() * 99), '.jpg') AS photo,
-#     (SELECT CONCAT(REPLACE(CONCAT(first_name, last_name, FLOOR(RANDOM() * 100), FLOOR(RANDOM() * 100))::text, ' ', ''), '@example.com')) AS email,
-#     'pbkdf2:sha256:600000$7dnk51qYZiEYws3h$d437d95b82fd519cf1b8ac73885516bfa9ad9eef8fb307fd4341fbd362b67a38' AS password_hash
-# FROM
-#     (SELECT first_name FROM (VALUES ('John'), ('Jane'), ('Bob'), ('Alice'), ('David'), ('Mary'), ('Tom'), ('Sara'), ('Peter'), ('Emily')) AS first_names (first_name) ORDER BY RANDOM() LIMIT 1) AS fn,
-#     (SELECT last_name FROM (VALUES ('Doe'), ('Smith'), ('Johnson'), ('Williams'), ('Brown'), ('Lee'), ('Wilson'), ('Taylor'), ('Anderson'), ('Clark')) AS last_names (last_name) ORDER BY RANDOM() LIMIT 1) AS ln
-# LIMIT 1;""")
-

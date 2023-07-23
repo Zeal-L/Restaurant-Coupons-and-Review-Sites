@@ -14,7 +14,7 @@ pipenv run pipenv --where
 echo -e "\033[34m\n 显示虚拟环境目录 ... \n\033[0m"
 pipenv run pipenv --venv
 
-echo -e "\033[32m\n 项目后端部署完成！启动中... \n\033[0m"
-pipenv run python app.py
+# echo -e "\033[32m\n 项目后端部署完成！启动中... \n\033[0m"
+# pipenv run python run.py
 
 

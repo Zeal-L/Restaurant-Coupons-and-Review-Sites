@@ -9,13 +9,21 @@ retrying = "*"
 flask = "*"
 flask-cors = "*"
 flask-restx = "*"
-psycopg2 = "*"
 flask-jwt-extended = "*"
+flask-sqlalchemy = "*"
+sqlalchemy-utils = "*"
+psycopg2 = "*"
 
 [dev-packages]
 rich = "*"
 pylint = "*"
 pandas = "*"
+faker = "*"
+ipykernel = "*"
+faker-food = "*"
+tqdm = "*"
+pytest = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.11"
