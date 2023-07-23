@@ -2,23 +2,24 @@ from sqlalchemy import Column, Integer, Boolean, Date, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
 from . import db
-from .users import Users
-from .voucherTemplate import VoucherTemplate
+from app import models
 
 
 class Vouchers(db.Model):
     __tablename__ = "Vouchers"
 
     voucher_id = Column(Integer, primary_key=True)
-    voucher_template_id = Column(Integer, ForeignKey("VoucherTemplate.voucher_id"), nullable=False)
+    voucher_template_id = Column(
+        Integer, ForeignKey("VoucherTemplate.voucher_id"), nullable=False
+    )
     owner_id = Column(Integer, ForeignKey("Users.user_id"), nullable=False)
     is_used = Column(Boolean, nullable=False)
     used_time = Column(Date)
     code = Column(Text, nullable=False)
     code_time = Column(Date)
 
-    voucher_template = relationship(VoucherTemplate)
-    owner = relationship(Users)
+    voucher_template = relationship(models.VoucherTemplate)
+    owner = relationship(models.Users)
 
     ############################################################
 
@@ -45,7 +46,10 @@ class Vouchers(db.Model):
         voucher_template_id: int, owner_id: int, is_used: bool, code: str
     ) -> "Vouchers":
         voucher = Vouchers(
-            voucher_template_id=voucher_template_id, owner_id=owner_id, is_used=is_used, code=code
+            voucher_template_id=voucher_template_id,
+            owner_id=owner_id,
+            is_used=is_used,
+            code=code,
         )
         db.session.add(voucher)
         db.session.commit()
@@ -58,6 +62,12 @@ class Vouchers(db.Model):
     @staticmethod
     def get_vouchers_by_owner(owner_id: int) -> "Vouchers" or None:
         return Vouchers.query.filter_by(owner_id=owner_id).all()
+
+    @staticmethod
+    def get_vouchers_by_voucher_template(
+        voucher_template_id: int,
+    ) -> "Vouchers" or None:
+        return Vouchers.query.filter_by(voucher_template_id=voucher_template_id).all()
 
     @staticmethod
     def delete_voucher(voucher_id: int) -> None:

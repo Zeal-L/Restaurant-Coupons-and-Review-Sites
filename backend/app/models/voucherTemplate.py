@@ -2,14 +2,16 @@ from sqlalchemy import Column, Integer, Text, Boolean, Date, ForeignKey
 from sqlalchemy.orm import relationship
 
 from . import db
-from .restaurants import Restaurants
+from app import models
 
 
 class VoucherTemplate(db.Model):
     __tablename__ = "VoucherTemplate"
 
     voucher_id = Column(Integer, primary_key=True)
-    restaurant_id = Column(Integer, ForeignKey("Restaurants.restaurant_id"), nullable=False)
+    restaurant_id = Column(
+        Integer, ForeignKey("Restaurants.restaurant_id"), nullable=False
+    )
     type = Column(Text, nullable=False)
     discount = Column(Text, nullable=False)
     condition = Column(Text, nullable=False)
@@ -19,7 +21,7 @@ class VoucherTemplate(db.Model):
     remain_amount = Column(Integer, nullable=False)
     total_amount = Column(Integer, nullable=False)
 
-    restaurant = relationship(Restaurants)
+    restaurant = relationship(models.Restaurants)
 
     ############################################################
 
@@ -89,7 +91,9 @@ class VoucherTemplate(db.Model):
         return VoucherTemplate.query.filter_by(voucher_id=voucher_id).one_or_none()
 
     @staticmethod
-    def get_voucher_templates_by_restaurant(restaurant_id: int) -> list:
+    def get_voucher_templates_by_restaurant(
+        restaurant_id: int,
+    ) -> list["VoucherTemplate"]:
         return VoucherTemplate.query.filter_by(restaurant_id=restaurant_id).all()
 
     @staticmethod

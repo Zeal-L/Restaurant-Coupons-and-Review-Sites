@@ -2,8 +2,8 @@ from sqlalchemy import Column, Integer, Text, Date, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
 from . import db
-from .users import Users
-from .comments import Comments
+
+from app import models
 
 
 class Replies(db.Model):
@@ -17,8 +17,8 @@ class Replies(db.Model):
     report_num = Column(Integer, nullable=False)
     anonymity = Column(Boolean, nullable=False)
 
-    sender = relationship(Users)
-    comment = relationship(Comments)
+    sender = relationship(models.Users)
+    comment = relationship(models.Comments)
 
     ############################################################
 
@@ -42,10 +42,20 @@ class Replies(db.Model):
 
     @staticmethod
     def create_reply(
-        sender_id: int, comment_id: int, content: str, date: str, report_num: int, anonymity: bool
+        sender_id: int,
+        comment_id: int,
+        content: str,
+        date: str,
+        report_num: int,
+        anonymity: bool,
     ) -> "Replies":
         reply = Replies(
-            sender_id=sender_id, comment_id=comment_id, content=content, date=date, report_num=report_num, anonymity=anonymity
+            sender_id=sender_id,
+            comment_id=comment_id,
+            content=content,
+            date=date,
+            report_num=report_num,
+            anonymity=anonymity,
         )
         db.session.add(reply)
         db.session.commit()
@@ -56,7 +66,7 @@ class Replies(db.Model):
         return Replies.query.filter_by(reply_id=reply_id).one_or_none()
 
     @staticmethod
-    def get_replies_by_comment(comment_id: int) -> list:
+    def get_replies_by_comment(comment_id: int) -> list["Replies"]:
         return Replies.query.filter_by(comment_id=comment_id).all()
 
     @staticmethod

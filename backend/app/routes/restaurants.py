@@ -1,11 +1,7 @@
 from app.models import Users, Restaurants
-
 from app.services.restaurants import new_restaurant_v1, delete_restaurant_v1
-
 from app.services.util import check_photo_format_v1
-
 from flask_jwt_extended import current_user, jwt_required
-
 from flask_restx import Namespace, Resource, fields
 
 api = Namespace("restaurants", description="Restaurants related operations")

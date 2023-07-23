@@ -2,20 +2,22 @@ from sqlalchemy import Column, Integer, Text, Float, ForeignKey
 from sqlalchemy.orm import relationship
 
 from . import db
-from .restaurants import Restaurants
+from app import models
 
 
 class Dishes(db.Model):
     __tablename__ = "Dishes"
 
     dish_id = Column(Integer, primary_key=True)
-    restaurant_id = Column(Integer, ForeignKey("Restaurants.restaurant_id"), nullable=False)
+    restaurant_id = Column(
+        Integer, ForeignKey("Restaurants.restaurant_id"), nullable=False
+    )
     name = Column(Text, nullable=False)
     price = Column(Float, nullable=False)
     description = Column(Text, nullable=False)
     image = Column(Text, nullable=False)
 
-    restaurant = relationship(Restaurants)
+    restaurant = relationship(models.Restaurants)
 
     ############################################################
 
@@ -42,7 +44,11 @@ class Dishes(db.Model):
         restaurant_id: int, name: str, price: float, description: str, image: str
     ) -> "Dishes":
         dish = Dishes(
-            restaurant_id=restaurant_id, name=name, price=price, description=description, image=image
+            restaurant_id=restaurant_id,
+            name=name,
+            price=price,
+            description=description,
+            image=image,
         )
         db.session.add(dish)
         db.session.commit()
@@ -53,7 +59,7 @@ class Dishes(db.Model):
         return Dishes.query.filter_by(dish_id=dish_id).one_or_none()
 
     @staticmethod
-    def get_dishes_by_restaurant(restaurant_id: int) -> list:
+    def get_dishes_by_restaurant(restaurant_id: int) -> list["Dishes"]:
         return Dishes.query.filter_by(restaurant_id=restaurant_id).all()
 
     @staticmethod

@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
 from . import db
-from .users import Users
+from app import models
 
 
 class Restaurants(db.Model):
@@ -14,7 +14,7 @@ class Restaurants(db.Model):
     address = Column(Text, nullable=False)
     image = Column(Text, nullable=False)
 
-    owner = relationship(Users)
+    owner = relationship(models.Users)
 
     ############################################################
 

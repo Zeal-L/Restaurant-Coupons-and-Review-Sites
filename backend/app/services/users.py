@@ -11,8 +11,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from smtplib import SMTP_SSL
 
-import app.config as config
-from app.models import Users
+from app import models, services, config
+
 
 ############################################################
 
@@ -68,7 +68,7 @@ def check_email_exists_v1(email: str) -> bool:
         bool: True if email exists, False otherwise
     """
 
-    return bool(Users.query.filter_by(email=email).first())
+    return bool(models.Users.query.filter_by(email=email).first())
 
 
 ############################################################
@@ -93,7 +93,7 @@ def user_register_v1(name: str, gender: str, email: str, password: str) -> str o
     if not check_password_format_v1(password):
         return 403
 
-    new_user = Users.create_user(name, gender, email, password)
+    new_user = models.Users.create_user(name, gender, email, password)
 
     return new_user.token
 
@@ -116,7 +116,7 @@ def user_login_v1(email: str, password: str) -> str or int:
     if not check_email_format_v1(email) or not check_email_exists_v1(email):
         return 400
 
-    user: Users = Users.query.filter_by(email=email).first()
+    user: models.Users = models.Users.query.filter_by(email=email).first()
     if not user.check_password(password):
         return 401
 
@@ -128,7 +128,7 @@ def user_login_v1(email: str, password: str) -> str or int:
 ############################################################
 
 
-def send_email_reset_code_v1(user: Users, new_email: str) -> str or int:
+def send_email_reset_code_v1(user: models.Users, new_email: str) -> str or int:
     """Send a reset code for the given email.
 
     Args:
@@ -171,7 +171,7 @@ def send_email_reset_code_v1(user: Users, new_email: str) -> str or int:
 ############################################################
 
 
-def verify_and_reset_email_v1(user: Users, reset_code):
+def verify_and_reset_email_v1(user: models.Users, reset_code):
     if user.email_reset_code is None:
         return 400
 
@@ -192,7 +192,9 @@ def verify_and_reset_email_v1(user: Users, reset_code):
 ############################################################
 
 
-def reset_password_v1(user: Users, old_password: str, new_password: str) -> str or int:
+def reset_password_v1(
+    user: models.Users, old_password: str, new_password: str
+) -> str or int:
     """
     Resets the user's password if the old password is correct and the new password is valid.
 
@@ -236,7 +238,7 @@ def send_password_reset_code_v1(email: str) -> str or int:
     if not check_email_format_v1(email):
         return 403
 
-    user: Users = Users.query.filter_by(email=email).one_or_none()
+    user: models.Users = models.Users.query.filter_by(email=email).one_or_none()
     if not user:
         return 404
 
@@ -284,7 +286,7 @@ def verify_and_reset_password_v1(
         str or int: If the reset code is valid and the password is successfully reset,
                     returns the user's refresh token. Otherwise, returns an error code.
     """
-    user: Users = Users.query.filter_by(email=email).one_or_none()
+    user: models.Users = models.Users.query.filter_by(email=email).one_or_none()
     if not user:
         return 404
 
@@ -309,6 +311,25 @@ def verify_and_reset_password_v1(
     user.set_password(new_password)
 
     return user.refresh_token()
+
+
+############################################################
+
+
+def delete_user_v1(user: models.Users) -> None:
+    """
+    Deletes the specified user and their associated restaurant (if any).
+
+    Args:
+        user (Users): The user to delete.
+
+    Returns:
+        None
+    """
+    if models.Restaurants.get_restaurant_by_owner(user.user_id) is not None:
+        services.restaurants.delete_restaurant_v1(user)
+
+    user.delete()
 
 
 ############################################################

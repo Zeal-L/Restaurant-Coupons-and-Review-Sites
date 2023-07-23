@@ -2,8 +2,7 @@ from sqlalchemy import Column, Integer, Date, ForeignKey
 from sqlalchemy.orm import relationship
 
 from . import db
-from .restaurants import Restaurants
-from .voucherTemplate import VoucherTemplate
+from app import models
 
 
 class VouchersAutoReleaseTimer(db.Model):
@@ -21,8 +20,8 @@ class VouchersAutoReleaseTimer(db.Model):
     end_date = Column(Date, nullable=False)
     interval = Column(Integer, nullable=False)
 
-    restaurant = relationship(Restaurants)
-    voucher_template = relationship(VoucherTemplate)
+    restaurant = relationship(models.Restaurants)
+    voucher_template = relationship(models.VoucherTemplate)
 
     ############################################################
 
@@ -66,23 +65,21 @@ class VouchersAutoReleaseTimer(db.Model):
         return vouchers_auto_release_timer
 
     @staticmethod
-    def get_vouchers_auto_release_timer_by_id(
+    def get_timer_by_id(
         timer_id: int,
     ) -> "VouchersAutoReleaseTimer" or None:
         return VouchersAutoReleaseTimer.query.filter_by(timer_id=timer_id).one_or_none()
 
     @staticmethod
-    def get_vouchers_auto_release_timers_by_restaurant(
+    def get_all_timers_by_restaurant(
         restaurant_id: int,
-    ) -> "VouchersAutoReleaseTimer" or None:
+    ) -> list["VouchersAutoReleaseTimer"] or None:
         return VouchersAutoReleaseTimer.query.filter_by(
             restaurant_id=restaurant_id
         ).all()
 
     @staticmethod
-    def delete_vouchers_auto_release_timer(timer_id: int) -> None:
-        vouchers_auto_release_timer = (
-            VouchersAutoReleaseTimer.get_vouchers_auto_release_timer_by_id(timer_id)
-        )
-        db.session.delete(vouchers_auto_release_timer)
+    def delete_timer_by_id(timer_id: int) -> None:
+        timer = VouchersAutoReleaseTimer.get_timer_by_id(timer_id)
+        db.session.delete(timer)
         db.session.commit()

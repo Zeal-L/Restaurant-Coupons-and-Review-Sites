@@ -9,6 +9,7 @@ from app.services.users import (
     verify_and_reset_email_v1,
     send_password_reset_code_v1,
     verify_and_reset_password_v1,
+    delete_user_v1
 )
 from app.services.util import check_photo_format_v1
 from flask_jwt_extended import current_user, jwt_required
@@ -293,7 +294,7 @@ class DeleteUser(Resource):
         """
         user: Users = current_user
 
-        user.delete()
+        delete_user_v1(user)
 
         return {"message": "User deleted successfully"}, 200
 

@@ -2,8 +2,8 @@ from sqlalchemy import Column, Integer, Text, Float, Date, Boolean, ARRAY, Forei
 from sqlalchemy.orm import relationship
 
 from . import db
-from .users import Users
-from .restaurants import Restaurants
+
+from app import models
 
 
 class Comments(db.Model):
@@ -22,8 +22,8 @@ class Comments(db.Model):
     liked_by = Column(ARRAY(Integer), nullable=False)
     disliked_by = Column(ARRAY(Integer), nullable=False)
 
-    user = relationship(Users)
-    restaurant = relationship(Restaurants)
+    user = relationship(models.Users)
+    restaurant = relationship(models.Restaurants)
 
     ############################################################
 
@@ -101,7 +101,7 @@ class Comments(db.Model):
         return Comments.query.filter_by(user_id=user_id).all()
 
     @staticmethod
-    def get_comments_by_restaurant(restaurant_id: int) -> list:
+    def get_comments_by_restaurant(restaurant_id: int) -> list["Comments"]:
         return Comments.query.filter_by(restaurant_id=restaurant_id).all()
 
     @staticmethod

@@ -203,6 +203,9 @@ def test_delete_user_unauthorized_old_token(client: FlaskClient) -> None:
     assert res.status_code == 401
 
 
+# TODO: Test delete user with restaurant, check if comments, dishes, voucherTemplate, voucheris deleted
+
+
 ############################################################
 # /reset/name/<string:new_name>
 ############################################################
@@ -212,7 +215,7 @@ def test_reset_name_success(client: FlaskClient) -> None:
     token = client.post("/users/register", json=next(user_random())).json["token"]
     new_name = "New Name"
     headers = {"Authorization": f"Bearer {token}"}
-    res = client.post(f"/users/reset/name/{new_name}", headers=headers)
+    res = client.put(f"/users/reset/name/{new_name}", headers=headers)
 
     assert res.status_code == 200
 
@@ -225,7 +228,7 @@ def test_reset_name_success(client: FlaskClient) -> None:
 def test_reset_name_unauthorized(client: FlaskClient) -> None:
     client.post("/users/register", json=next(user_random()))
     new_name = "New Name"
-    res = client.post(f"/users/reset/name/{new_name}")
+    res = client.put(f"/users/reset/name/{new_name}")
 
     assert res.status_code == 401
 
@@ -239,7 +242,7 @@ def test_reset_gender_success(client: FlaskClient) -> None:
     token = client.post("/users/register", json=next(user_random())).json["token"]
     new_gender = "Female"
     headers = {"Authorization": f"Bearer {token}"}
-    res = client.post(f"/users/reset/gender/{new_gender}", headers=headers)
+    res = client.put(f"/users/reset/gender/{new_gender}", headers=headers)
 
     assert res.status_code == 200
 
@@ -252,7 +255,7 @@ def test_reset_gender_success(client: FlaskClient) -> None:
 def test_reset_gender_unauthorized(client: FlaskClient) -> None:
     client.post("/users/register", json=next(user_random()))
     new_gender = "Female"
-    res = client.post(f"/users/reset/gender/{new_gender}")
+    res = client.put(f"/users/reset/gender/{new_gender}")
 
     assert res.status_code == 401
 
@@ -267,7 +270,7 @@ def test_reset_photo_success(client: FlaskClient) -> None:
     token = client.post("/users/register", json=user).json["token"]
     headers = {"Authorization": f"Bearer {token}"}
     photo = base64.b64encode(b"test_photo").decode("utf-8")
-    res = client.post("/users/reset/photo", headers=headers, json={"base64": photo})
+    res = client.put("/users/reset/photo", headers=headers, json={"base64": photo})
 
     assert res.status_code == 200
 
@@ -280,7 +283,7 @@ def test_reset_photo_success(client: FlaskClient) -> None:
 def test_reset_photo_unauthorized(client: FlaskClient) -> None:
     client.post("/users/register", json=next(user_random()))
     photo = base64.b64encode(b"test_photo").decode("utf-8")
-    res = client.post("/users/reset/photo", json={"base64": photo})
+    res = client.put("/users/reset/photo", json={"base64": photo})
 
     assert res.status_code == 401
 
@@ -289,7 +292,7 @@ def test_reset_photo_invalid_format(client: FlaskClient) -> None:
     user = next(user_random())
     token = client.post("/users/register", json=user).json["token"]
     headers = {"Authorization": f"Bearer {token}"}
-    res = client.post(
+    res = client.put(
         "/users/reset/photo", headers=headers, json={"base64": "invalid_format"}
     )
 
@@ -306,7 +309,7 @@ def test_reset_password_success(client: FlaskClient) -> None:
     token = client.post("/users/register", json=user).json["token"]
     headers = {"Authorization": f"Bearer {token}"}
     payload = {"old_password": user["password"], "new_password": "Abc1234567"}
-    res = client.post(
+    res = client.put(
         "/users/reset/password/with_old_password", headers=headers, json=payload
     )
 
@@ -318,7 +321,7 @@ def test_reset_password_unauthorized(client: FlaskClient) -> None:
     token = client.post("/users/register", json=user).json["token"]
     headers = {"Authorization": f"Bearer {token}"}
     payload = {"old_password": "wrong_password", "new_password": "Abc1234567"}
-    res = client.post(
+    res = client.put(
         "/users/reset/password/with_old_password", headers=headers, json=payload
     )
 
@@ -330,7 +333,7 @@ def test_reset_password_invalid_format(client: FlaskClient) -> None:
     token = client.post("/users/register", json=user).json["token"]
     headers = {"Authorization": f"Bearer {token}"}
     payload = {"old_password": user["password"], "new_password": "invalid_password"}
-    res = client.post(
+    res = client.put(
         "/users/reset/password/with_old_password", headers=headers, json=payload
     )
 
@@ -342,7 +345,7 @@ def test_reset_password_same_password(client: FlaskClient) -> None:
     token = client.post("/users/register", json=user).json["token"]
     headers = {"Authorization": f"Bearer {token}"}
     payload = {"old_password": user["password"], "new_password": user["password"]}
-    res = client.post(
+    res = client.put(
         "/users/reset/password/with_old_password", headers=headers, json=payload
     )
 
