@@ -101,7 +101,7 @@ class Comments(db.Model):
         return Comments.query.filter_by(user_id=user_id).all()
 
     @staticmethod
-    def get_comments_by_restaurant(restaurant_id: int) -> list["Comments"]:
+    def get_comments_by_restaurant_id(restaurant_id: int) -> list["Comments"]:
         return Comments.query.filter_by(restaurant_id=restaurant_id).all()
 
     @staticmethod

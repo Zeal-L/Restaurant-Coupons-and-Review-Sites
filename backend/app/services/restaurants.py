@@ -33,7 +33,9 @@ def new_restaurant_v1(
 
 
 def delete_restaurant_v1(user: models.Users) -> int:
-    """Deletes the restaurant owned by the given user. Also deletes all comments, replies, dishes, vouchers, voucherTemplates, and vouchersAutoReleaseTimers associated with the restaurant.
+    """Deletes the restaurant owned by the given user.
+    Also deletes all comments, replies, dishes, vouchers, voucherTemplates,
+    and vouchersAutoReleaseTimers associated with the restaurant.
 
     Args:
         user (Users): The user object for the owner of the restaurant.
@@ -59,3 +61,25 @@ def delete_restaurant_v1(user: models.Users) -> int:
     models.Restaurants.delete_restaurant(restaurant.restaurant_id)
 
     return 200
+
+
+def get_restaurant_rating_by_id_v1(restaurant_id: int) -> dict or None:
+    """Returns the rating and comment count of a restaurant with the given ID.
+
+    Args:
+        restaurant_id (int): The ID of the restaurant.
+
+    Returns:
+        dict or None: A dictionary containing the rating and comment count of the restaurant, or None if the restaurant does not exist.
+    """
+
+    comments: list[models.Comments] = models.Comments.get_comments_by_restaurant_id(
+        restaurant_id
+    )
+
+    if not comments:
+        return {"rating": 0, "comment_count": 0}
+
+    rating = sum(comm.rate for comm in comments)
+
+    return {"rating": rating / len(comments), "comment_count": len(comments)}

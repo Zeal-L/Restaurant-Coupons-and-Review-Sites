@@ -1,17 +1,5 @@
-from app.models import Users
-from app.services.users import (
-    check_email_exists_v1,
-    check_email_format_v1,
-    reset_password_v1,
-    user_login_v1,
-    user_register_v1,
-    send_email_reset_code_v1,
-    verify_and_reset_email_v1,
-    send_password_reset_code_v1,
-    verify_and_reset_password_v1,
-    delete_user_v1
-)
-from app.services.util import check_photo_format_v1
+from app import models, services
+
 from flask_jwt_extended import current_user, jwt_required
 from flask_restx import Namespace, Resource, fields
 
@@ -128,7 +116,7 @@ class Register(Resource):
 
         info = api.payload
 
-        token = user_register_v1(
+        token = services.users.user_register_v1(
             name=info["name"],
             gender=info["gender"],
             email=info["email"],
@@ -166,7 +154,9 @@ class Login(Resource):
 
         info = api.payload
 
-        token = user_login_v1(email=info["email"], password=info["password"])
+        token = services.users.user_login_v1(
+            email=info["email"], password=info["password"]
+        )
 
         if token == 400:
             return {"message": "Invalid email format or email not been registered"}, 400
@@ -193,7 +183,9 @@ class CheckEmailAvailable(Resource):
             message: A message indicating whether the email is available.
         """
 
-        if not check_email_format_v1(email) or check_email_exists_v1(email):
+        if not services.users.check_email_format_v1(
+            email
+        ) or services.users.check_email_exists_v1(email):
             return {"message": "Invalid email format or Email already registered"}, 400
         else:
             return {"message": "Email available"}, 200
@@ -217,7 +209,7 @@ class GetById(Resource):
             user: The user information.
         """
 
-        if user := Users.query.filter_by(user_id=user_id).first():
+        if user := models.Users.query.filter_by(user_id=user_id).first():
             return user, 200
         else:
             return {"message": "User not found"}, 404
@@ -241,7 +233,7 @@ class GetByEmail(Resource):
             user: The user information.
         """
 
-        if user := Users.query.filter_by(email=email).first():
+        if user := models.Users.query.filter_by(email=email).first():
             return user, 200
         else:
             return {"message": "User not found"}, 404
@@ -263,7 +255,7 @@ class UserList(Resource):
             users: A list of users.
         """
 
-        if users := Users.query.all():
+        if users := models.Users.query.all():
             return {"Users": users}, 200
         else:
             return {"message": "Internal Server Error"}, 500
@@ -287,14 +279,14 @@ class DeleteUser(Resource):
     @jwt_required()
     def delete(self) -> tuple[dict, int]:
         """
-        Deletes the user account associated with the JWT token in the Authorization header.
+        Deletes the user account associated with the JWT token in the Authorization header and their associated restaurant (if any).
 
         Returns:
             message: A message indicating whether the deletion was successful.
         """
-        user: Users = current_user
+        user: models.Users = current_user
 
-        delete_user_v1(user)
+        services.users.delete_user_v1(user)
 
         return {"message": "User deleted successfully"}, 200
 
@@ -323,7 +315,7 @@ class ResetName(Resource):
         Returns:
             message: A message indicating whether the reset was successful.
         """
-        user: Users = current_user
+        user: models.Users = current_user
         user.set_name(new_name)
 
         return {"message": "Name reset successfully"}, 200
@@ -353,7 +345,7 @@ class ResetGender(Resource):
         Returns:
             message: A message indicating whether the reset was successful.
         """
-        user: Users = current_user
+        user: models.Users = current_user
         user.set_gender(new_gender)
 
         return {"message": "Gender reset successfully"}, 200
@@ -386,10 +378,10 @@ class ResetPhoto(Resource):
 
         new_photo = api.payload.get("base64")
 
-        if not check_photo_format_v1(new_photo):
+        if not services.util.check_photo_format_v1(new_photo):
             return {"message": "Invalid photo format, must be base64"}, 400
 
-        user: Users = current_user
+        user: models.Users = current_user
         user.set_photo(new_photo)
 
         return {"message": "Photo reset successfully"}, 200
@@ -425,9 +417,9 @@ class SendEmailResetCode(Resource):
             A tuple containing a dictionary with a message indicating whether the reset was successful and an integer status code.
         """
 
-        user: Users = current_user
+        user: models.Users = current_user
 
-        res = send_email_reset_code_v1(user, new_email)
+        res = services.users.send_email_reset_code_v1(user, new_email)
 
         if res == 400:
             return {"message": "Invalid email format or Email already registered"}, 400
@@ -471,9 +463,9 @@ class VerifyEmailResetCode(Resource):
             A tuple containing a dictionary with a message indicating whether the email reset was successful and a new JWT token if applicable, and an integer status code.
         """
 
-        user: Users = current_user
+        user: models.Users = current_user
 
-        res = verify_and_reset_email_v1(user, reset_code)
+        res = services.users.verify_and_reset_email_v1(user, reset_code)
 
         if res == 400:
             return {
@@ -516,9 +508,11 @@ class ResetPassword(Resource):
         """
 
         info = api.payload
-        user: Users = current_user
+        user: models.Users = current_user
 
-        res = reset_password_v1(user, info["old_password"], info["new_password"])
+        res = services.users.reset_password_v1(
+            user, info["old_password"], info["new_password"]
+        )
 
         if res == 401:
             return {"message": "Unauthorized, incorrect old password"}, 401
@@ -554,7 +548,7 @@ class SendPasswordResetCode(Resource):
             A tuple containing a dictionary with a message indicating whether
             the password reset code send was successful and an integer status code.
         """
-        res = send_password_reset_code_v1(email)
+        res = services.users.send_password_reset_code_v1(email)
 
         if res == 400:
             return {
@@ -602,7 +596,7 @@ class VerifyPasswordResetCode(Resource):
 
         info = api.payload
 
-        res = verify_and_reset_password_v1(
+        res = services.users.verify_and_reset_password_v1(
             info["email"], info["reset_code"], info["new_password"]
         )
 

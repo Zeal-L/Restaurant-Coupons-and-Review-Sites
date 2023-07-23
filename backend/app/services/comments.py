@@ -9,7 +9,7 @@ def delete_all_comments_by_restaurant_v1(restaurant: models.Restaurants) -> None
     Args:
         restaurant (Restaurants): The restaurant object to delete comments and replies for.
     """
-    comments: list[models.Comments] = models.Comments.get_comments_by_restaurant(
+    comments: list[models.Comments] = models.Comments.get_comments_by_restaurant_id(
         restaurant.restaurant_id
     )
 

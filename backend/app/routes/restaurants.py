@@ -1,6 +1,5 @@
-from app.models import Users, Restaurants
-from app.services.restaurants import new_restaurant_v1, delete_restaurant_v1
-from app.services.util import check_photo_format_v1
+from app import models, services
+
 from flask_jwt_extended import current_user, jwt_required
 from flask_restx import Namespace, Resource, fields
 
@@ -11,11 +10,26 @@ api = Namespace("restaurants", description="Restaurants related operations")
 # Restaurant Models
 
 new_restaurant_model = api.model(
-    "New Restaurant",
+    "New_Restaurant",
     {
         "name": fields.String(required=True, description="Restaurant name"),
         "address": fields.String(required=True, description="Restaurant address"),
         "image": fields.String(required=True, description="Restaurant image in base64"),
+    },
+)
+
+restaurant_info_model = api.model(
+    "Restaurant_Info",
+    {
+        "restaurant_id": fields.Integer(required=True, description="Restaurant ID"),
+        "owner_id": fields.Integer(required=True, description="Restaurant owner ID"),
+        "name": fields.String(required=True, description="Restaurant name"),
+        "address": fields.String(required=True, description="Restaurant address"),
+        "image": fields.String(required=True, description="Restaurant image in base64"),
+        "rating": fields.Float(required=True, description="Restaurant rating"),
+        "comment_count": fields.Integer(
+            required=True, description="Restaurant comment count"
+        ),
     },
 )
 
@@ -46,16 +60,18 @@ class NewRestaurant(Resource):
         """
         info = api.payload
 
-        user: Users = current_user
+        user: models.Users = current_user
 
-        res = new_restaurant_v1(user, info["name"], info["address"], info["image"])
+        res = services.restaurants.new_restaurant_v1(
+            user, info["name"], info["address"], info["image"]
+        )
 
         if res == 400:
             return {"message": "Invalid photo format, must be base64"}, 400
         elif res == 403:
             return {"message": "User already has a restaurant"}, 403
 
-        res: Restaurants = res
+        res: models.Restaurants = res
 
         return {"message": "Success", "restaurant_id": res.restaurant_id}, 200
 
@@ -79,13 +95,15 @@ class DeleteRestaurant(Resource):
     @jwt_required()
     def delete(self) -> tuple[dict, int]:
         """Delete the restaurant associated with the current user.
+        Also deletes all comments, replies, dishes, vouchers, voucherTemplates,
+        and vouchersAutoReleaseTimers associated with the restaurant.
 
         Returns:
             A tuple containing a dictionary with a message indicating whether the deletion was successful, and an integer status code.
         """
-        user: Users = current_user
+        user: models.Users = current_user
 
-        res = delete_restaurant_v1(user)
+        res = services.restaurants.delete_restaurant_v1(user)
 
         if res == 404:
             return {"message": "User does not own the restaurant"}, 404
@@ -97,10 +115,12 @@ class DeleteRestaurant(Resource):
 
 
 @api.route("/get/by_id/<int:restaurant_id>")
-@api.response(200, "Success")
+@api.param("restaurant_id", "The ID of the restaurant", type="int", required=True)
+@api.response(200, "Success", model=restaurant_info_model)
 @api.response(404, "Restaurant not found")
 class GetRestaurantByID(Resource):
-    @api.doc("get_restaurant_by_id")
+    @api.doc("get_restaurant_by_id", model="Restaurant_Info")
+    @api.marshal_with(restaurant_info_model)
     def get(self, restaurant_id: int) -> tuple[dict, int]:
         """Get restaurant details by ID.
 
@@ -111,12 +131,12 @@ class GetRestaurantByID(Resource):
             A tuple containing a dictionary with the restaurant's name, address, and image if found, and an integer status code.
             If the restaurant is not found, returns a dictionary with a message indicating the restaurant was not found, and an integer status code.
         """
-        if restaurant := Restaurants.query.get(restaurant_id):
-            return {
-                "name": restaurant.name,
-                "address": restaurant.address,
-                "image": restaurant.image,
-            }, 200
+        if restaurant := models.Restaurants.query.get(restaurant_id):
+            rating_info = services.restaurants.get_restaurant_rating_by_id_v1(
+                restaurant_id
+            )
+
+            return restaurant.__dict__ | rating_info, 200
         else:
             return {"message": "Restaurant not found"}, 404
 
@@ -135,7 +155,8 @@ class GetRestaurantByID(Resource):
 @api.response(200, "Success")
 @api.response(404, "User does not own the restaurant")
 class GetRestaurantByToken(Resource):
-    @api.doc("get_restaurant_by_token")
+    @api.doc("get_restaurant_by_token", model="Restaurant_Info")
+    @api.marshal_with(restaurant_info_model)
     @jwt_required()
     def get(self) -> tuple[dict, int]:
         """Get restaurant details by JWT token.
@@ -144,14 +165,14 @@ class GetRestaurantByToken(Resource):
             A tuple containing a dictionary with the restaurant's name, address, and image if found, and an integer status code.
             If the restaurant is not found, returns a dictionary with a message indicating the restaurant was not found, and an integer status code.
         """
-        user: Users = current_user
+        user: models.Users = current_user
 
-        if restaurant := Restaurants.get_restaurant_by_owner(user.user_id):
-            return {
-                "name": restaurant.name,
-                "address": restaurant.address,
-                "image": restaurant.image,
-            }, 200
+        if restaurant := models.Restaurants.get_restaurant_by_owner(user.user_id):
+            rating_info = services.restaurants.get_restaurant_rating_by_id_v1(
+                restaurant.restaurant_id
+            )
+
+            return restaurant.__dict__ | rating_info, 200
         else:
             return {"message": "User does not own the restaurant"}, 404
 
@@ -181,9 +202,9 @@ class ResetName(Resource):
             A tuple containing a dictionary with the restaurant's name, address, and image if found, and an integer status code.
         """
 
-        user: Users = current_user
+        user: models.Users = current_user
 
-        if restaurant := Restaurants.get_restaurant_by_owner(user.user_id):
+        if restaurant := models.Restaurants.get_restaurant_by_owner(user.user_id):
             restaurant.set_name(name)
             return {"message": "Success"}, 200
         else:
@@ -215,9 +236,9 @@ class ResetAddress(Resource):
             A tuple containing a dictionary with the restaurant's name, address, and image if found, and an integer status code.
         """
 
-        user: Users = current_user
+        user: models.Users = current_user
 
-        if restaurant := Restaurants.get_restaurant_by_owner(user.user_id):
+        if restaurant := models.Restaurants.get_restaurant_by_owner(user.user_id):
             restaurant.set_address(address)
             return {"message": "Success"}, 200
         else:
@@ -252,10 +273,10 @@ class ResetImage(Resource):
             A tuple containing a dictionary with the restaurant's name, address, and image if found, and an integer status code.
         """
 
-        user: Users = current_user
+        user: models.Users = current_user
 
-        if restaurant := Restaurants.get_restaurant_by_owner(user.user_id):
-            if not check_photo_format_v1(image):
+        if restaurant := models.Restaurants.get_restaurant_by_owner(user.user_id):
+            if not services.util.check_photo_format_v1(image):
                 return {"message": "Invalid photo format, must be base64"}, 400
             restaurant.set_image(image)
             return {"message": "Success"}, 200

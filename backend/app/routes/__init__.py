@@ -1,8 +1,9 @@
 from flask import Flask
 from flask_restx import Api, Resource
 from flask_jwt_extended import JWTManager, decode_token
-from . import users, restaurants
-from app.models import Users, get_database_size
+from . import users, restaurants, dishes
+
+from app import models
 
 ############################################################
 
@@ -10,7 +11,7 @@ jwt = JWTManager()
 
 
 @jwt.user_lookup_loader
-def user_lookup_callback(_jwt_header: dict, jwt_payload: dict) -> Users or None:
+def user_lookup_callback(_jwt_header: dict, jwt_payload: dict) -> models.Users or None:
     """Callback function for JWTManager to get user from token
 
     Args:
@@ -22,7 +23,7 @@ def user_lookup_callback(_jwt_header: dict, jwt_payload: dict) -> Users or None:
     """
 
     identity = jwt_payload["sub"]
-    return Users.query.filter_by(email=identity).one_or_none()
+    return models.Users.query.filter_by(email=identity).one_or_none()
 
 
 @jwt.token_in_blocklist_loader
@@ -39,7 +40,7 @@ def check_if_token_in_blocklist(_jwt_header: dict, jwt_payload: dict) -> bool:
     """
 
     identity = jwt_payload["sub"]
-    user = Users.query.filter_by(email=identity).one_or_none()
+    user = models.Users.query.filter_by(email=identity).one_or_none()
     if user is None:
         return True
 
@@ -60,6 +61,7 @@ def init_app(app: Flask) -> None:
 
     api.add_namespace(users.api)
     api.add_namespace(restaurants.api)
+    api.add_namespace(dishes.api)
     api.init_app(app)
 
 
@@ -77,4 +79,6 @@ class DatabaseSize(Resource):
             dict: Database size
         """
 
-        return {"message": f"The size of the database is {get_database_size()}"}, 200
+        return {
+            "message": f"The size of the database is {models.get_database_size()}"
+        }, 200
