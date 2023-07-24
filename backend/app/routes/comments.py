@@ -1,1 +1,278 @@
 from app import models, services
+
+
+from flask_jwt_extended import current_user, jwt_required
+from flask_restx import Namespace, Resource, fields
+
+api = Namespace("comments", description="Comments related operations")
+
+############################################################
+# Models
+
+new_comment_model = api.model(
+    "New_Comment",
+    {
+        "restaurant_id": fields.Integer(
+            required=True,
+            description="The ID of the restaurant to which the comment is related.",
+        ),
+        "content": fields.String(
+            required=True, description="The content of the comment."
+        ),
+        "rate": fields.Float(required=True, description="The rate of the comment."),
+        "anonymity": fields.Boolean(
+            required=True, description="Whether the comment is anonymous."
+        ),
+    },
+)
+
+comment_info_model = api.model(
+    "Comment_Info",
+    {
+        "comment_id": fields.Integer(
+            required=True, description="The ID of the comment."
+        ),
+        "user_id": fields.Integer(
+            required=True, description="The ID of the user who wrote the comment."
+        ),
+        "restaurant_id": fields.Integer(
+            required=True,
+            description="The ID of the restaurant to which the comment is related.",
+        ),
+        "content": fields.String(
+            required=True, description="The content of the comment."
+        ),
+        "rate": fields.Float(required=True, description="The rate of the comment."),
+        "date": fields.String(required=True, description="The date of the comment."),
+        "anonymity": fields.Boolean(
+            required=True, description="Whether the comment is anonymous."
+        ),
+        "report_by": fields.List(
+            fields.Integer(),
+            required=True,
+            description="The IDs of the users who reported the comment.",
+        ),
+        "liked_by": fields.List(
+            fields.Integer(),
+            required=True,
+            description="The IDs of the users who liked the comment.",
+        ),
+        "disliked_by": fields.List(
+            fields.Integer(),
+            required=True,
+            description="The IDs of the users who disliked the comment.",
+        ),
+    },
+)
+
+comment_list_model = api.model(
+    "Comment_List",
+    {
+        "message": fields.String(
+            required=True,
+            description="A message indicating whether the operation was successful.",
+        ),
+        "comment_ids": fields.List(
+            fields.Integer(), required=True, description="The IDs of the comments."
+        ),
+    },
+)
+
+############################################################
+
+
+@api.route("/new")
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(400, "Invalid comment length, must be less than 1000 characters")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(404, "Restaurant not found")
+class NewComment(Resource):
+    @api.doc("new_comment", body=new_comment_model)
+    @jwt_required()
+    def post(self) -> tuple[dict, int]:
+        """Create a new comment associated with the current user and a restaurant.
+
+        Returns:
+            A tuple containing a dictionary with a message indicating whether the creation was successful and the ID of the new comment, and an integer status code.
+        """
+        info = api.payload
+
+        user: models.Users = current_user
+
+        restaurant = models.Restaurants.query.get(info["restaurant_id"])
+        if not restaurant:
+            return {"message": "Restaurant not found"}, 404
+
+        res = services.comments.new_comment_v1(
+            user, restaurant, info["content"], info["rate"], info["anonymity"]
+        )
+
+        if res == 400:
+            return {"message": "Invalid comment format"}, 400
+
+        res: models.Comments = res
+
+        return {"message": "Success", "comment_id": res.comment_id}, 200
+
+
+############################################################
+
+
+@api.route("/delete/<int:comment_id>")
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized, invalid JWT token or not the owner of the comment")
+@api.response(404, "Comment not found")
+class DeleteComment(Resource):
+    @jwt_required()
+    def delete(self, comment_id: int) -> tuple[dict, int]:
+        """Delete a comment associated with the current user. It also deletes all replies associated with the comment.
+
+        Args:
+            comment_id: The ID of the comment to delete.
+
+        Returns:
+            A tuple containing a dictionary with a message indicating whether the deletion was successful, and an integer status code.
+        """
+        user: models.Users = current_user
+
+        comment = models.Comments.query.get(comment_id)
+        if not comment:
+            return {"message": "Comment not found"}, 404
+
+        if comment.user_id != user.user_id:
+            return {"message": "Unauthorized to delete this comment"}, 401
+
+        services.comments.delete_comment_v1(comment)
+
+        return {"message": "Success"}, 200
+
+
+############################################################
+
+
+@api.route("/get/by_id/<int:comment_id>")
+@api.param("comment_id", "The ID of the comment to get", type="integer", required=True)
+@api.response(200, "Success", body=comment_info_model)
+@api.response(404, "Comment not found")
+class GetComment(Resource):
+    @api.doc("get_comment", model="Comment_Info")
+    @api.marshal_with(comment_info_model)
+    def get(self, comment_id: int) -> tuple[dict, int]:
+        """Get a single comment by its ID.
+
+        Args:
+            comment_id: The ID of the comment to get.
+
+        Returns:
+            A tuple containing a dictionary representing the comment, or a dictionary with an error message and an integer status code.
+        """
+        if comment := models.Comments.query.get(comment_id):
+            return comment, 200
+        else:
+            return {"message": "Comment not found"}, 404
+
+
+############################################################
+
+
+@api.route("/get/by_restaurant/<int:restaurant_id>")
+@api.param(
+    "restaurant_id",
+    "The ID of the restaurant to get comments for",
+    type="integer",
+    required=True,
+)
+@api.response(200, "Success", body=comment_list_model)
+@api.response(404, "Restaurant not found")
+class GetCommentsByRestaurant(Resource):
+    @api.doc("get_comments_by_restaurant", model="Comment_List")
+    def get(self, restaurant_id: int) -> tuple[dict, int]:
+        """Get a list of comment IDs for a given restaurant.
+
+        Args:
+            restaurant_id: The ID of the restaurant to get comments for.
+
+        Returns:
+            A tuple containing a list of comment IDs, or a dictionary with an error message and an integer status code.
+        """
+        if not models.Restaurants.query.get(restaurant_id):
+            return {"message": "Restaurant not found"}, 404
+
+        comment_ids = [
+            comment.comment_id
+            for comment in models.Comments.query.filter_by(
+                restaurant_id=restaurant_id
+            ).all()
+        ]
+
+        return comment_ids, 200
+
+
+############################################################
+
+
+@api.route("/report/<int:comment_id>")
+@api.param(
+    "comment_id",
+    "The ID of the comment to report",
+    type="integer",
+    required=True,
+)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(400, "User already reported the comment")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(403, "User cannot report their own comment")
+@api.response(404, "Comment not found")
+class ReportComment(Resource):
+    @api.doc("report_comment")
+    @jwt_required()
+    def post(self, comment_id: int) -> tuple[dict, int]:
+        """Report a comment. If the comment has been reported 5 or more times, it will be deleted.
+
+        Args:
+            comment_id: The ID of the comment to report.
+
+        Returns:
+            A tuple containing a dictionary with a success message or an error message and an integer status code.
+        """
+        user: models.Users = current_user
+
+        comment: models.Comments = models.Comments.query.get(comment_id)
+
+        if comment is None:
+            return {"message": "Comment not found"}, 404
+
+        if comment.user_id == user.user_id:
+            return {"message": "User cannot report their own comment"}, 403
+
+        if not comment.add_report_by(user.user_id):
+            return {"message": "User already reported the comment"}, 400
+
+        if comment.get_report_num() >= 5:
+            services.comments.delete_comment_v1(comment)
+
+        return {"message": "Success"}, 200
+
+############################################################
+# TODO: Add like/dislike endpoints

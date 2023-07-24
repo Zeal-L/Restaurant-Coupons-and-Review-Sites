@@ -66,7 +66,7 @@ class Replies(db.Model):
         return Replies.query.filter_by(reply_id=reply_id).one_or_none()
 
     @staticmethod
-    def get_replies_by_comment(comment_id: int) -> list["Replies"]:
+    def get_replies_by_comment_id(comment_id: int) -> list["Replies"]:
         return Replies.query.filter_by(comment_id=comment_id).all()
 
     @staticmethod

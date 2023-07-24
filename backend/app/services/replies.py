@@ -13,7 +13,7 @@ def delete_all_replies_by_comment_v1(comment: models.Comments) -> None:
     Args:
         comment (Comments): The comment object to delete replies for.
     """
-    replies: list[models.Replies] = models.Replies.get_replies_by_comment(
+    replies: list[models.Replies] = models.Replies.get_replies_by_comment_id(
         comment.comment_id
     )
 

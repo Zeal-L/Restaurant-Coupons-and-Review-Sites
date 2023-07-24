@@ -7,7 +7,7 @@ api = Namespace("restaurants", description="Restaurants related operations")
 
 
 ############################################################
-# Restaurant Models
+# Models
 
 new_restaurant_model = api.model(
     "New_Restaurant",
@@ -282,3 +282,7 @@ class ResetImage(Resource):
             return {"message": "Success"}, 200
         else:
             return {"message": "User does not own the restaurant"}, 404
+
+
+############################################################
+

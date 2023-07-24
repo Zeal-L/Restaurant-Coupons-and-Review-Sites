@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_restx import Api, Resource
 from flask_jwt_extended import JWTManager, decode_token
-from . import users, restaurants, dishes
+from . import users, restaurants, dishes, comments
 
 from app import models
 
@@ -62,6 +62,8 @@ def init_app(app: Flask) -> None:
     api.add_namespace(users.api)
     api.add_namespace(restaurants.api)
     api.add_namespace(dishes.api)
+    api.add_namespace(comments.api)
+
     api.init_app(app)
 
 

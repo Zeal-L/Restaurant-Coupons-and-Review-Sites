@@ -7,7 +7,7 @@ from flask_restx import Namespace, Resource, fields
 api = Namespace("dishes", description="Dishes related operations")
 
 ############################################################
-# Dish Models
+# Models
 
 new_dish_model = api.model(
     "New_Dish",
@@ -16,6 +16,13 @@ new_dish_model = api.model(
         "price": fields.Float(required=True, description="Dish price"),
         "description": fields.String(required=True, description="Dish description"),
         "image": fields.String(required=True, description="Dish image in base64"),
+    },
+)
+
+image_model = api.model(
+    "Image",
+    {
+        "base64": fields.String(required=True, description="The user photo in base64"),
     },
 )
 
@@ -115,6 +122,7 @@ class DeleteDishById(Resource):
 
 ############################################################
 
+
 @api.route("/reset/name/<int:dish_id>/<string:name>")
 @api.param("dish_id", "Dish ID", type="int", required=True)
 @api.param("name", "The new name of the dish", type="string", required=True)
@@ -152,6 +160,119 @@ class ResetDishName(Resource):
 
 ############################################################
 
-############################################################
+
+@api.route("/reset/price/<int:dish_id>/<float:price>")
+@api.param("dish_id", "Dish ID", type="int", required=True)
+@api.param("price", "The new price of the dish", type="float", required=True)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(404, "User does not own the dish")
+class ResetDishPrice(Resource):
+    @api.doc("reset_dish_price")
+    @jwt_required()
+    def put(self, dish_id: int, price: float) -> tuple[dict, int]:
+        """Reset the price of the dish.
+
+        Returns:
+            A tuple containing a dictionary with the dish's name, price, description, and image if found, and an integer status code.
+        """
+
+        user: models.Users = current_user
+
+        if dish := models.Dishes.get_dish_by_id(dish_id):
+            if dish.restaurant.owner_id == user.user_id:
+                dish.set_price(price)
+                return {"message": "Success"}, 200
+            else:
+                return {"message": "User does not own the dish"}, 404
+        else:
+            return {"message": "Dish not found"}, 404
+
 
 ############################################################
+
+
+@api.route("/reset/description/<int:dish_id>/<string:description>")
+@api.param("dish_id", "Dish ID", type="int", required=True)
+@api.param(
+    "description", "The new description of the dish", type="string", required=True
+)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(404, "User does not own the dish")
+class ResetDishDescription(Resource):
+    @api.doc("reset_dish_description")
+    @jwt_required()
+    def put(self, dish_id: int, description: str) -> tuple[dict, int]:
+        """Reset the description of the dish.
+
+        Returns:
+            A tuple containing a dictionary with the dish's name, price, description, and image if found, and an integer status code.
+        """
+
+        user: models.Users = current_user
+
+        if dish := models.Dishes.get_dish_by_id(dish_id):
+            if dish.restaurant.owner_id == user.user_id:
+                dish.set_description(description)
+                return {"message": "Success"}, 200
+            else:
+                return {"message": "User does not own the dish"}, 404
+        else:
+            return {"message": "Dish not found"}, 404
+
+
+############################################################
+
+
+@api.route("/reset/image/<int:dish_id>")
+@api.param("dish_id", "Dish ID", type="int", required=True)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(400, "Invalid photo format, must be base64")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(404, "User does not own the dish")
+class ResetDishImage(Resource):
+    @api.doc("reset_dish_image", body=image_model)
+    @jwt_required()
+    def put(self, dish_id: int) -> tuple[dict, int]:
+        """Reset the image of the dish.
+
+        Returns:
+            A tuple containing a dictionary with the dish's name, price, description, and image if found, and an integer status code.
+        """
+
+        user: models.Users = current_user
+        image = api.payload.get("base64")
+
+        if not services.util.check_photo_format_v1(image):
+            return {"message": "Invalid image format, must be base64"}, 400
+
+        if dish := models.Dishes.get_dish_by_id(dish_id):
+            if dish.restaurant.owner_id == user.user_id:
+                dish.set_image(image)
+                return {"message": "Success"}, 200
+            else:
+                return {"message": "User does not own the dish"}, 404
+        else:
+            return {"message": "Dish not found"}, 404

@@ -6,7 +6,7 @@ from flask_restx import Namespace, Resource, fields
 api = Namespace("users", description="Users related operations")
 
 ############################################################
-# User Models
+# Models
 
 login_model = api.model(
     "Login",
@@ -99,6 +99,16 @@ register_verify_code_model = api.model(
     },
 )
 
+check_favorite_model = api.model(
+    "Check_Favorite",
+    {
+        "message": fields.String(required=True, description="Success message"),
+        "is_favorite": fields.Boolean(
+            required=True, description="Whether the restaurant is in favorites"
+        ),
+    },
+)
+
 
 ############################################################
 
@@ -154,7 +164,7 @@ class Register_send_code(Resource):
     @api.doc("register_send_code", body=register_model)
     def post(self) -> tuple[dict, int]:
         """
-        Register a new user, without email verification.
+        Register a new user, with email verification.
 
         Returns:
             message: A message indicating whether the registration was successful.
@@ -675,3 +685,125 @@ class VerifyPasswordResetCode(Resource):
             return {"message": "Reset code expired"}, 406
 
         return {"message": "Password reset successfully", "token": res}, 200
+
+############################################################
+
+@api.route("/favorites/add/<int:restaurant_id>")
+@api.param(
+    "restaurant_id",
+    "The ID of the restaurant to add to favorites",
+    type="integer",
+    required=True,
+)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(400, "Restaurant already in favorites")
+@api.response(404, "Restaurant not found")
+class AddFavorite(Resource):
+    @api.doc("add_favorite")
+    @jwt_required()
+    def post(self, restaurant_id: int) -> tuple[dict, int]:
+        """Add a restaurant to the user's favorites.
+
+        Returns:
+            A tuple containing a dictionary with the message "Success" if the restaurant was added to favorites, and an integer status code.
+        """
+
+        user: models.Users = current_user
+
+        if not models.Restaurants.get_restaurant_by_id(restaurant_id):
+            return {"message": "Restaurant not found"}, 404
+
+        if user.add_favorite_restaurants(restaurant_id):
+            return {"message": "Success"}, 200
+        else:
+            return {"message": "Restaurant already in favorites"}, 400
+
+
+############################################################
+
+
+@api.route("/favorites/remove/<int:restaurant_id>")
+@api.param(
+    "restaurant_id",
+    "The ID of the restaurant to remove from favorites",
+    type="integer",
+    required=True,
+)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(400, "Restaurant not in favorites")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(404, "Restaurant not found")
+class RemoveFavorite(Resource):
+    @api.doc("remove_favorite")
+    @jwt_required()
+    def delete(self, restaurant_id: int) -> tuple[dict, int]:
+        """Remove a restaurant from the user's favorites.
+
+        Returns:
+            A tuple containing a dictionary with the message "Success" if the restaurant was removed from favorites, and an integer status code.
+        """
+
+        user: models.Users = current_user
+
+        if not models.Restaurants.get_restaurant_by_id(restaurant_id):
+            return {"message": "Restaurant not found"}, 404
+
+        if user.remove_favorite_restaurants(restaurant_id):
+            return {"message": "Success"}, 200
+        else:
+            return {"message": "Restaurant not in favorites"}, 400
+
+
+############################################################
+
+
+@api.route("/favorites/check/<int:restaurant_id>")
+@api.param(
+    "restaurant_id",
+    "The ID of the restaurant to check if it is in favorites",
+    type="integer",
+    required=True,
+)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success", model=check_favorite_model)
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(404, "Restaurant not found")
+class CheckFavorite(Resource):
+    @api.doc("check_favorite")
+    @jwt_required()
+    def get(self, restaurant_id: int) -> tuple[dict, int]:
+        """Check if a restaurant is in the user's favorites.
+
+        Returns:
+            A tuple containing a dictionary with the message "Success" and a boolean value indicating whether the restaurant is in the user's favorites, and an integer status code.
+        """
+
+        user: models.Users = current_user
+
+        restaurant = models.Restaurants.get_restaurant_by_id(restaurant_id)
+        if not restaurant:
+            return {"message": "Restaurant not found"}, 404
+
+        is_favorite = user.is_favorite_restaurant(restaurant_id)
+        return {"message": "Success", "is_favorite": is_favorite}, 200
