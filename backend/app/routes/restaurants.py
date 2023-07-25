@@ -33,6 +33,15 @@ restaurant_info_model = api.model(
     },
 )
 
+image_model = api.model(
+    "Image",
+    {
+        "base64": fields.String(
+            required=True, description="The restaurant image in base64"
+        ),
+    },
+)
+
 
 ############################################################
 
@@ -248,10 +257,7 @@ class ResetAddress(Resource):
 ############################################################
 
 
-@api.route("/reset/image/<string:image>")
-@api.param(
-    "image", "The new image of the restaurant in base64", type="string", required=True
-)
+@api.route("/reset/image")
 @api.param(
     "Authorization",
     "JWT Authorization header",
@@ -264,9 +270,9 @@ class ResetAddress(Resource):
 @api.response(401, "Unauthorized, invalid JWT token")
 @api.response(404, "User does not own the restaurant")
 class ResetImage(Resource):
-    @api.doc("reset_image")
+    @api.doc("reset_image", body=image_model)
     @jwt_required()
-    def put(self, image: str) -> tuple[dict, int]:
+    def put(self) -> tuple[dict, int]:
         """Reset the image of the restaurant.
 
         Returns:
@@ -275,14 +281,15 @@ class ResetImage(Resource):
 
         user: models.Users = current_user
 
+        new_image = api.payload.get("base64")
+
         if restaurant := models.Restaurants.get_restaurant_by_owner(user.user_id):
-            if not services.util.check_photo_format_v1(image):
+            if not services.util.check_photo_format_v1(new_image):
                 return {"message": "Invalid photo format, must be base64"}, 400
-            restaurant.set_image(image)
+            restaurant.set_image(new_image)
             return {"message": "Success"}, 200
         else:
             return {"message": "User does not own the restaurant"}, 404
 
 
 ############################################################
-

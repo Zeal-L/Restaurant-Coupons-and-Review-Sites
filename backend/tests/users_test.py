@@ -1,11 +1,10 @@
-# pylint: disable=redefined-outer-name, unused-import, missing-function-docstring
 
 import base64
 import time
 
 from flask.testing import FlaskClient
 
-from . import app, client, user_random
+from .util import user_random
 
 ############################################################
 # /users/register
