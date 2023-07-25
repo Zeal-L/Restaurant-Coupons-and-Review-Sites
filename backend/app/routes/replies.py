@@ -188,7 +188,7 @@ class GetRepliesByComment(Resource):
             for reply in models.Replies.query.filter_by(comment_id=comment_id).all()
         ]
 
-        return reply_ids, 200
+        return {"message": "Success", "reply_ids": reply_ids}, 200
 
 
 ############################################################

@@ -21,10 +21,13 @@ def new_comment_v1(
         anonymity (bool): Whether the comment is anonymous.
 
     Returns:
-        The comment object, or 400 if the comment is too long.
+        int or Comments: The comment object if successful, otherwise an error code.
     """
     if len(content) > 1000:
         return 400
+
+    if rate < 0 or rate > 5:
+        return 403
 
     return models.Comments.create_comment(
         user_id=user.user_id,

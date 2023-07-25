@@ -51,7 +51,8 @@ class Replies(db.Model):
             self.report_by = []
         if user_id in self.report_by:
             return False
-        self.report_by.append(user_id)
+        temp = self.report_by + [user_id]
+        self.report_by = temp
         db.session.commit()
         return True
 

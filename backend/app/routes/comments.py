@@ -92,6 +92,7 @@ comment_list_model = api.model(
 @api.response(200, "Success")
 @api.response(400, "Invalid comment length, must be less than 1000 characters")
 @api.response(401, "Unauthorized, invalid JWT token")
+@api.response(403, "Invalid rate range")
 @api.response(404, "Restaurant not found")
 class NewComment(Resource):
     @api.doc("new_comment", body=new_comment_model)
@@ -116,6 +117,8 @@ class NewComment(Resource):
 
         if res == 400:
             return {"message": "Invalid comment format"}, 400
+        elif res == 403:
+            return {"message": "Invalid rate range"}, 403
 
         res: models.Comments = res
 
@@ -219,7 +222,7 @@ class GetCommentsByRestaurant(Resource):
             ).all()
         ]
 
-        return comment_ids, 200
+        return {"message": "Success", "comment_ids": comment_ids}, 200
 
 
 ############################################################

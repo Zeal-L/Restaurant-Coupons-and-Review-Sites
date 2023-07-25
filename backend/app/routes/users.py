@@ -133,21 +133,23 @@ class Register(Resource):
 
         info = api.payload
 
-        token = services.users.user_register_v1(
+        res = services.users.user_register_v1(
             name=info["name"],
             email=info["email"],
             password=info["password"],
         )
 
-        if token == 400:
+        if res == 400:
             return {"message": "Invalid email format or Email already registered"}, 400
 
-        elif token == 403:
+        elif res == 403:
             return {
                 "message": "Invalid password format, At least 8 characters, at least 1 uppercase letter, at least 1 lowercase letter, at least 1 number"
             }, 403
 
-        return {"message": "User registered successfully", "token": token}, 200
+        return {"message": "User registered successfully",
+                "user_id": res["user_id"],
+                "token": res["token"]}, 200
 
 
 ############################################################

@@ -41,7 +41,8 @@ class Comments(db.Model):
             self.report_by = []
         if user_id in self.report_by:
             return False
-        self.report_by.append(user_id)
+        temp = self.report_by + [user_id]
+        self.report_by = temp
         db.session.commit()
         return True
 
@@ -69,9 +70,10 @@ class Comments(db.Model):
             self.liked_by = []
         if user_id in self.liked_by:
             return False
-        if user_id in self.disliked_by:
+        if self.disliked_by is not None and user_id in self.disliked_by:
             self.disliked_by = self.disliked_by.remove(user_id)
-        self.liked_by.append(user_id)
+        temp = self.liked_by + [user_id]
+        self.liked_by = temp
         db.session.commit()
         return True
 
@@ -107,9 +109,10 @@ class Comments(db.Model):
             self.disliked_by = []
         if user_id in self.disliked_by:
             return False
-        if user_id in self.liked_by:
+        if self.liked_by is not None and user_id in self.liked_by:
             self.liked_by = self.liked_by.remove(user_id)
-        self.disliked_by.append(user_id)
+        temp = self.disliked_by + [user_id]
+        self.disliked_by = temp
         db.session.commit()
         return True
 
