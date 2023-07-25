@@ -141,6 +141,20 @@ class Comments(db.Model):
         date: str,
         anonymity: bool,
     ) -> "Comments":
+        """
+        Creates a new comment object and adds it to the database.
+
+        Args:
+            user_id (int): The id of the user who created the comment.
+            restaurant_id (int): The id of the restaurant the comment is for.
+            content (str): The content of the comment.
+            rate (float): The rating given to the restaurant by the user.
+            date (str): The date the comment was created.
+            anonymity (bool): Whether the comment is anonymous or not.
+
+        Returns:
+            Comments: The newly created comment object.
+        """
         comment = Comments(
             user_id=user_id,
             restaurant_id=restaurant_id,
@@ -158,14 +172,38 @@ class Comments(db.Model):
 
     @staticmethod
     def get_comment_by_id(comment_id: int) -> "Comments" or None:
+        """
+        Retrieves a comment from the database by its id.
+
+        Args:
+            comment_id (int): The id of the comment to retrieve.
+
+        Returns:
+            Comments or None: The comment object if found, None otherwise.
+        """
         return Comments.query.filter_by(comment_id=comment_id).one_or_none()
 
     @staticmethod
     def get_comments_by_restaurant_id(restaurant_id: int) -> list["Comments"]:
+        """
+        Retrieves all comments for a given restaurant from the database.
+
+        Args:
+            restaurant_id (int): The id of the restaurant to retrieve comments for.
+
+        Returns:
+            list[Comments]: A list of comment objects for the given restaurant.
+        """
         return Comments.query.filter_by(restaurant_id=restaurant_id).all()
 
     @staticmethod
     def delete_comment(comment_id: int) -> None:
+        """
+        Deletes a comment from the database.
+
+        Args:
+            comment_id (int): The id of the comment to be deleted.
+        """
         comment = Comments.get_comment_by_id(comment_id)
         db.session.delete(comment)
         db.session.commit()

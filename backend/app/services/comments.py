@@ -10,7 +10,7 @@ def new_comment_v1(
     content: str,
     rate: float,
     anonymity: bool,
-) -> int:
+) -> int or models.Comments:
     """Creates a new comment associated with the given user and restaurant.
 
     Args:
@@ -40,7 +40,7 @@ def new_comment_v1(
 
 
 def delete_comment_v1(comment: models.Comments) -> None:
-    """Deletes the given comment.
+    """Deletes the given comment. Also deletes all replies associated with the comment.
 
     Args:
         comment (Comments): The comment object to delete.

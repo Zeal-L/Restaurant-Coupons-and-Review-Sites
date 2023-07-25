@@ -154,7 +154,7 @@ class DeleteComment(Resource):
             return {"message": "Comment not found"}, 404
 
         if comment.user_id != user.user_id:
-            return {"message": "Unauthorized to delete this comment"}, 401
+            return {"message": "Unauthorized, not the owner of the comment"}, 401
 
         services.comments.delete_comment_v1(comment)
 
@@ -274,5 +274,196 @@ class ReportComment(Resource):
 
         return {"message": "Success"}, 200
 
+
 ############################################################
-# TODO: Add like/dislike endpoints
+
+
+@api.route("/liked_by/add/<int:comment_id>")
+@api.param(
+    "comment_id",
+    "The ID of the comment to add liked by user",
+    type="integer",
+    required=True,
+)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(400, "User already liked the comment")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(403, "User cannot like their own comment")
+@api.response(404, "Comment not found")
+class AddLikedBy(Resource):
+    @api.doc("add_liked_by")
+    @jwt_required()
+    def post(self, comment_id: int) -> tuple[dict, int]:
+        """Add a user to the liked by list of a comment.
+        It also removes the user from the disliked by list if they are in it.
+
+        Args:
+            comment_id: The ID of the comment to add liked by user.
+
+        Returns:
+            A tuple containing a dictionary with a success message or an error message and an integer status code.
+        """
+        user: models.Users = current_user
+
+        comment: models.Comments = models.Comments.query.get(comment_id)
+
+        if comment is None:
+            return {"message": "Comment not found"}, 404
+
+        if comment.user_id == user.user_id:
+            return {"message": "User cannot like their own comment"}, 403
+
+        if not comment.add_liked_by(user.user_id):
+            return {"message": "User already liked the comment"}, 400
+
+        return {"message": "Success"}, 200
+
+
+############################################################
+
+
+@api.route("/liked_by/remove/<int:comment_id>")
+@api.param(
+    "comment_id",
+    "The ID of the comment to remove liked by user",
+    type="integer",
+    required=True,
+)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(400, "User did not like the comment")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(404, "Comment not found")
+class RemoveLikedBy(Resource):
+    @api.doc("remove_liked_by")
+    @jwt_required()
+    def delete(self, comment_id: int) -> tuple[dict, int]:
+        """Remove a user from the liked by list of a comment.
+
+        Args:
+            comment_id: The ID of the comment to remove liked by user.
+
+        Returns:
+            A tuple containing a dictionary with a success message or an error message and an integer status code.
+        """
+        user: models.Users = current_user
+
+        comment: models.Comments = models.Comments.query.get(comment_id)
+
+        if comment is None:
+            return {"message": "Comment not found"}, 404
+
+        if not comment.remove_liked_by(user.user_id):
+            return {"message": "User did not like the comment"}, 400
+
+        return {"message": "Success"}, 200
+
+
+############################################################
+
+
+@api.route("/disliked_by/add/<int:comment_id>")
+@api.param(
+    "comment_id",
+    "The ID of the comment to add disliked by user",
+    type="integer",
+    required=True,
+)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(400, "User already disliked the comment")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(403, "User cannot dislike their own comment")
+@api.response(404, "Comment not found")
+class AddDislikedBy(Resource):
+    @api.doc("add_disliked_by")
+    @jwt_required()
+    def post(self, comment_id: int) -> tuple[dict, int]:
+        """Add a user to the disliked by list of a comment.
+        It also removes the user from the liked by list if they are in it.
+
+        Args:
+            comment_id: The ID of the comment to add disliked by user.
+
+        Returns:
+            A tuple containing a dictionary with a success message or an error message and an integer status code.
+        """
+        user: models.Users = current_user
+
+        comment: models.Comments = models.Comments.query.get(comment_id)
+
+        if comment is None:
+            return {"message": "Comment not found"}, 404
+
+        if comment.user_id == user.user_id:
+            return {"message": "User cannot dislike their own comment"}, 403
+
+        if not comment.add_disliked_by(user.user_id):
+            return {"message": "User already disliked the comment"}, 400
+
+        return {"message": "Success"}, 200
+
+
+############################################################
+
+
+@api.route("/disliked_by/remove/<int:comment_id>")
+@api.param(
+    "comment_id",
+    "The ID of the comment to remove disliked by user",
+    type="integer",
+    required=True,
+)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(400, "User did not dislike the comment")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(404, "Comment not found")
+class RemoveDislikedBy(Resource):
+    @api.doc("remove_disliked_by")
+    @jwt_required()
+    def delete(self, comment_id: int) -> tuple[dict, int]:
+        """Remove a user from the disliked by list of a comment.
+
+        Args:
+            comment_id: The ID of the comment to remove disliked by user.
+
+        Returns:
+            A tuple containing a dictionary with a success message or an error message and an integer status code.
+        """
+        user: models.Users = current_user
+
+        comment: models.Comments = models.Comments.query.get(comment_id)
+
+        if comment is None:
+            return {"message": "Comment not found"}, 404
+
+        if not comment.remove_disliked_by(user.user_id):
+            return {"message": "User did not dislike the comment"}, 400
+
+        return {"message": "Success"}, 200
