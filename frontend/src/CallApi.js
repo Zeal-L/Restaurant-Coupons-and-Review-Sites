@@ -33,7 +33,8 @@ export function CallApiWithToken(path, type, data) {
   if (data !== undefined) {
     data = JSON.stringify(data);
   }
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    let statusCode;
     fetch(`${backendUrl}/${path}`, {
       method: type,
       headers: {
@@ -43,7 +44,17 @@ export function CallApiWithToken(path, type, data) {
       body: data,
     })
       .then(response => {
-        resolve(response);
+        statusCode = response.status;
+        return response.json();
+      })
+      .then(data => {
+        resolve({
+          status: statusCode,
+          data: data
+        });
+      })
+      .catch(error => {
+        reject(error);
       });
   });
 }

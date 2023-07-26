@@ -18,9 +18,10 @@ function Login() {
     const email = form.target.email.value;
     const password = form.target.password.value;
     CallApi("/users/login", "POST", {email, password}).then((res) => {
-      console.log(res);
       if (res.status === 200) {
         setter.showNotification(res.data.message, NotificationType.Success);
+        localStorage.setItem("token", res.data.token);
+        setter.setLogin(true);
         navigate("/");
       } else {
         setter.showNotification(res.data.message, NotificationType.Error);

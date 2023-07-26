@@ -85,6 +85,7 @@ function Register() {
       if (res.status === 200) {
         setter.showNotification(res.data.message, NotificationType.Success);
         localStorage.setItem("token", res.data.token);
+        setter.setLogin(true);
         navigate("/");
       } else {
         setter.showNotification(res.data.message, NotificationType.Error);

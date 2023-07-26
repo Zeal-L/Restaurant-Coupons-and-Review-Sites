@@ -14,12 +14,13 @@ import MenuItem from "@mui/material/MenuItem";
 import {useNavigate} from "react-router-dom";
 import {ReactComponent as Logo} from "../Resource/logo.svg";
 import {Divider} from "@mui/material";
+import {Context, useContext} from "../context";
+import LoginIcon from '@mui/icons-material/Login';
 
 export default function TopBar() {
 
-  // const pages = ['My Restaurant','Voucher verify']
+  const {getter, setter} = useContext(Context);
   const [pages, setPages] = React.useState(["My Restaurant", "Voucher verify"]);
-  // const settings = ['Profile', 'Logout'];
   // eslint-disable-next-line no-unused-vars
   const [settings, setSettings] = React.useState(["Profile", "Logout"]);
   const navigate = useNavigate();
@@ -27,7 +28,8 @@ export default function TopBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   // eslint-disable-next-line no-unused-vars
   const [haveRestaurant, setHaveRestaurant] = React.useState(false);
-
+  const [userImage, setUserImage] = React.useState("");
+  const [userName, setUserName] = React.useState("");
   React.useEffect(() => {
     if (haveRestaurant) {
       setPages(["My Restaurant", "Voucher verify"]);
@@ -76,6 +78,7 @@ export default function TopBar() {
       break;
     case "Logout":
       localStorage.removeItem("token");
+      setter.setLogin(false);
       navigate("/login");
       break;
     default:
@@ -185,13 +188,19 @@ export default function TopBar() {
               </>
             ))}
           </Box>
-
           <Box sx={{flexGrow: 0}}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg"/>
-              </IconButton>
-            </Tooltip>
+              {getter.login ? (
+                <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                  <Avatar alt={userName} src={userImage}/>
+                </IconButton>
+                ) : (
+                <Tooltip title="Login" arrow>
+                  <IconButton aria-label="fingerprint" color="secondary" onClick={() => navigate("/login")}>
+                    <LoginIcon />
+                  </IconButton>
+                </Tooltip>
+                )
+              }
             <Menu
               sx={{mt: "45px"}}
               id="menu-appbar"

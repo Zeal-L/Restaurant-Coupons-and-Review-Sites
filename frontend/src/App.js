@@ -71,7 +71,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Listing/>}/>
           <Route path="login" element={<Login/>}/>
-          <Route path="register" element={<Register/>}/>
+          <
+            Route path="register" element={<Register/>}/>
           <Route path="/findPassword/identity" element={<EMailVerification/>}/>
           <Route path="/findPassword/reset" element={<ResetPassword/>}/>
           <Route path="/manage/voucher" element={<VoucherVerify/>}/>
