@@ -4,7 +4,7 @@ import {Context, NotificationType, useContext} from "../context.js";
 import {Button, Dialog, DialogTitle, Grid, TextField} from "@mui/material";
 
 function ChangePasswordPop(props) {
-  const {setter, getter} = useContext(Context);
+  const {setter} = useContext(Context);
   const [oldPassword, setOldPassword] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [Cpassword, setCpassword] = React.useState("");
@@ -12,18 +12,18 @@ function ChangePasswordPop(props) {
   const [passwordErr, setPasswordErr] = React.useState(false);
   const [confirmPasswordErr, setConfirmPasswordErr] = React.useState(false);
 
-  const currentProfile = props.profileInfo;
+  const currentPassword = props.currentPassword;
   const editProfile = () => {
-    if (oldPassword !== currentProfile.password) {
+    if (oldPassword !== currentPassword) {
       setOldPasswordErr(true);
       setter.showNotification("Please enter old password right.", NotificationType.Error);
       return;
     }
     const isPasswordValid =
-      password.length >= 8 &&
-      /[A-Z]/.test(password) &&
-      /[a-z]/.test(password) &&
-      /\d/.test(password);
+    password.length >= 8 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /\d/.test(password);
     if (!isPasswordValid) {
       setPasswordErr(true);
       setter.showNotification("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.", NotificationType.Error);
@@ -34,18 +34,18 @@ function ChangePasswordPop(props) {
       setter.showNotification("Password and confirm password must be the same.", NotificationType.Error);
       return;
     }
-    currentProfile.password = password;
-    props.setProfileInfo(currentProfile);
+    props.setPassword(password);
     props.setOpen(false);
   };
   return (
     <Dialog open={props.open} TransitionComponent={TransitionUp} onClose={() => props.setOpen(false)} fullWidth>
       <DialogTitle>Change Password</DialogTitle>
-      <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "30px"}}>
+      <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{ padding: "30px" }}>
         <Grid item xs={12}>
           <TextField
             label="Old Password"
             variant="filled"
+            type="password"
             fullWidth
             onChange={(e) => {
               setOldPassword(e.target.value);
@@ -58,6 +58,7 @@ function ChangePasswordPop(props) {
             label="New Password"
             variant="filled"
             fullWidth
+            type="password"
             onChange={(e) => {
               setPassword(e.target.value);
             }}
@@ -69,22 +70,17 @@ function ChangePasswordPop(props) {
             label="Confirm Password"
             variant="filled"
             fullWidth
+            type="password"
             onChange={(e) => {
               setCpassword(e.target.value);
             }}
             error={confirmPasswordErr}
           />
         </Grid>
-      </Grid>
-
-
+      </Grid> 
       <Grid item xs={12}>
-        <Button fullWidth variant="contained" onClick={editProfile}>Edit</Button>
-
-
+        <Button fullWidth  variant="contained" onClick={editProfile}>Edit</Button>
       </Grid>
-
-
     </Dialog>
   );
 }
