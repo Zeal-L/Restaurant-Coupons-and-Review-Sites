@@ -178,7 +178,7 @@ def test_get_by_comment_success(client: FlaskClient) -> None:
         next(reply_random(client, comment_id, restaurant["token"])) for _ in range(10)
     ]
 
-    res = client.get(
+    res = client.post(
         "/replies/get/by_comment",
         json={"comment_id": comment_id, "start": 0, "end": 10},
     )
@@ -198,21 +198,21 @@ def test_get_by_comment_invalid_range(client: FlaskClient) -> None:
         next(reply_random(client, comment_id, restaurant["token"])) for _ in range(10)
     ]
 
-    res = client.get(
+    res = client.post(
         "/replies/get/by_comment",
         json={"comment_id": comment_id, "start": -1, "end": 10},
     )
 
     assert res.status_code == 400
 
-    res = client.get(
+    res = client.post(
         "/replies/get/by_comment",
         json={"comment_id": comment_id, "start": 3, "end": 2},
     )
 
     assert res.status_code == 400
 
-    res = client.get(
+    res = client.post(
         "/replies/get/by_comment",
         json={"comment_id": comment_id, "start": 0, "end": 100},
     )
@@ -221,7 +221,7 @@ def test_get_by_comment_invalid_range(client: FlaskClient) -> None:
 
 
 def test_get_by_comment_not_found(client: FlaskClient) -> None:
-    res = client.get(
+    res = client.post(
         "/replies/get/by_comment",
         json={"comment_id": 999, "start": 0, "end": 10},
     )
