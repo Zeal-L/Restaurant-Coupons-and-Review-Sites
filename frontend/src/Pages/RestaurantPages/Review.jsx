@@ -10,66 +10,6 @@ import {CallApiWithToken} from "../../CallApi";
 import PropTypes from "prop-types";
 import {Context, NotificationType, useContext} from "../../context";
 
-// const comments = [
-//   {
-//     id: 1,
-//     user: {
-//       name: "John Doe",
-//       avatar: "https://example.com/avatar1.jpg",
-//     },
-//     rating: 4.5,
-//     timestamp: "2023-06-15",
-//     content: "Great product! I highly recommend it.",
-//     likes: 10,
-//     dislikes: 2,
-//     reviews: [
-//       {
-//         id: 1,
-//         user: {
-//           name: "Jane Smith",
-//           avatar: "https://example.com/avatar2.jpg",
-//         },
-//         timestamp: "2023-06-15",
-//         content: "Thanks for your review!",
-//       },
-//
-//       {
-//         id: 1,
-//         user: {
-//           name: "Jane Smith",
-//           avatar: "https://example.com/avatar2.jpg",
-//         },
-//         timestamp: "2023-06-15",
-//         content: "Thanks for your review!",
-//       }
-//     ]
-//   },
-//   {
-//     id: 2,
-//     user: {
-//       name: "Jane Smith",
-//       avatar: "https://example.com/avatar2.jpg",
-//     },
-//     rating: 5,
-//     timestamp: "2023-06-14",
-//     content: "Excellent service. Will definitely buy again.",
-//     likes: 15,
-//     dislikes: 3,
-//     reviews: [
-//       {
-//         id: 1,
-//         user: {
-//           name: "Jane Smith",
-//           avatar: "https://example.com/avatar2.jpg",
-//         },
-//         timestamp: "2023-06-15",
-//         content: "Thanks for your review!",
-//       }
-//     ]
-//   },
-// ];
-
-
 const currentDateTime = () => {
   const now = new Date();
   const year = now.getFullYear();
@@ -78,14 +18,13 @@ const currentDateTime = () => {
   return `${year}-${month}-${day}`;
 };
 
-const Comment = ({user, rating, timestamp, content, likes, dislikes, reviews}) => {
-  console.log(user);
+const Comment = ({comment_id, user, rating, timestamp, content, likes, dislikes, reviews, allComments, setCurrentComment}) => {
   const [likeCount, setLikeCount] = useState(likes);
   const [dislikeCount, setDislikeCount] = useState(dislikes);
   const [showReplies, setShowReplies] = useState(false);
   const [reply, setReply] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
-
+  const {getter, setter} = useContext(Context);
   const handleLike = () => {
     setLikeCount(likeCount + 1);
   };
@@ -97,7 +36,6 @@ const Comment = ({user, rating, timestamp, content, likes, dislikes, reviews}) =
   const toggleReplies = () => {
     setShowReplies(!showReplies);
   };
-  console.log(rating);
   return (
     <Box display="flex" alignItems="flex-start" marginBottom={2}
       sx={{padding: 2, borderRadius: 4, boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"}}>
@@ -154,7 +92,7 @@ const Comment = ({user, rating, timestamp, content, likes, dislikes, reviews}) =
         <Box sx={{marginLeft: 4}}>
           {reviews.map((review) => (
             <Box
-              key={review.id}
+              key={review.reply_id}
               sx={{
                 display: "flex",
                 alignItems: "center",
@@ -166,7 +104,7 @@ const Comment = ({user, rating, timestamp, content, likes, dislikes, reviews}) =
               <Box marginLeft={2}>
                 <Typography variant="subtitle2">{review.user.name}</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {review.timestamp}
+                  {review.date}
                 </Typography>
                 <Typography variant="body2" gutterBottom>
                   {review.content}
@@ -176,7 +114,6 @@ const Comment = ({user, rating, timestamp, content, likes, dislikes, reviews}) =
           ))}
           {showReplies && (
             <Box
-              key={5}
               sx={{
                 display: "flex",
                 alignItems: "flex-start",
@@ -208,6 +145,29 @@ const Comment = ({user, rating, timestamp, content, likes, dislikes, reviews}) =
                   sx={{marginTop: 1}}
                 />
                 <Button variant="contained" color="primary" onClick={() => {
+                  const content = reply;
+                  const anonymity = isAnonymous;
+                  console.log(comment_id);
+                  CallApiWithToken("/replies/new", "POST", {
+                    comment_id,
+                    content,
+                    anonymity,
+                    }).then((res) => {
+                      setReply("");
+                      setShowReplies(false);
+                      setter.showNotification("Reply added successfully!", NotificationType.Success);
+
+                      // CallApiWithToken(`/replies/get/by_id/${res.data.reply_id}`, "GET").then((res) => {
+                      //   if (res.status === 200) {
+                      //     const newReply = res.data.reply;
+                      //     const newAllComments = [...allComments];
+                      //     const commentIndex = newAllComments.findIndex((comment) => comment.comment_id === comment_id);
+                      //     newAllComments[commentIndex].reviews.push(res.data);
+                      //     setCurrentComment(newAllComments[commentIndex]);
+                      //   }
+                      // });
+                      }
+                    );
                 }} sx={{marginTop: 1}}>
                   Submit
                 </Button>
@@ -241,7 +201,6 @@ function Review (props){
   React.useEffect(() => {
     const handleScroll = () => {
       setIsAtBottom( (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight === document.documentElement.scrollHeight);
-      console.log(isAtBottom);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -267,14 +226,11 @@ function Review (props){
     const restaurant_id = restaurantId;
     const start = numberOfComments;
     const end = numberOfComments + 5 < maxComments ? numberOfComments + 5 : maxComments;
-    console.log(start, end);
     if(end === 0 || start >= end) return;
     CallApiWithToken(`/comments/get/by_restaurant`, "POST",{restaurant_id,start,end}).then((response) => {
       if (response.status === 200) {
         const comment_ids = response.data.comment_ids;
-        console.log(comment_ids);
         for (let i = 0; i < comment_ids.length; i++) {
-          console.log(comment_ids);
           getReviews(comment_ids[i]).then((comment) => {
             setComments((comments) => [...comments, comment]);
           });
@@ -311,19 +267,21 @@ function Review (props){
     <div>
       {comments.map((comment) => (
         <Comment
-          key={comment.id}
+          key={comment.comment_id}
+          comment_id={comment.comment_id}
           user={comment.user}
           rating={comment.rate}
           timestamp={comment.date}
           content={comment.content}
           likes={comment.likes}
           dislikes={comment.dislikes}
-          reviews={comment.reviews} /*Adding Commpents' properties*/
+          reviews={comment.reviews}
+          allComments={comments}
+          setCurrentComment={setComments}
         />
       ))}
 
       <Box
-        key={5}
         sx={{
           display: "flex",
           alignItems: "flex-start",
@@ -384,7 +342,6 @@ function Review (props){
             ).then((response) => {
               if (response.status === 200) {
                   let comment = response.data;
-                  console.log(comment);
                   getReviews(comment.comment_id).then((commentData) => {
                       setComments((comments) => [...comments, commentData]);
                   });
@@ -439,16 +396,27 @@ async function getReviews (comment_id){
     const repliceList = await CallApiWithToken(`/replies/get/by_comment`, "POST", {comment_id, start: 0, end: repliceCount});
     if (repliceList.status === 200) {
       const repliceIds = repliceList.data.reply_ids;
-      console.log(repliceList);
       for (let i = 0; i < repliceIds.length; i++) {
-          const repliceResponse = await CallApiWithToken(`replies/get/by_id/${repliceIds[i]}`, "GET");
-          if (repliceResponse.status === 200) {
-              replice.push(repliceResponse.data);
-          }
+        const repliceResponse = await CallApiWithToken(`replies/get/by_id/${repliceIds[i]}`, "GET");
+        const userResponse = await CallApiWithToken(`users/get/by_id/${response.data.user_id}`, "GET");
+        if (userResponse.status !== 200) {
+          repliceResponse.data.user = {
+            name: "Anonymous",
+            avatar: "",
+          };
+        }
+        else {
+          repliceResponse.data.user = {
+            name: userResponse.data.name,
+            avatar: userResponse.data.photo,
+          };
+        }
+        replice.push(repliceResponse.data);
       }
     }
   }
   response.data.reviews = replice;
+  console.log(response.data);
   return response.data;
 }
 
