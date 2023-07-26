@@ -1,4 +1,5 @@
 import base64
+import random
 
 from flask.testing import FlaskClient
 
@@ -145,6 +146,113 @@ def test_get_restaurant_by_token_user_does_not_own_restaurant(
     )
 
     assert res.status_code == 404
+
+
+############################################################
+# /restaurants/get/list/by_name
+############################################################
+
+
+def test_get_restaurant_list_by_name_success(client: FlaskClient) -> None:
+    # sourcery skip: extract-duplicate-method
+    for i in range(10):
+        token = client.post("/users/register", json=next(user_random())).json["token"]
+        with open("backend/tests/test_image.jpg", "rb") as image:
+            image_base64 = base64.b64encode(image.read()).decode("utf-8")
+
+            res = client.post(
+                "/restaurants/new",
+                json={
+                    "name": f"Test Restaurant {i}",
+                    "address": "Test Address",
+                    "image": image_base64,
+                },
+                headers={"Authorization": f"Bearer {token}"},
+            )
+
+    res = client.post(
+        "/restaurants/get/list/by_name",
+        json={"name": "Test Restaurant", "start": 0, "end": 5},
+    )
+
+    assert res.status_code == 200
+    assert len(res.json["Restaurants"]) == 5
+
+    res = client.post(
+        "/restaurants/get/list/by_name",
+        json={"name": "1", "start": 0, "end": 5},
+    )
+
+    assert res.status_code == 200
+    assert len(res.json["Restaurants"]) == 1
+
+    res = client.post(
+        "/restaurants/get/list/by_name",
+        json={"name": "Test", "start": 0, "end": 20},
+    )
+
+    assert res.status_code == 200
+    assert len(res.json["Restaurants"]) == 10
+
+
+def test_get_restaurant_list_by_name_invalid_range(client: FlaskClient) -> None:
+    for i in range(10):
+        token = client.post("/users/register", json=next(user_random())).json["token"]
+        with open("backend/tests/test_image.jpg", "rb") as image:
+            image_base64 = base64.b64encode(image.read()).decode("utf-8")
+
+            res = client.post(
+                "/restaurants/new",
+                json={
+                    "name": f"Test Restaurant {i}",
+                    "address": "Test Address",
+                    "image": image_base64,
+                },
+                headers={"Authorization": f"Bearer {token}"},
+            )
+
+    res = client.post(
+        "/restaurants/get/list/by_name",
+        json={"name": "Test Restaurant", "start": -1, "end": 5},
+    )
+
+    assert res.status_code == 403
+
+    res = client.post(
+        "/restaurants/get/list/by_name",
+        json={"name": "Test Restaurant", "start": 5, "end": 0},
+    )
+
+    assert res.status_code == 403
+
+
+############################################################
+# /restaurants/get/list/by_rating
+############################################################
+
+
+def test_get_restaurant_list_by_rating_success(client: FlaskClient) -> None:
+    for _ in range(10):
+        restaurant = next(restaurant_random(client))
+        for _ in range(10):
+            client.post(
+                "/comments/new",
+                json={
+                    "restaurant_id": restaurant["restaurant_id"],
+                    "content": "Test Comment",
+                    "rate": random.randint(0, 50) / 10,
+                    "anonymity": False,
+                },
+                headers={"Authorization": f"Bearer {restaurant['token']}"},
+            )
+
+    res = client.post(
+        "/restaurants/get/list/by_rating",
+        json={"ascending_order": True, "start": 0, "end": 10},
+    )
+
+    assert res.status_code == 200
+    assert len(res.json["Restaurants"]) == 10
 
 
 ############################################################

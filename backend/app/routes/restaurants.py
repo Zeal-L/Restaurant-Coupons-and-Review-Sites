@@ -42,6 +42,35 @@ image_model = api.model(
     },
 )
 
+get_by_name_model = api.model(
+    "Get_Restaurant_List_By_Name",
+    {
+        "name": fields.String(required=True, description="Restaurant name"),
+        "start": fields.Integer(required=True, description="Start index"),
+        "end": fields.Integer(required=True, description="End index"),
+    },
+)
+
+get_by_rating_model = api.model(
+    "Get_Restaurant_List_By_Rating",
+    {
+        "ascending_order": fields.Boolean(required=True, description="Ascending order"),
+        "start": fields.Integer(required=True, description="Start index"),
+        "end": fields.Integer(required=True, description="End index"),
+    },
+)
+
+restaurant_info_list_model = api.model(
+    "Restaurant_Info_List",
+    {
+        "Restaurants": fields.List(
+            fields.Nested(restaurant_info_model),
+            required=True,
+            description="List of restaurants",
+        ),
+    },
+)
+
 
 ############################################################
 
@@ -184,6 +213,92 @@ class GetRestaurantByToken(Resource):
             return restaurant.__dict__ | rating_info, 200
         else:
             return {"message": "User does not own the restaurant"}, 404
+
+
+############################################################
+
+
+@api.route("/get/list/by_name")
+@api.response(200, "Success", model=restaurant_info_list_model)
+@api.response(403, "Invalid start and end index")
+class GetRestaurantListByName(Resource):
+    @api.doc("get_restaurant_list_by_name", body=get_by_name_model)
+    @api.marshal_with(restaurant_info_list_model)
+    def post(self) -> tuple[dict, int]:
+        """
+        Get a list of restaurants by name.
+
+        Returns:
+            A tuple containing a dictionary with a list of restaurants sorted by rating, and an integer status code.
+            If the start and end indices are invalid, returns a dictionary with a message indicating the indices are invalid, and an integer status code.
+        """
+        info = api.payload
+
+        start = info["start"]
+        end = info["end"]
+
+        if restaurant_list := models.Restaurants.query.filter(
+            models.Restaurants.name.like(f"%{info['name']}%")
+        ).all():
+            restaurant_info_list = []
+            for restaurant in restaurant_list:
+                rating_info = services.restaurants.get_restaurant_rating_by_id_v1(
+                    restaurant.restaurant_id
+                )
+                restaurant_info_list.append(restaurant.__dict__ | rating_info)
+
+            if start < 0 or start > len(restaurant_info_list) or end < 1 or end < start:
+                return {"message": "Invalid start and end index"}, 403
+
+            end = min(end, len(restaurant_info_list))
+
+            return {"Restaurants": restaurant_info_list[start:end]}, 200
+
+
+############################################################
+
+
+@api.route("/get/list/by_rating")
+@api.response(200, "Success", model=restaurant_info_list_model)
+@api.response(403, "Invalid start and end index")
+class GetRestaurantListByRating(Resource):
+    @api.doc(
+        "get_restaurant_list_by_rating",
+        body=get_by_rating_model,
+    )
+    @api.marshal_with(restaurant_info_list_model)
+    def post(self) -> tuple[dict, int]:
+        """Get a list of restaurants by rating.
+
+        Returns:
+            A tuple containing a dictionary with a list of restaurants sorted by rating, and an integer status code.
+        """
+        info = api.payload
+
+        ascending_order: bool = info["ascending_order"]
+        start = info["start"]
+        end = info["end"]
+
+        # get all restaurant and rating
+        restaurant_list = models.Restaurants.query.all()
+        restaurant_info_list = []
+        for restaurant in restaurant_list:
+            rating_info = services.restaurants.get_restaurant_rating_by_id_v1(
+                restaurant.restaurant_id
+            )
+            restaurant_info_list.append(restaurant.__dict__ | rating_info)
+
+        # sort by rating
+        restaurant_info_list.sort(
+            key=lambda restaurant: restaurant["rating"], reverse=ascending_order
+        )
+
+        if start < 0 or start > len(restaurant_info_list) or end < 1 or end < start:
+            return {"message": "Invalid start and end index"}, 403
+
+        end = min(end, len(restaurant_info_list))
+
+        return {"Restaurants": restaurant_info_list[start:end]}, 200
 
 
 ############################################################
