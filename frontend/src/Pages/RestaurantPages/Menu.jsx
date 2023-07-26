@@ -41,8 +41,8 @@ function Menu(props) {
   const [popType, setPopType] = React.useState("Add Dish");
   const [popLoading, setPopLoading] = React.useState(false);
 
+  console.log("useEffect44");
   React.useEffect(() => {
-    console.log("useEffect");
     setMenuItems([]);
     let mi = [];
     CallApi(`/dishes/get/by_restaurant/${restaurantId}`, "GET").then((res) => {
@@ -52,7 +52,6 @@ function Menu(props) {
             CallApi(`/dishes/get/by_id/${dish_ids[i]}`, "GET").then((res) => {
               if (res.status === 200) {
                 console.log(res.data);
-                // mi.push(res.data);
                 setMenuItems((prev) => [...prev, res.data]);
               } else {
                 setter.showNotification(res.data.message, NotificationType.Error);
@@ -63,7 +62,7 @@ function Menu(props) {
           setter.showNotification(res.data.message, NotificationType.Error);
         }
     });
-  }, [restaurantId]);
+  }, []);
   const EditDish = (id, image, name, price, description) => {
     image = image.replace(/^data:image\/[a-z]+;base64,/, "");
   };

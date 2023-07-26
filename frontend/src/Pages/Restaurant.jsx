@@ -19,7 +19,7 @@ function Restaurant(props) {
   const [alignment, setAlignment] = React.useState(props.subPage);
   const [data, setData] = React.useState({
     name: "KFC",
-    rating: 4.7,
+    rating: 4.9,
     comment_count: 200,
     address: "40-50+Arncliffe+Street,+Wolli+Creek+新南威尔士州",
     image: "https://media-cdn.tripadvisor.com/media/photo-s/1b/99/44/8e/kfc-faxafeni.jpg",
