@@ -206,7 +206,7 @@ class GetRepliesCountByComment(Resource):
 @api.response(404, "Comment not found")
 class GetRepliesByComment(Resource):
     @api.doc("get_replies_by_comment", model="Reply_List", body=by_comment_model)
-    def get(self) -> tuple[dict, int]:
+    def post(self) -> tuple[dict, int]:
         """Get a list of reply IDs for a comment by its ID, with optional start and end indices.
 
         Returns:
