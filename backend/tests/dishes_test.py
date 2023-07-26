@@ -316,3 +316,57 @@ def test_reset_image_invalid_image(client: FlaskClient) -> None:
     )
 
     assert res.status_code == 400
+
+
+############################################################
+# /dishes/reset/info/<int:dish_id>>
+############################################################
+
+
+def test_reset_info_success(client: FlaskClient) -> None:
+    restaurant = next(restaurant_random(client))
+    dish_id = next(dish_random(client, restaurant["token"]))
+
+    with open("backend/tests/test_image.jpg", "rb") as image_file:
+        image_base64 = base64.b64encode(image_file.read()).decode("utf-8")
+
+    res = client.put(
+        f"/dishes/reset/info/{dish_id}",
+        json={
+            "name": "New Name",
+            "price": 10.0,
+            "description": "New Description",
+            "image": image_base64,
+        },
+        headers={"Authorization": f"Bearer {restaurant['token']}"},
+    )
+
+    assert res.status_code == 200
+
+    res = client.get(f"/dishes/get/by_id/{dish_id}")
+
+    assert res.status_code == 200
+    assert res.json["name"] == "New Name"
+    assert res.json["price"] == 10.0
+    assert res.json["description"] == "New Description"
+    assert res.json["image"] == image_base64
+
+
+def test_reset_info_success_only_name(client: FlaskClient) -> None:
+    restaurant = next(restaurant_random(client))
+    dish_id = next(dish_random(client, restaurant["token"]))
+
+    res = client.put(
+        f"/dishes/reset/info/{dish_id}",
+        json={
+            "name": "New Name",
+        },
+        headers={"Authorization": f"Bearer {restaurant['token']}"},
+    )
+
+    assert res.status_code == 200
+
+    res = client.get(f"/dishes/get/by_id/{dish_id}")
+
+    assert res.status_code == 200
+    assert res.json["name"] == "New Name"

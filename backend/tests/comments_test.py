@@ -152,6 +152,39 @@ def test_get_by_id_success(client: FlaskClient) -> None:
     assert json["content"] == res.json["content"]
     assert json["rate"] == res.json["rate"]
     assert json["anonymity"] == res.json["anonymity"]
+    assert res.json["liked_by"] is False
+    assert res.json["disliked_by"] is False
+
+
+def test_get_by_id_success_liked_by(client: FlaskClient) -> None:
+    restaurant = next(restaurant_random(client))
+    json = {
+        "restaurant_id": restaurant["restaurant_id"],
+        "content": "Test Comment",
+        "rate": 5,
+        "anonymity": False,
+    }
+    res = client.post(
+        "/comments/new",
+        json=json,
+        headers={"Authorization": f"Bearer {restaurant['token']}"},
+    )
+
+    token = client.post("/users/register", json=next(user_random())).json["token"]
+
+    client.post(
+        f"/comments/liked_by/add/{res.json['comment_id']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    res = client.get(
+        f"/comments/get/by_id/{res.json['comment_id']}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert res.status_code == 200
+    assert res.json["liked_by"] is True
+    assert res.json["disliked_by"] is False
 
 
 def test_get_by_id_comment_not_found(client: FlaskClient) -> None:
@@ -163,11 +196,52 @@ def test_get_by_id_comment_not_found(client: FlaskClient) -> None:
 
 
 ############################################################
-# /comments/get/by_restaurant/<int:restaurant_id>
+# /comments/get/count/by_restaurant/<int:restaurant_id>
+############################################################
+
+
+def test_get_count_by_restaurant_success(client: FlaskClient) -> None:
+    restaurant = next(restaurant_random(client))
+    _comment_ids = [
+        next(comment_random(client, restaurant["restaurant_id"], restaurant["token"]))
+        for _ in range(4)
+    ]
+
+    res = client.get(
+        f"/comments/get/count/by_restaurant/{restaurant['restaurant_id']}",
+    )
+
+    assert res.status_code == 200
+    assert res.json["count"] == 4
+
+
+############################################################
+# /comments/get/by_restaurant
 ############################################################
 
 
 def test_get_by_restaurant_success(client: FlaskClient) -> None:
+    restaurant = next(restaurant_random(client))
+    comment_ids = [
+        next(comment_random(client, restaurant["restaurant_id"], restaurant["token"]))
+        for _ in range(5)
+    ]
+
+    res = client.get(
+        "/comments/get/by_restaurant",
+        json={
+            "restaurant_id": restaurant["restaurant_id"],
+            "start": 0,
+            "end": 2,
+        },
+    )
+
+    assert res.status_code == 200
+    assert len(res.json["comment_ids"]) == 2
+    assert comment_ids[:2] == res.json["comment_ids"]
+
+
+def test_get_by_restaurant_invalid_range(client: FlaskClient) -> None:
     restaurant = next(restaurant_random(client))
     comment_ids = [
         next(comment_random(client, restaurant["restaurant_id"], restaurant["token"]))
@@ -183,12 +257,37 @@ def test_get_by_restaurant_success(client: FlaskClient) -> None:
     )
 
     res = client.get(
-        f"/comments/get/by_restaurant/{restaurant['restaurant_id']}",
+        "/comments/get/by_restaurant",
+        json={
+            "restaurant_id": restaurant["restaurant_id"],
+            "start": -1,
+            "end": 2,
+        },
     )
 
-    assert res.status_code == 200
-    assert len(res.json["comment_ids"]) == 4
-    assert comment_ids == res.json["comment_ids"]
+    assert res.status_code == 400
+
+    res = client.get(
+        "/comments/get/by_restaurant",
+        json={
+            "restaurant_id": restaurant["restaurant_id"],
+            "start": 3,
+            "end": 2,
+        },
+    )
+
+    assert res.status_code == 400
+
+    res = client.get(
+        "/comments/get/by_restaurant",
+        json={
+            "restaurant_id": restaurant["restaurant_id"],
+            "start": 0,
+            "end": 10,
+        },
+    )
+
+    assert res.status_code == 400
 
 
 def test_get_by_restaurant_restaurant_not_found(client: FlaskClient) -> None:
@@ -218,10 +317,6 @@ def test_report_success(client: FlaskClient) -> None:
     )
 
     assert res.status_code == 200
-
-    res = client.get(f"/comments/get/by_id/{comment_id}")
-
-    assert user_info["user_id"] in res.json["report_by"]
 
 
 def test_report_success_5_times(client: FlaskClient) -> None:
@@ -313,9 +408,12 @@ def test_liked_by_add_success(client: FlaskClient) -> None:
 
     assert res.status_code == 200
 
-    res = client.get(f"/comments/get/by_id/{comment_id}")
+    res = client.get(
+        f"/comments/get/by_id/{comment_id}",
+        headers={"Authorization": f"Bearer {user_info['token']}"},
+    )
 
-    assert user_info["user_id"] in res.json["liked_by"]
+    assert res.json["liked_by"] is True
 
 
 def test_liked_by_add_already_liked(client: FlaskClient) -> None:
@@ -386,10 +484,13 @@ def test_liked_by_add_will_romeve_dislike(client: FlaskClient) -> None:
 
     assert res.status_code == 200
 
-    res = client.get(f"/comments/get/by_id/{comment_id}")
+    res = client.get(
+        f"/comments/get/by_id/{comment_id}",
+        headers={"Authorization": f"Bearer {user_info['token']}"},
+    )
 
-    assert user_info["user_id"] in res.json["liked_by"]
-    assert res.json["disliked_by"] is None
+    assert res.json["liked_by"] is True
+    assert res.json["disliked_by"] is False
 
 
 ############################################################
@@ -418,9 +519,12 @@ def test_liked_by_remove_success(client: FlaskClient) -> None:
 
     assert res.status_code == 200
 
-    res = client.get(f"/comments/get/by_id/{comment_id}")
+    res = client.get(
+        f"/comments/get/by_id/{comment_id}",
+        headers={"Authorization": f"Bearer {user_info['token']}"},
+    )
 
-    assert res.json["liked_by"] is None
+    assert res.json["liked_by"] is False
 
 
 def test_liked_by_remove_not_liked(client: FlaskClient) -> None:
@@ -468,9 +572,12 @@ def test_disliked_by_add_success(client: FlaskClient) -> None:
 
     assert res.status_code == 200
 
-    res = client.get(f"/comments/get/by_id/{comment_id}")
+    res = client.get(
+        f"/comments/get/by_id/{comment_id}",
+        headers={"Authorization": f"Bearer {user_info['token']}"},
+    )
 
-    assert user_info["user_id"] in res.json["disliked_by"]
+    assert res.json["disliked_by"] is True
 
 
 def test_disliked_by_add_already_disliked(client: FlaskClient) -> None:
@@ -540,10 +647,13 @@ def test_disliked_by_add_will_romeve_like(client: FlaskClient) -> None:
 
     assert res.status_code == 200
 
-    res = client.get(f"/comments/get/by_id/{comment_id}")
+    res = client.get(
+        f"/comments/get/by_id/{comment_id}",
+        headers={"Authorization": f"Bearer {user_info['token']}"},
+    )
 
-    assert user_info["user_id"] in res.json["disliked_by"]
-    assert res.json["liked_by"] is None
+    assert res.json["disliked_by"] is True
+    assert res.json["liked_by"] is False
 
 
 ############################################################
@@ -572,9 +682,12 @@ def test_disliked_by_remove_success(client: FlaskClient) -> None:
 
     assert res.status_code == 200
 
-    res = client.get(f"/comments/get/by_id/{comment_id}")
+    res = client.get(
+        f"/comments/get/by_id/{comment_id}",
+        headers={"Authorization": f"Bearer {user_info['token']}"},
+    )
 
-    assert res.json["disliked_by"] is None
+    assert res.json["disliked_by"] is False
 
 
 def test_disliked_by_remove_not_disliked(client: FlaskClient) -> None:

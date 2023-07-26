@@ -47,20 +47,13 @@ comment_info_model = api.model(
         "anonymity": fields.Boolean(
             required=True, description="Whether the comment is anonymous."
         ),
-        "report_by": fields.List(
-            fields.Integer(),
+        "liked_by": fields.Boolean(
             required=True,
-            description="The IDs of the users who reported the comment.",
+            description="Whether the current user liked the comment.",
         ),
-        "liked_by": fields.List(
-            fields.Integer(),
+        "disliked_by": fields.Boolean(
             required=True,
-            description="The IDs of the users who liked the comment.",
-        ),
-        "disliked_by": fields.List(
-            fields.Integer(),
-            required=True,
-            description="The IDs of the users who disliked the comment.",
+            description="Whether the current user disliked the comment.",
         ),
     },
 )
@@ -74,6 +67,21 @@ comment_list_model = api.model(
         ),
         "comment_ids": fields.List(
             fields.Integer(), required=True, description="The IDs of the comments."
+        ),
+    },
+)
+
+by_restaurant_model = api.model(
+    "By_Restaurant",
+    {
+        "restaurant_id": fields.Integer(
+            required=True, description="The ID of the restaurant to get comments for."
+        ),
+        "start": fields.Integer(
+            required=True, description="The starting index of the comments to get."
+        ),
+        "end": fields.Integer(
+            required=True, description="The ending index of the comments to get."
         ),
     },
 )
@@ -168,11 +176,19 @@ class DeleteComment(Resource):
 
 
 @api.route("/get/by_id/<int:comment_id>")
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=False,
+    _in="header",
+)
 @api.param("comment_id", "The ID of the comment to get", type="integer", required=True)
 @api.response(200, "Success", body=comment_info_model)
 @api.response(404, "Comment not found")
 class GetComment(Resource):
     @api.doc("get_comment", model="Comment_Info")
+    @jwt_required(optional=True)
     @api.marshal_with(comment_info_model)
     def get(self, comment_id: int) -> tuple[dict, int]:
         """Get a single comment by its ID.
@@ -183,44 +199,92 @@ class GetComment(Resource):
         Returns:
             A tuple containing a dictionary representing the comment, or a dictionary with an error message and an integer status code.
         """
-        if comment := models.Comments.query.get(comment_id):
-            return comment, 200
-        else:
+        user: models.Users = current_user
+
+        if not (comment := models.Comments.query.get(comment_id)):
             return {"message": "Comment not found"}, 404
+        liked_by = False
+        disliked_by = False
+        if user:
+            if comment.liked_by is not None:
+                liked_by = user.user_id in comment.liked_by
+            if comment.disliked_by is not None:
+                disliked_by = user.user_id in comment.disliked_by
+
+        return {
+            "comment_id": comment.comment_id,
+            "user_id": comment.user_id,
+            "restaurant_id": comment.restaurant_id,
+            "content": comment.content,
+            "rate": comment.rate,
+            "date": comment.date,
+            "anonymity": comment.anonymity,
+            "liked_by": liked_by,
+            "disliked_by": disliked_by,
+        }, 200
 
 
 ############################################################
 
 
-@api.route("/get/by_restaurant/<int:restaurant_id>")
+@api.route("/get/count/by_restaurant/<int:restaurant_id>")
 @api.param(
     "restaurant_id",
     "The ID of the restaurant to get comments for",
     type="integer",
     required=True,
 )
-@api.response(200, "Success", body=comment_list_model)
+@api.response(200, "Success")
 @api.response(404, "Restaurant not found")
-class GetCommentsByRestaurant(Resource):
-    @api.doc("get_comments_by_restaurant", model="Comment_List")
+class GetCommentsCountByRestaurant(Resource):
+    @api.doc("get_comments_count_by_restaurant")
     def get(self, restaurant_id: int) -> tuple[dict, int]:
-        """Get a list of comment IDs for a given restaurant.
-
-        Args:
-            restaurant_id: The ID of the restaurant to get comments for.
-
-        Returns:
-            A tuple containing a list of comment IDs, or a dictionary with an error message and an integer status code.
-        """
         if not models.Restaurants.query.get(restaurant_id):
             return {"message": "Restaurant not found"}, 404
 
-        comment_ids = [
-            comment.comment_id
-            for comment in models.Comments.query.filter_by(
-                restaurant_id=restaurant_id
-            ).all()
-        ]
+        comments_count = models.Comments.query.filter_by(
+            restaurant_id=restaurant_id
+        ).count()
+
+        return {"message": "Success", "count": comments_count}, 200
+
+
+############################################################
+
+
+@api.route("/get/by_restaurant")
+@api.response(200, "Success", body=comment_list_model)
+@api.response(400, "Invalid start or end value")
+@api.response(404, "Restaurant not found")
+class GetCommentsByRestaurant(Resource):
+    @api.doc(
+        "get_comments_by_restaurant", model="Comment_List", body=by_restaurant_model
+    )
+    def get(self) -> tuple[dict, int]:
+        """Get a list of comment IDs for a given restaurant, with optional start and end indices.
+
+        Returns:
+            A tuple containing a dictionary with a message and a list of comment IDs, or a dictionary with an error message and an integer status code.
+        """
+
+        info = api.payload
+
+        if not models.Restaurants.query.get(info["restaurant_id"]):
+            return {"message": "Restaurant not found"}, 404
+
+        comments = (
+            models.Comments.query.filter_by(restaurant_id=info["restaurant_id"])
+            .order_by(models.Comments.comment_id)
+            .all()
+        )
+
+        start = info["start"]
+        end = info["end"]
+
+        if start < 0 or end < 1 or start >= end or end > len(comments):
+            return {"message": "Invalid start or end value"}, 400
+
+        comment_ids = [comment.comment_id for comment in comments[start:end]]
 
         return {"message": "Success", "comment_ids": comment_ids}, 200
 
