@@ -1,4 +1,60 @@
+from datetime import datetime
 from app import models, services
+
+############################################################
+
+
+def new_comment_v1(
+    user: models.Users,
+    restaurant: models.Restaurants,
+    content: str,
+    rate: float,
+    anonymity: bool,
+) -> int or models.Comments:
+    """Creates a new comment associated with the given user and restaurant.
+
+    Args:
+        user (Users): The user object to associate the comment with.
+        restaurant (Restaurants): The restaurant object to associate the comment with.
+        content (str): The content of the comment.
+        rate (float): The rate of the comment.
+        anonymity (bool): Whether the comment is anonymous.
+
+    Returns:
+        int or Comments: The comment object if successful, otherwise an error code.
+    """
+    if len(content) > 1000:
+        return 400
+
+    if rate < 0 or rate > 5:
+        return 403
+
+    return models.Comments.create_comment(
+        user_id=user.user_id,
+        restaurant_id=restaurant.restaurant_id,
+        content=content,
+        rate=rate,
+        date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        anonymity=anonymity,
+    )
+
+
+############################################################
+
+
+def delete_comment_v1(comment: models.Comments) -> None:
+    """Deletes the given comment. Also deletes all replies associated with the comment.
+
+    Args:
+        comment (Comments): The comment object to delete.
+    """
+    replies: list[models.Replies] = models.Replies.get_replies_by_comment_id(
+        comment.comment_id
+    )
+    for reply in replies:
+        models.Replies.delete_reply(reply.reply_id)
+    models.Comments.delete_comment(comment.comment_id)
+
 
 ############################################################
 

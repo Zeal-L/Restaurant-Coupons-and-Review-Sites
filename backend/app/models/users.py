@@ -22,7 +22,7 @@ class Users(db.Model):
     password_reset_code = Column(Text)
     photo: Column = Column(Text)
     token: Column = Column(Text)
-    saved_restaurants: Column = Column(ARRAY(Integer))
+    favorite_restaurants: Column = Column(ARRAY(Integer))
 
     ############################################################
 
@@ -116,6 +116,57 @@ class Users(db.Model):
         self.photo = photo
         db.session.commit()
 
+    def add_favorite_restaurants(self, restaurant_id: int) -> bool:
+        """
+        Add a restaurant to the user's list of favorite restaurants.
+
+        Args:
+            restaurant_id (int): The restaurant to add.
+
+        Returns:
+            bool: True if the restaurant was added, False if it was already in the list.
+        """
+        if self.favorite_restaurants is None:
+            self.favorite_restaurants = []
+        if restaurant_id in self.favorite_restaurants:
+            return False
+        self.favorite_restaurants.append(restaurant_id)
+        db.session.commit()
+        return True
+
+    def remove_favorite_restaurants(self, restaurant_id: int) -> None:
+        """
+        Remove a restaurant from the user's list of favorite restaurants.
+
+        Args:
+            restaurant_id (int): The restaurant to remove.
+
+        Returns:
+            bool: True if the restaurant was removed, False if it was not in the list.
+        """
+        if (
+            self.favorite_restaurants is None
+            or restaurant_id not in self.favorite_restaurants
+        ):
+            return False
+        self.favorite_restaurants = self.favorite_restaurants.remove(restaurant_id)
+        db.session.commit()
+        return True
+
+    def is_favorite_restaurant(self, restaurant_id: int) -> bool:
+        """
+        Check if a restaurant is in the user's list of favorite restaurants.
+
+        Args:
+            restaurant_id (int): The restaurant to check.
+
+        Returns:
+            bool: True if the restaurant is in the list, False otherwise.
+        """
+        if self.favorite_restaurants is None:
+            return False
+        return restaurant_id in self.favorite_restaurants
+
     ############################################################
 
     @staticmethod
@@ -137,7 +188,7 @@ class Users(db.Model):
             password_hash=generate_password_hash(password),
             photo=None,
             token=create_access_token(identity=email),
-            saved_restaurants=None,
+            favorite_restaurants=None,
         )
         db.session.add(new_user)
         db.session.commit()

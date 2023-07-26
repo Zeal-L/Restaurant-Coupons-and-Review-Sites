@@ -83,7 +83,7 @@ def check_email_exists_v1(email: str) -> bool:
 ############################################################
 
 
-def user_register_v1(name: str, email: str, password: str) -> str or int:
+def user_register_v1(name: str, email: str, password: str) -> str or dict:
     """Registers a new user with the given name, email and password.
 
     Args:
@@ -92,7 +92,7 @@ def user_register_v1(name: str, email: str, password: str) -> str or int:
         password (str): User password
 
     Returns:
-        str: User token if registration is successful, 400 otherwise
+        str or dict: User token if registration is successful, 400 if email is invalid or already exists, 403 if password is invalid
     """
 
     if not check_email_format_v1(email) or check_email_exists_v1(email):
@@ -103,7 +103,10 @@ def user_register_v1(name: str, email: str, password: str) -> str or int:
 
     new_user = models.Users.create_user(name, email, password)
 
-    return new_user.token
+    return {
+        "user_id": new_user.user_id,
+        "token": new_user.token,
+    }
 
 
 ############################################################
@@ -178,7 +181,7 @@ def verify_user_register_sent_code_v1(email: str, confirm_code: str) -> str or i
     if time.time() > confirm_json["expiration"]:
         return 406
 
-    token = user_register_v1(
+    res = user_register_v1(
         unconfirmed_user.name, unconfirmed_user.email, unconfirmed_user.password_hash
     )
 
@@ -187,7 +190,7 @@ def verify_user_register_sent_code_v1(email: str, confirm_code: str) -> str or i
 
     models.UnconfirmedUsers.delete_unconfirmed_user_by_id(unconfirmed_user.user_id)
 
-    return token
+    return res["token"]
 
 
 ############################################################
