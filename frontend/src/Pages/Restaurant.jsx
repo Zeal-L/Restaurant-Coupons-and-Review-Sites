@@ -1,5 +1,5 @@
-import React from "react";
-import {useParams} from "react-router-dom";
+import React, {useEffect} from "react";
+import {useNavigate, useParams} from "react-router-dom";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import {BottomNavigation, BottomNavigationAction, Link, Rating} from "@mui/material";
@@ -11,14 +11,35 @@ import Review from "./RestaurantPages/Review";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
+import {CallApi, CallApiWithToken} from "../CallApi";
 
-function Restaurant() {
+function Restaurant(props) {
   const {restaurantId} = useParams();
-  const [alignment, setAlignment] = React.useState("Menu");
-
+  const navigate = useNavigate();
+  const [alignment, setAlignment] = React.useState(props.subPage);
+  const [data, setData] = React.useState({
+    name: "KFC",
+    rating: 4.7,
+    comment_count: 200,
+    address: "40-50+Arncliffe+Street,+Wolli+Creek+新南威尔士州",
+    image: "https://media-cdn.tripadvisor.com/media/photo-s/1b/99/44/8e/kfc-faxafeni.jpg",
+  });
+  useEffect(() => {
+    CallApi(`/restaurants/get/by_id/${restaurantId}`,"GET").then((res) => {
+      if (res.status === 200) {
+        let address = res.data.address;
+        address = address.replace(/ /g, "+");
+        address = address.replace(/,/g, "%2C");
+        res.data.address = address;
+        setData(res.data);
+      } else {
+        navigate("/");
+      }
+    })
+  }, [restaurantId]);
   const handleAlignment = (event, newAlignment) => {
-    console.log(newAlignment);
     if (newAlignment !== null) {
+      navigate(`/restaurant/${restaurantId}/${newAlignment}`);
       setAlignment(newAlignment);
     }
   };
@@ -35,7 +56,7 @@ function Restaurant() {
       >
         <Box
           component="img"
-          src="https://media-cdn.tripadvisor.com/media/photo-s/1b/99/44/8e/kfc-faxafeni.jpg"
+          src={`data:image/png;base64,${data.image}`}
           alt="Restaurant Image"
           width="100%"
           height="100%"
@@ -59,15 +80,15 @@ function Restaurant() {
         >
           <Grid item>
             <Typography variant="h2" fontFamily="Helvetica" fontWeight="400">
-              KFC
+                {data.name}
             </Typography>
           </Grid>
           <Grid item>
-            <Rating name="customized-10" value={4.7} max={5} style={{margin: "10px 0"}} readOnly/>
+            <Rating name="customized-10" value={data.rating} max={5} style={{margin: "10px 0"}} readOnly/>
           </Grid>
           <Grid item>
             <Typography variant="h6" fontFamily="Helvetica" fontWeight="400">
-              4.7 (200+ Reviews)
+                {data.rating} ({data.comment_count}+ Reviews)
             </Typography>
           </Grid>
           <Grid item>
@@ -79,7 +100,7 @@ function Restaurant() {
             >
               <LocationOnIcon sx={{marginRight: "8px"}}/>
               <Link
-                href="https://www.google.com/maps/place/40-50+Arncliffe+Street,+Wolli+Creek"
+                href={"https://www.google.com/maps/place/" + data.address}
                 target="_blank"
                 rel="noopener"
                 color="inherit"
@@ -97,18 +118,17 @@ function Restaurant() {
         onChange={handleAlignment}
       >
         <BottomNavigationAction value="Menu" label="Menu" icon={<RestaurantMenuIcon/>}/>
-        <BottomNavigationAction value="VoucherRest" label="Voucher" icon={<ConfirmationNumberIcon/>}/>
+        <BottomNavigationAction value="Voucher" label="Voucher" icon={<ConfirmationNumberIcon/>}/>
         <BottomNavigationAction value="Review" label="Review" icon={<ReviewsIcon/>}/>
       </BottomNavigation>
       {
         alignment === "Menu" ?
-          <Menu/>
-          : alignment === "VoucherRest" ?
-            <VoucherRest/>
+          <Menu id={restaurantId}/>
+          : alignment === "Voucher" ?
+            <VoucherRest id={restaurantId}/>
             :
-            <Review/>
+            <Review id={restaurantId}/>
       }
-
     </>
   );
 }

@@ -35,8 +35,11 @@ import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import EditIcon from "@mui/icons-material/Edit";
+import {useParams} from "react-router-dom";
+import PropTypes from "prop-types";
 
-function VoucherRest() {
+function VoucherRest(props) {
+  const restaurantId = props.id;
   const menuItems = [
     {
       id: "1",
@@ -208,6 +211,11 @@ const options = {
     }
   },
 };
+
+VoucherRest.propTypes = {
+  id : PropTypes.string.isRequired
+}
+
 const keys = ["Free", "CFree", "Fixed_Amount", "Percentage"];
 
 

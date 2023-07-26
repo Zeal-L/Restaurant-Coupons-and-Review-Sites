@@ -67,16 +67,17 @@ function App() {
     <ThemeProvider theme={theme}>
       <Context.Provider value={{getter, setter}}>
         <TopBar/>
-
         <Routes>
           <Route path="/" element={<Listing/>}/>
           <Route path="login" element={<Login/>}/>
-          <
-            Route path="register" element={<Register/>}/>
+          <Route path="register" element={<Register/>}/>
           <Route path="/findPassword/identity" element={<EMailVerification/>}/>
           <Route path="/findPassword/reset" element={<ResetPassword/>}/>
           <Route path="/manage/voucher" element={<VoucherVerify/>}/>
-          <Route path="/restaurant/:restaurantId" element={<Restaurant/>}/>
+          <Route path="/restaurant/:restaurantId" element={<Restaurant subPage="Menu"/>}/>
+          <Route path="/restaurant/:restaurantId/menu" element={<Restaurant subPage="Menu"/>}/>
+          <Route path="/restaurant/:restaurantId/review" element={<Restaurant subPage="Review"/>}/>
+          <Route path="/restaurant/:restaurantId/voucher" element={<Restaurant subPage="Voucher"/>}/>
           <Route path="/manage/create" element={<CreateRestaurant/>}/>
           <Route path="/user/voucher/:voucherId" element={<VoucherUse/>}/>
           <Route path="profile" element={<Profile/>}/>

@@ -6,65 +6,69 @@ import ReplyIcon from "@mui/icons-material/Reply";
 import StarIcon from "@mui/icons-material/Star";
 import ReportIcon from "@mui/icons-material/Report";
 import IconButton from "@mui/material/IconButton";
+import {useParams} from "react-router-dom";
+import {CallApiWithToken} from "../../CallApi";
+import PropTypes from "prop-types";
+import {Context, NotificationType, useContext} from "../../context";
 
-const comments = [
-  {
-    id: 1,
-    user: {
-      name: "John Doe",
-      avatar: "https://example.com/avatar1.jpg",
-    },
-    rating: 4.5,
-    timestamp: "2023-06-15",
-    content: "Great product! I highly recommend it.",
-    likes: 10,
-    dislikes: 2,
-    reviews: [
-      {
-        id: 1,
-        user: {
-          name: "Jane Smith",
-          avatar: "https://example.com/avatar2.jpg",
-        },
-        timestamp: "2023-06-15",
-        content: "Thanks for your review!",
-      },
-
-      {
-        id: 1,
-        user: {
-          name: "Jane Smith",
-          avatar: "https://example.com/avatar2.jpg",
-        },
-        timestamp: "2023-06-15",
-        content: "Thanks for your review!",
-      }
-    ]
-  },
-  {
-    id: 2,
-    user: {
-      name: "Jane Smith",
-      avatar: "https://example.com/avatar2.jpg",
-    },
-    rating: 5,
-    timestamp: "2023-06-14",
-    content: "Excellent service. Will definitely buy again.",
-    likes: 15,
-    dislikes: 3,
-    reviews: [
-      {
-        id: 1,
-        user: {
-          name: "Jane Smith",
-          avatar: "https://example.com/avatar2.jpg",
-        },
-        timestamp: "2023-06-15",
-        content: "Thanks for your review!",
-      }
-    ]
-  },
-];
+// const comments = [
+//   {
+//     id: 1,
+//     user: {
+//       name: "John Doe",
+//       avatar: "https://example.com/avatar1.jpg",
+//     },
+//     rating: 4.5,
+//     timestamp: "2023-06-15",
+//     content: "Great product! I highly recommend it.",
+//     likes: 10,
+//     dislikes: 2,
+//     reviews: [
+//       {
+//         id: 1,
+//         user: {
+//           name: "Jane Smith",
+//           avatar: "https://example.com/avatar2.jpg",
+//         },
+//         timestamp: "2023-06-15",
+//         content: "Thanks for your review!",
+//       },
+//
+//       {
+//         id: 1,
+//         user: {
+//           name: "Jane Smith",
+//           avatar: "https://example.com/avatar2.jpg",
+//         },
+//         timestamp: "2023-06-15",
+//         content: "Thanks for your review!",
+//       }
+//     ]
+//   },
+//   {
+//     id: 2,
+//     user: {
+//       name: "Jane Smith",
+//       avatar: "https://example.com/avatar2.jpg",
+//     },
+//     rating: 5,
+//     timestamp: "2023-06-14",
+//     content: "Excellent service. Will definitely buy again.",
+//     likes: 15,
+//     dislikes: 3,
+//     reviews: [
+//       {
+//         id: 1,
+//         user: {
+//           name: "Jane Smith",
+//           avatar: "https://example.com/avatar2.jpg",
+//         },
+//         timestamp: "2023-06-15",
+//         content: "Thanks for your review!",
+//       }
+//     ]
+//   },
+// ];
 
 
 const currentDateTime = () => {
@@ -218,7 +222,9 @@ const Comment = ({user, rating, timestamp, content, likes, dislikes, reviews}) =
 };
 
 
-const Review = () => {
+function Review (props){
+  const restaurantId = props.id;
+  const {getter, setter} = useContext(Context);
   const [ratingValue, setRatingValue] = useState(5);
   const [comment, setComment] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -228,6 +234,38 @@ const Review = () => {
   };
   const [userName, setUserName] = useState(userDetail.name);
   const [userImage, setUserImage] = useState(userDetail.image);
+  const [comments, setComments] = useState([]);
+  React.useEffect(() => {
+    CallApiWithToken(`/users/get/by_token`, "GET", ).then((response) => {
+      if (response.status === 200) {
+        setUserName(response.data.name);
+        setUserImage(response.data.image);
+      } else {
+        setter.showNotification(response.data.message, NotificationType.Error);
+      }
+    });
+  }, [restaurantId]);
+
+  React.useEffect(() => {
+    // /comments/get/by_restaurant/{restaurant_id}
+    CallApiWithToken(`/comments/get/by_restaurant/${restaurantId}`, "GET").then((response) => {
+      if (response.status === 200) {
+        const comment_ids = response.data.comment_ids;
+        for (let i = 0; i < comment_ids.length; i++) {
+          CallApiWithToken(`/comments/get/by_id/${comment_ids[i]}`, "GET").then((response) => {
+            if (response.status === 200) {
+              const comment = response.data;
+              setComments((comments) => [...comments, comment]);
+            } else {
+              setter.showNotification(response.data.message, NotificationType.Error);
+            }
+          });
+        }
+      } else {
+        setter.showNotification(response.data.message, NotificationType.Error);
+      }
+    });
+  }, [restaurantId]);
   return (
     <div>
       {comments.map((comment) => (
@@ -304,6 +342,50 @@ const Review = () => {
     </div>
   );
 };
+
+async function getReviews (comment_id){
+  const response = await CallApiWithToken(`comments/get/by_id/${comment_id}`, "GET");
+  if (response.status !== 200) {
+    return null;
+  }
+  if (response.data.anonymity === true) {
+    response.data.user = {
+      name: "Anonymous",
+      avatar: "",
+    };
+  } else {
+    const userResponse = await CallApiWithToken(`users/get/by_id/${response.data.user_id}`, "GET");
+    if (userResponse.status !== 200) {
+      response.data.user = {
+        name: "Anonymous",
+        avatar: "",
+      };
+    }
+    else {
+      response.data.user = {
+        name: userResponse.data.name,
+        avatar: userResponse.data.avatar,
+      };
+    }
+  }
+  let replice = [];
+  const repliceList = await CallApiWithToken(`replies/get/by_comment/${comment_id}`, "GET");
+  if (repliceList.status === 200) {
+    const repliceIds = repliceList.data.reply_ids;
+    for (let i = 0; i < repliceIds.length; i++) {
+        const repliceResponse = await CallApiWithToken(`replies/get/by_id/${repliceIds[i]}`, "GET");
+        if (repliceResponse.status === 200) {
+            replice.push(repliceResponse.data);
+        }
+    }
+  }
+  response.data.reviews = replice;
+  return response.data;
+}
+
+Review.propTypes = {
+    id: PropTypes.string.isRequired,
+}
 
 
 export default Review;

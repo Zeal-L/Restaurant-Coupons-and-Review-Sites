@@ -23,34 +23,64 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import {TransitionUp} from "../../styles.js";
 import PropTypes from "prop-types";
+import {useParams} from "react-router-dom";
+import {CallApi, CallApiWithToken} from "../../CallApi";
+import {Context, NotificationType, useContext} from "../../context";
+import {LoadingButton} from "@mui/lab";
 
-function Menu() {
-  const menuItems = [
-    {
-      name: "dish 1",
-      price: "9.99",
-      image: "https://media-cdn.tripadvisor.com/media/photo-s/1b/99/44/8e/kfc-faxafeni.jpg",
-      description: "this is the description of dish 1.",
-    },
-    {
-      name: "dish 2",
-      price: "12.99",
-      image: "https://media-cdn.tripadvisor.com/media/photo-s/1b/99/44/8e/kfc-faxafeni.jpg",
-      description: "this is the description of dish 2.",
-    },
-    {
-      name: "dish 3",
-      price: "8.99",
-      image: "https://media-cdn.tripadvisor.com/media/photo-s/1b/99/44/8e/kfc-faxafeni.jpg",
-      description: "this is the description of dish 3.",
-    },
-  ];
+function Menu(props) {
+  const restaurantId = props.id;
+  const [menuItems, setMenuItems] = useState([]);
+  const {getter, setter} = useContext(Context);
   const [popImage, setPopImage] = React.useState("");
   const [popName, setPopName] = React.useState("");
   const [popPrice, setPopPrice] = React.useState(0);
   const [popDescription, setPopDescription] = React.useState("");
   const [popOpen, setPopOpen] = React.useState(false);
   const [isOwner, setIsOwner] = useState(true);
+  const [popType, setPopType] = React.useState("Add Dish");
+  const [popLoading, setPopLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    console.log("useEffect");
+    setMenuItems([]);
+    let mi = [];
+    CallApi(`/dishes/get/by_restaurant/${restaurantId}`, "GET").then((res) => {
+        if (res.status === 200) {
+          const dish_ids = res.data.dish_ids;
+          for (let i = 0; i < dish_ids.length; i++) {
+            CallApi(`/dishes/get/by_id/${dish_ids[i]}`, "GET").then((res) => {
+              if (res.status === 200) {
+                console.log(res.data);
+                // mi.push(res.data);
+                setMenuItems((prev) => [...prev, res.data]);
+              } else {
+                setter.showNotification(res.data.message, NotificationType.Error);
+              }
+            });
+          }
+        } else {
+          setter.showNotification(res.data.message, NotificationType.Error);
+        }
+    });
+  }, [restaurantId]);
+  const EditDish = (id, image, name, price, description) => {
+    image = image.replace(/^data:image\/[a-z]+;base64,/, "");
+  };
+  const AddDish = (image, name, price, description) => {
+    setPopLoading(true)
+    image = image.replace(/^data:image\/[a-z]+;base64,/, "");
+    CallApiWithToken("/dishes/new", "POST", { image, name, price, description }).then((res) => {
+      if (res.status === 200) {
+        setter.showNotification(res.data.message, NotificationType.Success);
+        setMenuItems((prev) => [...prev, { image, name, price, description }]);
+        setPopOpen(false);
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+      setPopLoading(false)
+    });
+  };
 
   return (
     <>
@@ -65,16 +95,27 @@ function Menu() {
                     setPopName(item.name);
                     setPopPrice(item.price);
                     setPopDescription(item.description);
+                    setPopType("Edit Dish");
                     setPopOpen(true);
                   }}/>
                 </IconButton>
-                <IconButton sx={{position: "relative"}} id="iconButtonS">
+                <IconButton sx={{position: "relative"}} id="iconButtonS" onClick={() => {
+                  // /dishes/delete/by_id/{dish_id}
+                  CallApiWithToken(`/dishes/delete/by_id/${item.dish_id}`, "DELETE").then((res) => {
+                    if (res.status === 200) {
+                      setter.showNotification(res.data.message, NotificationType.Success);
+                      setMenuItems((prev) => prev.filter((dish) => dish.dish_id !== item.dish_id));
+                    } else {
+                      setter.showNotification(res.data.message, NotificationType.Error);
+                    }
+                  });
+                }}>
                   <DeleteIcon color="white"/>
                 </IconButton>
               </>
             }
             <Card>
-              <CardMedia component="img" src={item.image} alt={item.name} height="200"/>
+              <CardMedia component="img" src={`data:image/png;base64,${item.image}`} alt={item.name} height="200"/>
               <CardContent>
                 <Typography variant="h5" component="div" gutterBottom>
                   {item.name}
@@ -103,13 +144,14 @@ function Menu() {
               setPopName("");
               setPopPrice(0);
               setPopDescription("");
+                setPopType("Add Dish");
               setPopOpen(true);
             }}
           />
           <MenuDialog
             open={popOpen}
             setOpen={setPopOpen}
-            title="Add Menu Item"
+            title={popType}
             image={popImage}
             setImage={setPopImage}
             name={popName}
@@ -118,11 +160,23 @@ function Menu() {
             setPrice={setPopPrice}
             description={popDescription}
             setDescription={setPopDescription}
+            loading={popLoading}
+            handleSubmit={() => {
+                if (popType === "Add Dish") {
+                    AddDish(popImage, popName, popPrice, popDescription);
+                } else {
+                    EditDish(popImage, popName, popPrice, popDescription);
+                }
+            }}
           />
         </>
       }
     </>
   );
+}
+
+Menu.propTypes = {
+    id: PropTypes.string.isRequired,
 }
 
 const MenuDialog = (props) => {
@@ -208,9 +262,11 @@ const MenuDialog = (props) => {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.handleSubmit} variant="contained" color="primary">
+        <LoadingButton
+          loading={props.loading}
+          onClick={props.handleSubmit} variant="contained" color="primary">
           Submit
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );
