@@ -82,4 +82,4 @@ def get_restaurant_rating_by_id_v1(restaurant_id: int) -> dict or None:
 
     rating = sum(comm.rate for comm in comments)
 
-    return {"rating": rating / len(comments), "comment_count": len(comments)}
+    return {"rating": round(rating / len(comments), 1), "comment_count": len(comments)}
