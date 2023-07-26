@@ -227,7 +227,7 @@ def test_get_by_restaurant_success(client: FlaskClient) -> None:
         for _ in range(5)
     ]
 
-    res = client.get(
+    res = client.post(
         "/comments/get/by_restaurant",
         json={
             "restaurant_id": restaurant["restaurant_id"],
@@ -256,7 +256,7 @@ def test_get_by_restaurant_invalid_range(client: FlaskClient) -> None:
         next(comment_random(client, restaurant["restaurant_id"], restaurant["token"]))
     )
 
-    res = client.get(
+    res = client.post(
         "/comments/get/by_restaurant",
         json={
             "restaurant_id": restaurant["restaurant_id"],
@@ -267,7 +267,7 @@ def test_get_by_restaurant_invalid_range(client: FlaskClient) -> None:
 
     assert res.status_code == 400
 
-    res = client.get(
+    res = client.post(
         "/comments/get/by_restaurant",
         json={
             "restaurant_id": restaurant["restaurant_id"],
@@ -278,7 +278,7 @@ def test_get_by_restaurant_invalid_range(client: FlaskClient) -> None:
 
     assert res.status_code == 400
 
-    res = client.get(
+    res = client.post(
         "/comments/get/by_restaurant",
         json={
             "restaurant_id": restaurant["restaurant_id"],
@@ -291,7 +291,7 @@ def test_get_by_restaurant_invalid_range(client: FlaskClient) -> None:
 
 
 def test_get_by_restaurant_restaurant_not_found(client: FlaskClient) -> None:
-    res = client.get(
+    res = client.post(
         "/comments/get/by_restaurant/999",
     )
 

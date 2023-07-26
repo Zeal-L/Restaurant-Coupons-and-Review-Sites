@@ -260,7 +260,7 @@ class GetCommentsByRestaurant(Resource):
     @api.doc(
         "get_comments_by_restaurant", model="Comment_List", body=by_restaurant_model
     )
-    def get(self) -> tuple[dict, int]:
+    def post(self) -> tuple[dict, int]:
         """Get a list of comment IDs for a given restaurant, with optional start and end indices.
 
         Returns:
