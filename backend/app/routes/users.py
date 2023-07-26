@@ -147,9 +147,11 @@ class Register(Resource):
                 "message": "Invalid password format, At least 8 characters, at least 1 uppercase letter, at least 1 lowercase letter, at least 1 number"
             }, 403
 
-        return {"message": "User registered successfully",
-                "user_id": res["user_id"],
-                "token": res["token"]}, 200
+        return {
+            "message": "User registered successfully",
+            "user_id": res["user_id"],
+            "token": res["token"],
+        }, 200
 
 
 ############################################################
@@ -266,6 +268,41 @@ class Login(Resource):
 ############################################################
 
 
+@api.route("/logout")
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Logout successful")
+@api.response(401, "Unauthorized")
+class Logout(Resource):
+    @api.doc("logout")
+    @jwt_required()
+    def post(self) -> tuple[dict, int]:
+        """
+        Logs out the current user.
+
+        Returns:
+            message: A message indicating whether the logout was successful.
+        """
+
+        user: models.Users = current_user
+
+        # Refresh the user's token to invalidate it
+        # A clearer way to do this would be to use the JWT blacklist store in database
+        # But our blacklist callback function will checks for token expiration
+        # So this method is works better for our purposes
+        user.refresh_token()
+
+        return {"message": "Logout successful"}, 200
+
+
+############################################################
+
+
 @api.route("/check/email_available/<string:email>")
 @api.param("email", "The user email", type="string", required=True)
 @api.response(200, "Email available")
@@ -310,6 +347,35 @@ class GetById(Resource):
             return user, 200
         else:
             return {"message": "User not found"}, 404
+
+
+############################################################
+
+
+@api.route("/get/by_token")
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized")
+class GetByToken(Resource):
+    @api.doc("get_user_by_token", model="User")
+    @api.marshal_with(user_model)
+    @jwt_required()
+    def get(self) -> tuple[dict, int]:
+        """
+        Get the user associated with the provided JWT token.
+
+        Returns:
+            user: The user information.
+        """
+        user: models.Users = current_user
+
+        return user, 200
 
 
 ############################################################
@@ -688,7 +754,9 @@ class VerifyPasswordResetCode(Resource):
 
         return {"message": "Password reset successfully", "token": res}, 200
 
+
 ############################################################
+
 
 @api.route("/favorites/add/<int:restaurant_id>")
 @api.param(

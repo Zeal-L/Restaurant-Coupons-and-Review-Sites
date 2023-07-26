@@ -1,4 +1,3 @@
-
 import base64
 import time
 
@@ -81,6 +80,25 @@ def test_login_invalid_password(client: FlaskClient) -> None:
 
 
 ############################################################
+# /users/logout
+############################################################
+
+
+def test_logout_success(client: FlaskClient) -> None:
+    token = client.post("/users/register", json=next(user_random())).json["token"]
+
+    time.sleep(1)
+
+    res = client.post("/users/logout", headers={"Authorization": f"Bearer {token}"})
+
+    assert res.status_code == 200
+
+    res = client.delete("/users/delete", headers={"Authorization": f"Bearer {token}"})
+
+    assert res.status_code == 401
+
+
+############################################################
 # /check/email_available/<string:email>
 ############################################################
 
@@ -124,6 +142,27 @@ def test_get_user_randomy_id_not_found(client: FlaskClient) -> None:
     res = client.get("/users/get/by_id/999")
 
     assert res.status_code == 404
+
+
+############################################################
+# /get/get/by_token
+############################################################
+
+
+def test_get_user_by_token_success(client: FlaskClient) -> None:
+    token = client.post("/users/register", json=next(user_random())).json["token"]
+
+    res = client.get(
+        "/users/get/by_token", headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert res.status_code == 200
+
+
+def test_get_user_by_token_unauthorized(client: FlaskClient) -> None:
+    res = client.get("/users/get/by_token", headers={"Authorization": "invalid"})
+
+    assert res.status_code == 401
 
 
 ############################################################

@@ -121,3 +121,17 @@ def test_delete_not_found(client: FlaskClient) -> None:
 ############################################################
 # /replies/get/by_id/<int:reply_id>
 ############################################################
+
+
+def test_get_by_id_success(client: FlaskClient) -> None:
+    restaurant = next(restaurant_random(client))
+    comment_id = next(
+        comment_random(client, restaurant["restaurant_id"], restaurant["token"])
+    )
+
+    reply_id = next(reply_random(client, comment_id, restaurant["token"]))
+
+    res = client.get(f"/replies/get/by_id/{reply_id}")
+
+    assert res.status_code == 200
+
