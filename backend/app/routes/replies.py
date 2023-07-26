@@ -44,6 +44,15 @@ reply_list_model = api.model(
     },
 )
 
+by_comment_model = api.model(
+    "By_Comment",
+    {
+        "comment_id": fields.Integer(required=True, description="Comment ID"),
+        "start": fields.Integer(required=True, description="Start index"),
+        "end": fields.Integer(required=True, description="End index"),
+    },
+)
+
 
 ############################################################
 
@@ -160,33 +169,67 @@ class GetReply(Resource):
 ############################################################
 
 
-@api.route("/get/by_comment/<int:comment_id>")
+@api.route("/get/count/by_comment/<int:comment_id>")
 @api.param(
     "comment_id",
-    "The ID of the comment to get replies for",
+    "The ID of the comment to get replies count for",
     type="integer",
     required=True,
 )
-@api.response(200, "Success", body=reply_list_model)
+@api.response(200, "Success")
 @api.response(404, "Comment not found")
-class GetRepliesByComment(Resource):
-    @api.doc("get_replies_by_comment", model="Reply_List")
+class GetRepliesCountByComment(Resource):
+    @api.doc("get_replies_count_by_comment")
     def get(self, comment_id: int) -> tuple[dict, int]:
-        """Get a list of reply IDs for a given comment.
+        """Get the number of replies for a comment by its ID.
 
         Args:
-            comment_id: The ID of the comment to get replies for.
+            comment_id: The ID of the comment to get replies count for.
 
         Returns:
-            A tuple containing a list of reply IDs, or a dictionary with an error message and an integer status code.
+            A tuple containing a dictionary with the message and the count of replies, and an integer status code.
         """
         if not models.Comments.query.get(comment_id):
             return {"message": "Comment not found"}, 404
 
-        reply_ids = [
-            reply.reply_id
-            for reply in models.Replies.query.filter_by(comment_id=comment_id).all()
-        ]
+        replies_count = models.Replies.query.filter_by(comment_id=comment_id).count()
+
+        return {"message": "Success", "count": replies_count}, 200
+
+
+############################################################
+
+
+@api.route("/get/by_comment")
+@api.response(200, "Success", body=reply_list_model)
+@api.response(400, "Invalid start or end value")
+@api.response(404, "Comment not found")
+class GetRepliesByComment(Resource):
+    @api.doc("get_replies_by_comment", model="Reply_List", body=by_comment_model)
+    def get(self) -> tuple[dict, int]:
+        """Get a list of reply IDs for a comment by its ID, with optional start and end indices.
+
+        Returns:
+            A tuple containing a dictionary with the message and a list of reply IDs, and an integer status code.
+        """
+        info = api.payload
+
+        if not models.Comments.query.get(info["comment_id"]):
+            return {"message": "Comment not found"}, 404
+
+        replies = (
+            models.Replies.query.filter_by(comment_id=info["comment_id"])
+            .order_by(models.Replies.reply_id)
+            .all()
+        )
+
+        start = info["start"]
+        end = info["end"]
+
+        if start < 0 or end < 1 or start >= end or end > len(replies):
+            return {"message": "Invalid start or end value"}, 400
+
+        reply_ids = [reply.reply_id for reply in replies[start:end]]
 
         return {"message": "Success", "reply_ids": reply_ids}, 200
 

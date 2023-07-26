@@ -46,6 +46,16 @@ image_model = api.model(
     },
 )
 
+reset_dish_model = api.model(
+    "Dish_Info",
+    {
+        "name": fields.String(required=False, description="Dish name"),
+        "price": fields.Float(required=False, description="Dish price"),
+        "description": fields.String(required=False, description="Dish description"),
+        "image": fields.String(required=False, description="Dish image in base64"),
+    },
+)
+
 ############################################################
 
 
@@ -354,3 +364,43 @@ class ResetDishImage(Resource):
                 return {"message": "User does not own the dish"}, 404
         else:
             return {"message": "Dish not found"}, 404
+
+
+############################################################
+
+
+@api.route("/reset/info/<int:dish_id>")
+@api.param("dish_id", "Dish ID", type="int", required=True)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(404, "User does not own the dish")
+@api.response(400, "Invalid image format, must be base64")
+class ResetDishInfo(Resource):
+    @api.doc("reset_dish_info", body=reset_dish_model)
+    @jwt_required()
+    def put(self, dish_id: int) -> tuple[dict, int]:
+        user: models.Users = current_user
+        info = api.payload
+
+        if not (dish := models.Dishes.get_dish_by_id(dish_id)):
+            return {"message": "Dish not found"}, 404
+        if dish.restaurant.owner_id != user.user_id:
+            return {"message": "User does not own the dish"}, 404
+        if "name" in info:
+            dish.set_name(info["name"])
+        if "price" in info:
+            dish.set_price(info["price"])
+        if "description" in info:
+            dish.set_description(info["description"])
+        if "image" in info:
+            if not services.util.check_photo_format_v1(info["image"]):
+                return {"message": "Invalid image format, must be base64"}, 400
+            dish.set_image(info["image"])
+        return {"message": "Success"}, 200
