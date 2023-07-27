@@ -29,4 +29,21 @@ new_voucher_model = api.model(
 
 ############################################################
 
+@api.route("/new")
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized, invalid JWT token or user not have a restaurant")
+class NewVoucherTemplate(Resource):
+    @api.doc("new_voucher_template", body=new_voucher_model)
+    @jwt_required()
+    def post(self) -> tuple[dict, int]:
 
+        info = api.payload
+
+        user: models.Users = current_user
