@@ -42,7 +42,17 @@ function Menu(props) {
   const [popLoading, setPopLoading] = React.useState(false);
   const [popDishId, setPopDishId] = React.useState("");
 
-  console.log("useEffect44");
+
+  React.useEffect(() => {
+    CallApiWithToken("/restaurants/get/by_token", "GET").then((res) => {
+        if (res.status === 200) {
+          setIsOwner(res.data.restaurant_id.toString() === restaurantId);
+        } else {
+            setIsOwner(false);
+        }
+    })
+  }, []);
+
   React.useEffect(() => {
     setMenuItems([]);
     let mi = [];

@@ -29,16 +29,27 @@ export default function TopBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   // eslint-disable-next-line no-unused-vars
   const [haveRestaurant, setHaveRestaurant] = React.useState(false);
+  const [restaurantId, setRestaurantId] = React.useState("");
   const [userImage, setUserImage] = React.useState("");
   const [userName, setUserName] = React.useState("");
   React.useEffect(() => {
-    if (haveRestaurant) {
+    if (restaurantId !== "") {
       setPages(["My Restaurant", "Voucher verify"]);
     } else {
       setPages(["Create Restaurant"]);
     }
 
-  }, [haveRestaurant]);
+  }, [restaurantId]);
+
+  React.useEffect(() => {
+    CallApiWithToken("/restaurants/get/by_token", "GET").then((res) => {
+      if (res.status === 200) {
+        setRestaurantId(res.data.restaurant_id);
+      } else {
+        setRestaurantId("");
+      }
+    })
+  }, []);
 
   React.useEffect(() => {
     CallApiWithToken("users/get/by_token", "GET").then((result) => {
@@ -71,7 +82,7 @@ export default function TopBar() {
     handleCloseNavMenu();
     switch (page) {
     case "My Restaurant":
-      navigate("/restaurant/a");
+      navigate("/restaurant/" + restaurantId);
       break;
     case "Voucher verify":
       navigate("/manage/voucher");

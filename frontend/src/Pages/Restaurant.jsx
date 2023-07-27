@@ -21,19 +21,15 @@ function Restaurant(props) {
     document.title = "Restaurant";
   }, []);
   const [data, setData] = React.useState({
-    name: "KFC",
-    rating: 4.9,
-    comment_count: 200,
-    address: "40-50+Arncliffe+Street,+Wolli+Creek+新南威尔士州",
-    image: "https://media-cdn.tripadvisor.com/media/photo-s/1b/99/44/8e/kfc-faxafeni.jpg",
+    name: "",
+    rating: 0,
+    comment_count: 0,
+    address: "",
+    image: "",
   });
   useEffect(() => {
     CallApi(`/restaurants/get/by_id/${restaurantId}`,"GET").then((res) => {
       if (res.status === 200) {
-        let address = res.data.address;
-        address = address.replace(/ /g, "+");
-        address = address.replace(/,/g, "%2C");
-        res.data.address = address;
         setData(res.data);
       } else {
         navigate("/");
@@ -108,7 +104,7 @@ function Restaurant(props) {
                 rel="noopener"
                 color="inherit"
               >
-                40-50 Arncliffe Street, Wolli Creek 新南威尔士州
+                {data.address}
               </Link>
             </Box>
           </Grid>

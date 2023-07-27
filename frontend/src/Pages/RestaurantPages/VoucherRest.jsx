@@ -37,6 +37,7 @@ import dayjs from "dayjs";
 import EditIcon from "@mui/icons-material/Edit";
 import {useParams} from "react-router-dom";
 import PropTypes from "prop-types";
+import {CallApiWithToken} from "../../CallApi";
 
 function VoucherRest(props) {
   const restaurantId = props.id;
@@ -99,6 +100,17 @@ function VoucherRest(props) {
   const [popOpen, setPopOpen] = useState(false);
   const [selectVendor, setSelectVendor] = useState(menuItems[0]);
   const [isOwner, setIsOwner] = useState(true);
+
+  React.useEffect(() => {
+    CallApiWithToken("/restaurants/get/by_token", "GET").then((res) => {
+      if (res.status === 200) {
+        setIsOwner(res.data.restaurant_id.toString() === restaurantId);
+      } else {
+        setIsOwner(false);
+      }
+    })
+  }, []);
+
   return (
     <>
       <Grid
@@ -516,8 +528,31 @@ function CreateVoucher(props) {
   };
 
   const handleSubmit = () => {
-    // TODO
-    console.log(selectedOption);
+    let body = {
+      type: selectedOption,
+      discount: discount,
+      condition: condition,
+      description: description,
+      expire: expire.unix(),
+      shareable: isShareable,
+      total_amount: count,
+    }
+    if (isAutoRelease) {
+        body.auto_release = {
+            amount: autoReleaseCount,
+            start_date: autoReleaseStart.unix(),
+            end_date: autoReleaseEnd.unix(),
+            interval: autoReleaseTimeRange.unix(),
+        }
+    }
+    CallApiWithToken("/vouchers/new", "POST", body).then((res) => {
+      if (res.status === 200) {
+          alert("success");
+          props.onClose();
+      } else {
+          alert("fail");
+      }
+    });
   };
 
   return (

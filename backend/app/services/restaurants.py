@@ -83,3 +83,9 @@ def get_restaurant_rating_by_id_v1(restaurant_id: int) -> dict or None:
     rating = sum(comm.rate for comm in comments)
 
     return {"rating": round(rating / len(comments), 1), "comment_count": len(comments)}
+
+
+def get_all_user_who_favorite_v1(restaurant_id: int) -> list:
+    users = models.Users.query.all()
+
+    return [user for user in users if restaurant_id in user.favorite_restaurants]
