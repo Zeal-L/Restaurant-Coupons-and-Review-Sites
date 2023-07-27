@@ -252,7 +252,7 @@ function Listing() {
                 <div className="list-nav-icon">
                   <Restaurant sx={{color: "#ff8400"}}/>
                 </div>
-                <h2>food</h2>
+                <h2>Restaurant</h2>
               </div>
               {/* <Autocomplete
                                 id="combo-box-demo"
