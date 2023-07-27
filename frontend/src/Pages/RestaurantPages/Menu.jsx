@@ -40,6 +40,7 @@ function Menu(props) {
   const [isOwner, setIsOwner] = useState(true);
   const [popType, setPopType] = React.useState("Add Dish");
   const [popLoading, setPopLoading] = React.useState(false);
+  const [popDishId, setPopDishId] = React.useState("");
 
   console.log("useEffect44");
   React.useEffect(() => {
@@ -65,6 +66,21 @@ function Menu(props) {
   }, []);
   const EditDish = (id, image, name, price, description) => {
     image = image.replace(/^data:image\/[a-z]+;base64,/, "");
+    // /dishes/reset/info/{dish_id}
+    CallApiWithToken(`/dishes/reset/info/${menuItems[0].dish_id}`, "PUT", { image, name, price, description }).then((res) => {
+      if (res.status === 200) {
+        setter.showNotification(res.data.message, NotificationType.Success);
+        let tmpList = menuItems;
+        // remove the old one
+        tmpList = tmpList.filter((dish) => dish.dish_id !== id);
+        // add the new one
+        tmpList.push({ dish_id: id, image, name, price, description });
+        setMenuItems(tmpList);
+        setPopOpen(false);
+      } else {
+          setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
   };
   const AddDish = (image, name, price, description) => {
     setPopLoading(true)
@@ -95,6 +111,7 @@ function Menu(props) {
                     setPopPrice(item.price);
                     setPopDescription(item.description);
                     setPopType("Edit Dish");
+                    setPopDishId(item.dish_id);
                     setPopOpen(true);
                   }}/>
                 </IconButton>
@@ -164,7 +181,7 @@ function Menu(props) {
                 if (popType === "Add Dish") {
                     AddDish(popImage, popName, popPrice, popDescription);
                 } else {
-                    EditDish(popImage, popName, popPrice, popDescription);
+                    EditDish(popDishId, popImage, popName, popPrice, popDescription);
                 }
             }}
           />
@@ -185,7 +202,9 @@ const MenuDialog = (props) => {
       const reader = new FileReader();
       reader.readAsDataURL(image);
       reader.onloadend = () => {
-        props.setImage(reader.result);
+
+        // image = image.replace(/^data:image\/[a-z]+;base64,/, "");
+        props.setImage(reader.result.replace(/^data:image\/[a-z]+;base64,/, ""));
       };
     }
   };
@@ -193,7 +212,6 @@ const MenuDialog = (props) => {
     <Dialog open={props.open} TransitionComponent={TransitionUp} onClose={() => props.setOpen(false)}>
       <DialogTitle>{props.title}</DialogTitle>
       <DialogContent>
-
         <Button
           component="label"
           name="thumbnail-upload-input"
@@ -222,7 +240,7 @@ const MenuDialog = (props) => {
               </Box>
             )
             : (
-              <img src={props.image} alt="thumbnail" style={{width: "100%"}}/>
+              <img src={`data:image/png;base64,${props.image}`} alt="thumbnail" style={{width: "100%"}}/>
             )}
           <input hidden accept="image/*" type="file" onChange={updateImage}/>
         </Button>

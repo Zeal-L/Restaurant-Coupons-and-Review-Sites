@@ -316,7 +316,7 @@ function VoucherDialog(props) {
             value={props.expire}
             onChange={props.handleExpireChange}
             sx={{width: "100%", marginTop: "16px"}}
-            label="Select a Date"
+            label="Expire"
           />
         </LocalizationProvider>
 

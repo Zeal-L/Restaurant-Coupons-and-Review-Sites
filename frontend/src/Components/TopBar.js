@@ -16,13 +16,14 @@ import {ReactComponent as Logo} from "../Resource/logo.svg";
 import {Divider} from "@mui/material";
 import {Context, useContext} from "../context";
 import LoginIcon from '@mui/icons-material/Login';
+import {CallApiWithToken} from "../CallApi";
 
 export default function TopBar() {
 
   const {getter, setter} = useContext(Context);
   const [pages, setPages] = React.useState(["My Restaurant", "Voucher verify"]);
   // eslint-disable-next-line no-unused-vars
-  const [settings, setSettings] = React.useState(["Profile", "Logout"]);
+  const [settings, setSettings] = React.useState(["Profile","liked Restaurant" ,"Logout"]);
   const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -38,6 +39,19 @@ export default function TopBar() {
     }
 
   }, [haveRestaurant]);
+
+  React.useEffect(() => {
+    CallApiWithToken("users/get/by_token", "GET").then((result) => {
+        if (result.status === 200) {
+            setUserName(result.data.name);
+            setUserImage(result.data.photo);
+            setter.setLogin(true);
+        } else {
+            setter.setLogin(false);
+        }
+    });
+  }, []);
+
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -80,6 +94,9 @@ export default function TopBar() {
       localStorage.removeItem("token");
       setter.setLogin(false);
       navigate("/login");
+      break;
+    case "liked Restaurant":
+      navigate("/user/likedRestaurant");
       break;
     default:
       break;

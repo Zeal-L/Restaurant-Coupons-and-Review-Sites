@@ -41,26 +41,74 @@ const Comment = ({comment_id,
   const [isAnonymous, setIsAnonymous] = useState(false);
   const {getter, setter} = useContext(Context);
   const handleLike = () => {
-    setLikeCount(likeCount + (liked ? -1 : 1));
-    if (disliked) {
-      setDisliked(false);
-      setDislikeCount(dislikeCount - 1);
+    // /comments/liked_by/add/{comment_id}
+    if (!liked) {
+      CallApiWithToken(`/comments/liked_by/add/${comment_id}`, "POST", {}, getter.token).then((res) => {
+          if (res.status === 200) {
+            setLikeCount(likeCount + 1);
+            if (disliked) {
+              setDisliked(false);
+              setDislikeCount(dislikeCount - 1);
+            }
+            setLiked(!liked);
+            setter.showNotification(res.data.message, NotificationType.Success);
+          } else {
+              setter.showNotification(res.data.message, NotificationType.Error);
+          }
+      })
+    } else {
+      CallApiWithToken(`/comments/liked_by/remove/${comment_id}`, "DELETE", {}, getter.token).then((res) => {
+          if (res.status === 200) {
+              setLikeCount(likeCount - 1);
+              if (disliked) {
+                  setDisliked(false);
+                  setDislikeCount(dislikeCount - 1);
+              }
+              setLiked(!liked);
+            setter.showNotification(res.data.message, NotificationType.Success);
+          } else {
+              setter.showNotification(res.data.message, NotificationType.Error);
+          }
+      })
     }
-    setLiked(!liked);
   };
 
   const handleDislike = () => {
-    setDislikeCount(dislikeCount + (disliked ? -1 : 1));
-    if (liked) {
-        setLiked(false);
-        setLikeCount(likeCount - 1);
+    if (!disliked) {
+      CallApiWithToken(`/comments/disliked_by/add/${comment_id}`, "POST", {}, getter.token).then((res) => {
+        if (res.status === 200) {
+          setDislikeCount(dislikeCount + 1);
+          if (liked) {
+              setLiked(false);
+              setLikeCount(likeCount - 1);
+          }
+          setDisliked(!disliked);
+          setter.showNotification(res.data.message, NotificationType.Success);
+        } else {
+            setter.showNotification(res.data.message, NotificationType.Error);
+        }
+        })
+    } else {
+        CallApiWithToken(`/comments/disliked_by/remove/${comment_id}`, "DELETE", {}, getter.token).then((res) => {
+            if (res.status === 200) {
+              setDislikeCount(dislikeCount - 1);
+              if (liked) {
+                  setLiked(false);
+                  setLikeCount(likeCount - 1);
+              }
+              setDisliked(!disliked);
+              setter.showNotification(res.data.message, NotificationType.Success);
+            } else {
+                setter.showNotification(res.data.message, NotificationType.Error);
+            }
+        })
     }
-    setDisliked(!disliked);
   };
 
-  const toggleReplies = () => {
-    setShowReplies(!showReplies);
-  };
+
+    const toggleReplies = () => {
+      setShowReplies(!showReplies);
+    };
   return (
     <Box display="flex" alignItems="flex-start" marginBottom={2}
       sx={{padding: 2, borderRadius: 4, boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"}}>
@@ -308,10 +356,10 @@ function Review (props){
           rating={comment.rate}
           timestamp={comment.date}
           content={comment.content}
-          likes={comment.liked_by}
-          dislikes={comment.disliked_by}
-          Numlike={13}
-          Numdislike={2}
+          likes={comment.liked}
+          dislikes={comment.disliked}
+          Numlike={comment.like_count}
+          Numdislike={comment.dislike_count}
           reviews={comment.reviews}
           allComments={comments}
           setCurrentComment={setComments}
