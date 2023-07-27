@@ -79,6 +79,14 @@ class VouchersAutoReleaseTimer(db.Model):
         ).all()
 
     @staticmethod
+    def get_by_template_id(
+        template_id: int,
+    ) -> "VouchersAutoReleaseTimer" or None:
+        return VouchersAutoReleaseTimer.query.filter_by(
+            template_id=template_id
+        ).one_or_none()
+
+    @staticmethod
     def delete_timer_by_id(timer_id: int) -> None:
         timer = VouchersAutoReleaseTimer.get_timer_by_id(timer_id)
         db.session.delete(timer)
