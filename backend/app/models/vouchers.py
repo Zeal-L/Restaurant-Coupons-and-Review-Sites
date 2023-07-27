@@ -14,9 +14,9 @@ class Vouchers(db.Model):
     )
     owner_id = Column(Integer, ForeignKey("Users.user_id"), nullable=False)
     is_used = Column(Boolean, nullable=False)
-    used_time = Column(Date)
-    code = Column(Text, nullable=False)
-    code_time = Column(Date)
+    used_time = Column(Date, nullable=True)
+    code = Column(Text, nullable=True)
+    code_time = Column(Date, nullable=True)
 
     template = relationship(models.VoucherTemplate)
     owner = relationship(models.Users)
@@ -43,13 +43,14 @@ class Vouchers(db.Model):
 
     @staticmethod
     def create_voucher(
-        voucher_template_id: int, owner_id: int, is_used: bool, code: str
-    ) -> "Vouchers":
+        template_id: int, owner_id: int) -> "Vouchers":
         voucher = Vouchers(
-            voucher_template_id=voucher_template_id,
+            template_id=template_id,
             owner_id=owner_id,
-            is_used=is_used,
-            code=code,
+            is_used=False,
+            used_time=None,
+            code=None,
+            code_time=None,
         )
         db.session.add(voucher)
         db.session.commit()
