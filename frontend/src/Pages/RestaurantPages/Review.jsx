@@ -6,6 +6,8 @@ import ReplyIcon from "@mui/icons-material/Reply";
 import StarIcon from "@mui/icons-material/Star";
 import ReportIcon from "@mui/icons-material/Report";
 import IconButton from "@mui/material/IconButton";
+import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
+import ThumbDownAltOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
 import {CallApiWithToken} from "../../CallApi";
 import PropTypes from "prop-types";
 import {Context, NotificationType, useContext} from "../../context";
@@ -18,19 +20,42 @@ const currentDateTime = () => {
   return `${year}-${month}-${day}`;
 };
 
-const Comment = ({comment_id, user, rating, timestamp, content, likes, dislikes, reviews, allComments, setCurrentComment}) => {
-  const [likeCount, setLikeCount] = useState(likes);
-  const [dislikeCount, setDislikeCount] = useState(dislikes);
+const Comment = ({comment_id,
+  user,
+  rating,
+  timestamp,
+  content,
+  likes,
+  dislikes,
+  Numlike,
+  Numdislike,
+  reviews,
+  allComments,
+  setCurrentComment}) => {
+  const [liked, setLiked] = useState(likes);
+  const [disliked, setDisliked] = useState(dislikes);
+  const [likeCount, setLikeCount] = useState(Numlike);
+  const [dislikeCount, setDislikeCount] = useState(Numdislike);
   const [showReplies, setShowReplies] = useState(false);
   const [reply, setReply] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const {getter, setter} = useContext(Context);
   const handleLike = () => {
-    setLikeCount(likeCount + 1);
+    setLikeCount(likeCount + (liked ? -1 : 1));
+    if (disliked) {
+      setDisliked(false);
+      setDislikeCount(dislikeCount - 1);
+    }
+    setLiked(!liked);
   };
 
   const handleDislike = () => {
-    setDislikeCount(dislikeCount + 1);
+    setDislikeCount(dislikeCount + (disliked ? -1 : 1));
+    if (liked) {
+        setLiked(false);
+        setLikeCount(likeCount - 1);
+    }
+    setDisliked(!disliked);
   };
 
   const toggleReplies = () => {
@@ -65,7 +90,12 @@ const Comment = ({comment_id, user, rating, timestamp, content, likes, dislikes,
             <Button
               variant="text"
               color="primary"
-              startIcon={<ThumbUpIcon/>}
+              startIcon={
+                liked ?
+              <ThumbUpIcon/>
+                :
+                <ThumbUpOutlinedIcon/>
+            }
               onClick={handleLike}
             >
               {likeCount}
@@ -73,7 +103,12 @@ const Comment = ({comment_id, user, rating, timestamp, content, likes, dislikes,
             <Button
               variant="text"
               color="secondary"
-              startIcon={<ThumbDownIcon/>}
+              startIcon={
+                disliked ?
+                <ThumbDownIcon/>
+                :
+                <ThumbDownAltOutlinedIcon/>
+                }
               onClick={handleDislike}
               sx={{marginLeft: 1}}
             >
@@ -273,8 +308,10 @@ function Review (props){
           rating={comment.rate}
           timestamp={comment.date}
           content={comment.content}
-          likes={comment.likes}
-          dislikes={comment.dislikes}
+          likes={comment.liked_by}
+          dislikes={comment.disliked_by}
+          Numlike={13}
+          Numdislike={2}
           reviews={comment.reviews}
           allComments={comments}
           setCurrentComment={setComments}
