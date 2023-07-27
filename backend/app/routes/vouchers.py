@@ -72,7 +72,20 @@ auto_release_info_model = api.model(
 info_model = api.model(
     "Info",
     {
-        "template_info": fields.Nested(template_info_model, required=True),
+        "template_id": fields.Integer(required=True, description="Voucher id"),
+        "restaurant_id": fields.Integer(required=True, description="Template id"),
+        "type": fields.String(required=True, description="Voucher type"),
+        "discount": fields.String(required=True, description="Voucher discount"),
+        "condition": fields.String(required=True, description="Voucher condition"),
+        "description": fields.String(required=True, description="Voucher description"),
+        "expire": fields.Float(required=True, description="Voucher expire date"),
+        "shareable": fields.Boolean(required=True, description="Voucher shareable"),
+        "remain_amount": fields.Integer(
+            required=True, description="Voucher remain amount"
+        ),
+        "total_amount": fields.Integer(
+            required=True, description="Voucher total amount"
+        ),
         "auto_release_info": fields.Nested(auto_release_info_model, required=False),
     },
 )
@@ -152,9 +165,19 @@ class NewVoucherTemplate(Resource):
             return {"message": "Start date or end date is invalid"}, 400
 
         return {
-            "template_info": template_res,
+            "template_id": template_res.template_id,
+            "type": template_res.type,
+            "discount": template_res.discount,
+            "condition": template_res.condition,
+            "description": template_res.description,
+            "expire": template_res.expire,
+            "shareable": template_res.shareable,
+            "remain_amount": template_res.remain_amount,
             "auto_release_info": auto_release_res,
         }, 200
+
+
+############################################################
 
 
 @api.route("/get/by_restaurant/<int:restaurant_id>")
@@ -190,13 +213,23 @@ class GetByRestaurant(Resource):
             )
 
             temp = {
-                "template_info": template,
+                "template_id": template.template_id,
+                "type": template.type,
+                "discount": template.discount,
+                "condition": template.condition,
+                "description": template.description,
+                "expire": template.expire,
+                "shareable": template.shareable,
+                "remain_amount": template.remain_amount,
                 "auto_release_info": auto_release,
             }
 
             info.append(temp)
 
         return {"info": info}, 200
+
+
+############################################################
 
 
 @api.route("/reset/template")
@@ -258,5 +291,48 @@ class ResetTemplate(Resource):
 
         if info.get("total_amount"):
             template.set_total_amount(info["total_amount"])
+
+        return {"message": "Success"}, 200
+
+
+############################################################
+
+
+@api.route("/user/collect/<int:template_id>")
+@api.param("template_id", "Template id", type="int", required=True)
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(403, "Template not exist")
+class CollectVoucher(Resource):
+    @api.doc("collect_voucher")
+    @jwt_required()
+    def post(self, template_id: int) -> tuple[dict, int]:
+        """
+        Collect a voucher.
+
+        Returns:
+            A tuple containing a dictionary with a success message and an HTTP status code.
+            If the template does not exist, returns a 403 error.
+        """
+        user: models.Users = current_user
+
+        template = models.VoucherTemplate.get_voucher_template_by_id(template_id)
+
+        if template is None:
+            return {"message": "Template not exist"}, 403
+
+        models.Vouchers.create_voucher(
+            template_id=template_id,
+            owner_id=user.user_id,
+        )
+
+        template.set_remain_amount(template.remain_amount - 1)
 
         return {"message": "Success"}, 200
