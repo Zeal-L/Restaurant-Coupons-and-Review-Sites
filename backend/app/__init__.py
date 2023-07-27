@@ -2,7 +2,8 @@ from flask import Flask
 from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from . import config, models, routes
+from . import config, models, routes, services
+
 
 
 def create_app(con: object = config.DevelopmentConfig) -> Flask:
@@ -16,5 +17,6 @@ def create_app(con: object = config.DevelopmentConfig) -> Flask:
 
     models.init_app(app)
     routes.init_app(app)
+    services.vouchers.init_app(app)
 
     return app

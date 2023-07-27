@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Text, Boolean, Date, ForeignKey
+from sqlalchemy import Column, Integer, Text, Boolean, Date, ForeignKey, Float
 from sqlalchemy.orm import relationship
 
 from . import db
@@ -8,7 +8,7 @@ from app import models
 class VoucherTemplate(db.Model):
     __tablename__ = "VoucherTemplate"
 
-    voucher_id = Column(Integer, primary_key=True)
+    template_id = Column(Integer, primary_key=True)
     restaurant_id = Column(
         Integer, ForeignKey("Restaurants.restaurant_id"), nullable=False
     )
@@ -16,7 +16,7 @@ class VoucherTemplate(db.Model):
     discount = Column(Text, nullable=False)
     condition = Column(Text, nullable=False)
     description = Column(Text, nullable=False)
-    expire = Column(Date, nullable=False)
+    expire = Column(Float, nullable=False)
     shareable = Column(Boolean, nullable=False)
     remain_amount = Column(Integer, nullable=False)
     total_amount = Column(Integer, nullable=False)
@@ -41,7 +41,7 @@ class VoucherTemplate(db.Model):
         self.description = description
         db.session.commit()
 
-    def set_expire(self, expire: Date) -> None:
+    def set_expire(self, expire: float) -> None:
         self.expire = expire
         db.session.commit()
 
@@ -66,7 +66,7 @@ class VoucherTemplate(db.Model):
         discount: str,
         condition: str,
         description: str,
-        expire: Date,
+        expire: float,
         shareable: bool,
         remain_amount: int,
         total_amount: int,
@@ -87,8 +87,8 @@ class VoucherTemplate(db.Model):
         return voucher_template
 
     @staticmethod
-    def get_voucher_template_by_id(voucher_id: int) -> "VoucherTemplate" or None:
-        return VoucherTemplate.query.filter_by(voucher_id=voucher_id).one_or_none()
+    def get_voucher_template_by_id(template_id: int) -> "VoucherTemplate" or None:
+        return VoucherTemplate.query.filter_by(template_id=template_id).one_or_none()
 
     @staticmethod
     def get_voucher_templates_by_restaurant(
@@ -97,7 +97,7 @@ class VoucherTemplate(db.Model):
         return VoucherTemplate.query.filter_by(restaurant_id=restaurant_id).all()
 
     @staticmethod
-    def delete_voucher_template(voucher_id: int) -> None:
-        voucher_template = VoucherTemplate.get_voucher_template_by_id(voucher_id)
+    def delete_voucher_template(template_id: int) -> None:
+        voucher_template = VoucherTemplate.get_voucher_template_by_id(template_id)
         db.session.delete(voucher_template)
         db.session.commit()

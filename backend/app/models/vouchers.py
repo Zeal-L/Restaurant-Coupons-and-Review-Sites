@@ -9,8 +9,8 @@ class Vouchers(db.Model):
     __tablename__ = "Vouchers"
 
     voucher_id = Column(Integer, primary_key=True)
-    voucher_template_id = Column(
-        Integer, ForeignKey("VoucherTemplate.voucher_id"), nullable=False
+    template_id = Column(
+        Integer, ForeignKey("VoucherTemplate.template_id"), nullable=False
     )
     owner_id = Column(Integer, ForeignKey("Users.user_id"), nullable=False)
     is_used = Column(Boolean, nullable=False)
@@ -18,7 +18,7 @@ class Vouchers(db.Model):
     code = Column(Text, nullable=False)
     code_time = Column(Date)
 
-    voucher_template = relationship(models.VoucherTemplate)
+    template = relationship(models.VoucherTemplate)
     owner = relationship(models.Users)
 
     ############################################################
@@ -65,9 +65,9 @@ class Vouchers(db.Model):
 
     @staticmethod
     def get_vouchers_by_voucher_template(
-        voucher_template_id: int,
+        template_id: int,
     ) -> "Vouchers" or None:
-        return Vouchers.query.filter_by(voucher_template_id=voucher_template_id).all()
+        return Vouchers.query.filter_by(template_id=template_id).all()
 
     @staticmethod
     def delete_voucher(voucher_id: int) -> None:

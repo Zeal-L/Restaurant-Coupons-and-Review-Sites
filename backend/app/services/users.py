@@ -1,17 +1,10 @@
-import email as Email
-import imaplib
 import json
-import random
 import re
 import smtplib
-import string
 import time
-from email.header import Header, decode_header
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from smtplib import SMTP_SSL
 
-from app import models, services, config
+
+from app import models, services
 
 
 ############################################################
@@ -150,7 +143,7 @@ def user_register_sent_code_v1(name: str, email: str, password: str) -> str or i
         body = f"Your reset code is {confirm_code}.\n"
         body += "Please use this code to confirm your registration.\n"
         body += "This code will expire in 5 minutes."
-        _send_email(
+        services.util.send_email(
             email,
             {
                 "header": "Donut Voucher Registration confirm Code",
@@ -268,7 +261,7 @@ def send_email_reset_code_v1(user: models.Users, new_email: str) -> str or int:
         body = f"Your reset code is {reset_code}.\n"
         body += "Please use this code to reset your email.\n"
         body += "This code will expire in 5 minutes."
-        _send_email(
+        services.util.send_email(
             new_email,
             {
                 "header": "Donut Voucher E-mail Reset Code",
@@ -368,7 +361,7 @@ def send_password_reset_code_v1(email: str) -> str or int:
         body = f"Your password reset code is {reset_code}.\n"
         body += "Please use this code to reset your password.\n"
         body += "This code will expire in 5 minutes."
-        _send_email(
+        services.util.send_email(
             email,
             {
                 "header": "Donut Voucher Password Reset Code",
@@ -443,94 +436,3 @@ def delete_user_v1(user: models.Users) -> None:
         services.restaurants.delete_restaurant_v1(user)
 
     user.delete()
-
-
-############################################################
-# Private helper functions
-############################################################
-
-
-def _send_email(receiver: str, content: dict) -> None:
-    """
-    Sends an email to the specified receiver using the SMTP protocol over SSL.
-
-    Args:
-        receiver (str): The email address of the receiver.
-        content (dict): A dictionary containing the email header and body.
-
-    Returns:
-        None
-    """
-
-    host_server = "smtp.gmail.com"
-
-    msg = MIMEMultipart()
-    msg["subject"] = Header(content["header"], "utf_8")
-    msg["From"] = config.email_address
-    msg["To"] = Header(receiver, "UTF-8")
-
-    msg.attach(MIMEText(content["body"], "plain", "utf-8"))
-
-    stmp = SMTP_SSL(host_server)
-
-    stmp.login(config.email_address, config.specific_password)
-    stmp.sendmail(config.email_address, receiver, msg.as_string())
-    stmp.quit()
-
-
-def _read_latest_email():
-    """
-    Reads the latest email from the Gmail inbox using the IMAP protocol.
-
-    Returns:
-        str: The subject of the latest email.
-        str: The sender of the latest email.
-        str: The body of the latest email.
-    """
-    # create an IMAP4 class with SSL
-    imap = imaplib.IMAP4_SSL("imap.gmail.com")
-
-    # authenticate
-    imap.login(config.email_address, config.specific_password)
-
-    # select mailbox
-    imap.select("inbox")
-
-    # search for latest email
-    _, message_numbers_raw = imap.search(None, "ALL")
-    message_numbers = message_numbers_raw[0].split(b" ")
-    latest_message_number = message_numbers[-1]
-
-    # fetch the email message by ID
-    _, message_raw = imap.fetch(latest_message_number, "(RFC822)")
-    message = Email.message_from_bytes(message_raw[0][1])
-
-    # decode the email subject and sender
-    subject = decode_header(message["Subject"])[0][0]
-    sender = decode_header(message["From"])[0][0]
-
-    # get the email body
-    if message.is_multipart():
-        # iterate over email parts
-        for part in message.walk():
-            # extract content type of email
-            content_type = part.get_content_type()
-            content_disposition = str(part.get("Content-Disposition"))
-
-            # get the email body
-            if content_type == "text/plain" and "attachment" not in content_disposition:
-                body = part.get_payload(decode=True).decode()
-                break
-    else:
-        # extract content type of email
-        content_type = message.get_content_type()
-
-        # get the email body
-        if content_type == "text/plain":
-            body = message.get_payload(decode=True).decode()
-
-    # close the mailbox and logout
-    imap.close()
-    imap.logout()
-
-    return subject, sender, body

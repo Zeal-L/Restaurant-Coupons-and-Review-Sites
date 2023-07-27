@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Date, ForeignKey
+from sqlalchemy import Column, Integer, Date, ForeignKey, Float
 from sqlalchemy.orm import relationship
 
 from . import db
@@ -12,16 +12,16 @@ class VouchersAutoReleaseTimer(db.Model):
     restaurant_id = Column(
         Integer, ForeignKey("Restaurants.restaurant_id"), nullable=False
     )
-    voucher_template_id = Column(
-        Integer, ForeignKey("VoucherTemplate.voucher_id"), nullable=False
+    template_id = Column(
+        Integer, ForeignKey("VoucherTemplate.template_id"), nullable=False
     )
     amount = Column(Integer, nullable=False)
-    start_date = Column(Date, nullable=False)
-    end_date = Column(Date, nullable=False)
+    start_date = Column(Float, nullable=False)
+    end_date = Column(Float, nullable=False)
     interval = Column(Integer, nullable=False)
 
     restaurant = relationship(models.Restaurants)
-    voucher_template = relationship(models.VoucherTemplate)
+    template = relationship(models.VoucherTemplate)
 
     ############################################################
 
@@ -29,11 +29,11 @@ class VouchersAutoReleaseTimer(db.Model):
         self.amount = amount
         db.session.commit()
 
-    def set_start_date(self, start_date: Date) -> None:
+    def set_start_date(self, start_date: float) -> None:
         self.start_date = start_date
         db.session.commit()
 
-    def set_end_date(self, end_date: Date) -> None:
+    def set_end_date(self, end_date: float) -> None:
         self.end_date = end_date
         db.session.commit()
 
@@ -46,15 +46,15 @@ class VouchersAutoReleaseTimer(db.Model):
     @staticmethod
     def create_vouchers_auto_release_timer(
         restaurant_id: int,
-        voucher_template_id: int,
+        template_id: int,
         amount: int,
-        start_date: Date,
-        end_date: Date,
+        start_date: float,
+        end_date: float,
         interval: int,
     ) -> "VouchersAutoReleaseTimer":
         vouchers_auto_release_timer = VouchersAutoReleaseTimer(
             restaurant_id=restaurant_id,
-            voucher_template_id=voucher_template_id,
+            template_id=template_id,
             amount=amount,
             start_date=start_date,
             end_date=end_date,
