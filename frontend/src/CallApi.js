@@ -24,7 +24,12 @@ export function CallApi(path, type, data) {
         });
       })
       .catch(error => {
-        reject(error);
+        resolve({
+          status: 404,
+          data: {
+            message: "Not Found"
+          }
+        });
       });
   });
 }
@@ -54,7 +59,12 @@ export function CallApiWithToken(path, type, data) {
         });
       })
       .catch(error => {
-        reject(error);
+        resolve({
+            status: 404,
+            data: {
+                message: "Not Found"
+            }
+        });
       });
   });
 }
