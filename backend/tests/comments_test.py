@@ -152,8 +152,10 @@ def test_get_by_id_success(client: FlaskClient) -> None:
     assert json["content"] == res.json["content"]
     assert json["rate"] == res.json["rate"]
     assert json["anonymity"] == res.json["anonymity"]
-    assert res.json["liked_by"] is False
-    assert res.json["disliked_by"] is False
+    assert res.json["liked"] is False
+    assert res.json["like_count"] == 0
+    assert res.json["disliked"] is False
+    assert res.json["dislike_count"] == 0
 
 
 def test_get_by_id_success_liked_by(client: FlaskClient) -> None:
@@ -183,8 +185,10 @@ def test_get_by_id_success_liked_by(client: FlaskClient) -> None:
     )
 
     assert res.status_code == 200
-    assert res.json["liked_by"] is True
-    assert res.json["disliked_by"] is False
+    assert res.json["liked"] is True
+    assert res.json["like_count"] == 1
+    assert res.json["disliked"] is False
+    assert res.json["dislike_count"] == 0
 
 
 def test_get_by_id_comment_not_found(client: FlaskClient) -> None:

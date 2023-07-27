@@ -3,6 +3,10 @@ from app import models, services
 ############################################################
 
 
+def create_voucher_template_v1(info: dict) -> models.VoucherTemplate:
+    pass
+
+
 def delete_all_voucher_by_voucherTemplate_v1(
     voucherTemplate: models.VoucherTemplate,
 ) -> int:

@@ -47,13 +47,19 @@ comment_info_model = api.model(
         "anonymity": fields.Boolean(
             required=True, description="Whether the comment is anonymous."
         ),
-        "liked_by": fields.Boolean(
+        "liked": fields.Boolean(
             required=True,
             description="Whether the current user liked the comment.",
         ),
-        "disliked_by": fields.Boolean(
+        "like_count": fields.Integer(
+            required=True, description="The number of likes of the comment."
+        ),
+        "disliked": fields.Boolean(
             required=True,
             description="Whether the current user disliked the comment.",
+        ),
+        "dislike_count": fields.Integer(
+            required=True, description="The number of dislikes of the comment."
         ),
     },
 )
@@ -219,8 +225,10 @@ class GetComment(Resource):
             "rate": comment.rate,
             "date": comment.date,
             "anonymity": comment.anonymity,
-            "liked_by": liked_by,
-            "disliked_by": disliked_by,
+            "liked": liked_by,
+            "like_count": 0 if comment.liked_by is None else len(comment.liked_by),
+            "disliked": disliked_by,
+            "dislike_count": 0 if comment.disliked_by is None else len(comment.disliked_by),
         }, 200
 
 
