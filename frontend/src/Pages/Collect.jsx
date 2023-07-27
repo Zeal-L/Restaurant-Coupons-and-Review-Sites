@@ -105,6 +105,9 @@ const Search = styled('div')(({ theme }) => ({
   }));
 
 function Collect() {
+    useEffect(() => {
+        document.title = 'Liked Restaurants'
+    }, []);
     const [restaurantsList, setRestaurantsList] = useState(defaultRestaurantsList)
     const [maxWidth, setMaxWidth] = useState(1051)
     const [width, setWidth] = useState()

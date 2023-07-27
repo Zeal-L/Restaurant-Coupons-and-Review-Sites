@@ -17,6 +17,9 @@ function Restaurant(props) {
   const {restaurantId} = useParams();
   const navigate = useNavigate();
   const [alignment, setAlignment] = React.useState(props.subPage);
+  useEffect(() => {
+    document.title = "Restaurant";
+  }, []);
   const [data, setData] = React.useState({
     name: "KFC",
     rating: 4.9,

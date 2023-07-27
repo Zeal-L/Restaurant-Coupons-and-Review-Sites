@@ -5,6 +5,9 @@ import Voucher from "../Components/Voucher";
 import dayjs from "dayjs";
 
 function VoucherUse() {
+  useEffect(() => {
+    document.title = "Voucher";
+  }, []);
   const [editPopOpen, setEditPopopen] = React.useState(false);
   const {voucherId} = useParams();
   //const [voucherList, setVoucherList] = React.useState([]);

@@ -152,6 +152,9 @@ const StyledInputBase = styled(InputBase)(({theme}) => ({
 }));
 
 function Listing() {
+  useEffect(() => {
+    document.title = 'Listing';
+  }, []);
   const [restaurantsList, setRestaurantsList] = useState(defaultRestaurantsList);
   const [maxWidth, setMaxWidth] = useState(1051);
   const [width, setWidth] = useState();

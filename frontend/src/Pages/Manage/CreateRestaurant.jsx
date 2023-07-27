@@ -1,4 +1,4 @@
-import React, {Fragment, useRef, useState} from "react";
+import React, {Fragment, useEffect, useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {Box, Button, Card, CardContent, Grid, Modal, Tab, Tabs, TextField, Tooltip, Typography} from "@mui/material";
 import {createSvgIcon} from "@mui/material/utils";
@@ -42,6 +42,9 @@ function TabPanel(props) {
 }
 
 function CreateRestaurant() {
+  useEffect(() => {
+    document.title = "Create Restaurant";
+  }, []);
   const {setter, getter} = useContext(Context);
   const navigate = useNavigate();
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Context, NotificationType, useContext} from "../context.js";
 import {useNavigate} from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
@@ -9,6 +9,9 @@ import {CallApi} from "../CallApi";
 import {LoadingButton} from "@mui/lab";
 
 function Register() {
+  useEffect(() => {
+    document.title = 'Register';
+  }, []);
   // eslint-disable-next-line no-unused-vars
   const {setter, getter} = useContext(Context);
   // console.log(getter);

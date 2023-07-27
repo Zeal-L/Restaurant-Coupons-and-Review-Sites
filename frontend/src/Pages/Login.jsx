@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Context, NotificationType, useContext} from "../context.js";
 import {useNavigate} from "react-router-dom";
 import {Card, CardContent, Grid, Link, TextField} from "@mui/material";
@@ -8,6 +8,9 @@ import {CallApi} from "../CallApi";
 import {LoadingButton} from "@mui/lab";
 
 function Login() {
+  useEffect(() => {
+    document.title = 'Login';
+  }, []);
   // eslint-disable-next-line no-unused-vars
   const {getter, setter} = useContext(Context);
   const navigate = useNavigate();

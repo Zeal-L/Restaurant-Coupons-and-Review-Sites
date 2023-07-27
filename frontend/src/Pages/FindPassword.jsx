@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Context, NotificationType, useContext} from "../context.js";
 import {useNavigate} from "react-router-dom";
 import {Button, Card, CardContent, Grid, Link, TextField} from "@mui/material";
@@ -132,6 +132,9 @@ export function EMailVerification() {
 }
 
 export function ResetPassword() {
+  useEffect(() => {
+    document.title = 'Reset Password';
+  }, []);
   const {getter, setter} = useContext(Context);
   const navigate = useNavigate();
   const submit = (form) => {

@@ -144,6 +144,9 @@ const profileData = {
 
 
 function Profile() {
+  useEffect(() => {
+    document.title = 'Profile';
+  }, []);
   const [ChangePasswordOpen, setChangePasswordOpen] = React.useState(false);
   // const {voucherId} = useParams();
   const [voucherList, setVoucherList] = React.useState(voucherItems);
