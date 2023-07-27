@@ -183,8 +183,6 @@ class GetDishesByRestaurant(Resource):
 class DeleteDishById(Resource):
     @api.doc("delete_dish_by_id")
     @jwt_required()
-    @api.doc("delete_dish_by_id")
-    @jwt_required()
     def delete(self, dish_id: int) -> tuple[dict, int]:
         """
         Delete a dish by its ID.

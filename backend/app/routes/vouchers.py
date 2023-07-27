@@ -77,6 +77,32 @@ info_model = api.model(
     },
 )
 
+info_list_model = api.model(
+    "InfoList",
+    {
+        "info": fields.List(fields.Nested(info_model), required=True),
+    },
+)
+
+reset_model = api.model(
+    "Reset",
+    {
+        "template_id": fields.Integer(required=False, description="Template id"),
+        "type": fields.String(required=False, description="Voucher type"),
+        "discount": fields.String(required=False, description="Voucher discount"),
+        "condition": fields.String(required=False, description="Voucher condition"),
+        "description": fields.String(required=False, description="Voucher description"),
+        "expire": fields.Float(required=False, description="Voucher expire date"),
+        "shareable": fields.Boolean(required=False, description="Voucher shareable"),
+        "remain_amount": fields.Integer(
+            required=False, description="Voucher remain amount"
+        ),
+        "total_amount": fields.Integer(
+            required=False, description="Voucher total amount"
+        ),
+    },
+)
+
 ############################################################
 
 
@@ -115,7 +141,6 @@ class NewVoucherTemplate(Resource):
 
         if not info.get("auto_release"):
             return {
-                "message": "Success",
                 "template_info": template_res,
                 "auto_release_info": None,
             }, 200
@@ -127,7 +152,111 @@ class NewVoucherTemplate(Resource):
             return {"message": "Start date or end date is invalid"}, 400
 
         return {
-            "message": "Success",
             "template_info": template_res,
             "auto_release_info": auto_release_res,
         }, 200
+
+
+@api.route("/get/by_restaurant/<int:restaurant_id>")
+@api.param("restaurant_id", "Restaurant id", type="int", required=True)
+@api.response(200, "Success", body=info_list_model)
+@api.response(403, "Restaurant not exist")
+class GetByRestaurant(Resource):
+    @api.doc("get_by_restaurant")
+    @api.marshal_with(info_list_model)
+    def get(self, restaurant_id: int) -> tuple[dict, int]:
+        """Get all voucher templates and auto release info for a given restaurant.
+
+        Args:
+        - restaurant_id (int): The ID of the restaurant to get voucher templates for.
+
+        Returns:
+        - A tuple containing a dictionary with the voucher template information and an HTTP status code.
+
+        If the restaurant does not exist, returns a 403 error.
+        """
+        if models.Restaurants.get_restaurant_by_id(restaurant_id) is None:
+            return {"message": "Restaurant not exist"}, 403
+
+        template_list = models.VoucherTemplate.get_voucher_templates_by_restaurant(
+            restaurant_id
+        )
+
+        info = []
+
+        for template in template_list:
+            auto_release = models.VouchersAutoReleaseTimer.get_by_template_id(
+                template.template_id
+            )
+
+            temp = {
+                "template_info": template,
+                "auto_release_info": auto_release,
+            }
+
+            info.append(temp)
+
+        return {"info": info}, 200
+
+
+@api.route("/reset/template")
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized")
+@api.response(403, "Template not exist")
+class ResetTemplate(Resource):
+    @api.doc("reset_template", body=reset_model)
+    @jwt_required()
+    def put(self) -> tuple[dict, int]:
+        """
+        Update an existing voucher template.
+
+        Returns:
+            A tuple containing a dictionary with a success message and an HTTP status code.
+            If the template does not exist, returns a 403 error.
+        """
+        user: models.Users = current_user
+
+        info = api.payload
+
+        template = models.VoucherTemplate.get_voucher_template_by_id(
+            info["template_id"]
+        )
+
+        if template is None:
+            return {"message": "Template not exist"}, 403
+
+        if template.restaurant.owner_id != user.user_id:
+            return {"message": "Unauthorized"}, 401
+
+        if info.get("type"):
+            template.set_type(info["type"])
+
+        if info.get("discount"):
+            template.set_discount(info["discount"])
+
+        if info.get("condition"):
+            template.set_condition(info["condition"])
+
+        if info.get("description"):
+            template.set_description(info["description"])
+
+        if info.get("expire"):
+            template.set_expire(info["expire"])
+
+        if info.get("shareable"):
+            template.set_shareable(info["shareable"])
+
+        if info.get("remain_amount"):
+            template.set_remain_amount(info["remain_amount"])
+
+        if info.get("total_amount"):
+            template.set_total_amount(info["total_amount"])
+
+        return {"message": "Success"}, 200
