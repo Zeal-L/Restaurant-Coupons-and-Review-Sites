@@ -14,7 +14,7 @@ import CreateRestaurant from "./Pages/Manage/CreateRestaurant";
 import Listing from "./Pages/Listing";
 import Vouchsers from "./Pages/Vouchers";
 import Profile from "./Pages/Profile";
-import Collect from './Pages/collect';
+import Collect from './Pages/Collect';
 import {Dialog} from "@mui/material";
 function App() {
 
