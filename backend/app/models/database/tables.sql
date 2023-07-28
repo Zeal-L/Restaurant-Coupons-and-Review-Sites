@@ -1,3 +1,10 @@
+create table UnconfirmedUsers (
+    user_id Serial primary key,
+    name Text not null,
+    email Text not null,
+    password_hash Text not null,
+    confirm_code Text
+);
 create table Users (
     user_id Serial primary key,
     name Text not null,
@@ -31,47 +38,47 @@ create table Comments (
     content Text not null,
     rate Float not null,
     date Date not null,
-    report_num Integer not null,
     anonymity Boolean not null,
+    report_by Integer [],
     liked_by Integer [],
     disliked_by Integer []
 );
 create table Replies (
     reply_id Serial primary key,
-    sender_id Serial not null references Users(user_id),
+    user_id Serial not null references Users(user_id),
     comment_id Serial not null references Comments(comment_id),
     content Text not null,
     date Date not null,
-    report_num Integer not null,
     anonymity Boolean not null
+    report_by Integer [],
 );
 create table VoucherTemplate (
-    voucher_id Serial primary key,
+    template_id Serial primary key,
     restaurant_id Serial not null references Restaurants(restaurant_id),
     type Text not null,
     discount Text not null,
     condition Text not null,
     description Text not null,
-    expire Date not null,
+    expire Float not null,
     shareable Boolean not null,
     remain_amount Integer not null,
     total_amount Integer not null
 );
 create table Vouchers (
     voucher_id Serial primary key,
-    VoucherTemplate Serial not null references VoucherTemplate(voucher_id),
+    template_id Serial not null references VoucherTemplate(template_id),
     owner_id Serial not null references Users(user_id),
     is_used Boolean not null,
-    used_time Date,
+    used_time Float,
     code Text,
-    code_time Date
+    code_time Float
 );
 create table VouchersAutoReleaseTimer (
     timer_id Serial primary key,
     restaurant_id Serial not null references Restaurants(restaurant_id),
-    VoucherTemplate Serial not null references VoucherTemplate(voucher_id),
+    template_id Serial not null references VoucherTemplate(template_id),
     amount Integer not null,
-    start_date Date not null,
-    end_date Date not null,
+    start_date Float not null,
+    end_date Float not null,
     interval Integer not null
 );

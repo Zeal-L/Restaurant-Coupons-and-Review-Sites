@@ -35,26 +35,6 @@ new_voucher_model = api.model(
     },
 )
 
-template_info_model = api.model(
-    "TemplateInfo",
-    {
-        "template_id": fields.Integer(required=True, description="Voucher id"),
-        "restaurant_id": fields.Integer(required=True, description="Template id"),
-        "type": fields.String(required=True, description="Voucher type"),
-        "discount": fields.String(required=True, description="Voucher discount"),
-        "condition": fields.String(required=True, description="Voucher condition"),
-        "description": fields.String(required=True, description="Voucher description"),
-        "expire": fields.Float(required=True, description="Voucher expire date"),
-        "shareable": fields.Boolean(required=True, description="Voucher shareable"),
-        "remain_amount": fields.Integer(
-            required=True, description="Voucher remain amount"
-        ),
-        "total_amount": fields.Integer(
-            required=True, description="Voucher total amount"
-        ),
-    },
-)
-
 auto_release_info_model = api.model(
     "AutoReleaseInfo",
     {
@@ -74,6 +54,7 @@ info_model = api.model(
     {
         "template_id": fields.Integer(required=True, description="Voucher id"),
         "restaurant_id": fields.Integer(required=True, description="Template id"),
+        "restaurant_name": fields.String(required=True, description="Restaurant name"),
         "type": fields.String(required=True, description="Voucher type"),
         "discount": fields.String(required=True, description="Voucher discount"),
         "condition": fields.String(required=True, description="Voucher condition"),
@@ -82,6 +63,9 @@ info_model = api.model(
         "shareable": fields.Boolean(required=True, description="Voucher shareable"),
         "remain_amount": fields.Integer(
             required=True, description="Voucher remain amount"
+        ),
+        "is_collected": fields.Boolean(
+            required=False, description="Voucher is collected"
         ),
         "total_amount": fields.Integer(
             required=True, description="Voucher total amount"
@@ -166,12 +150,15 @@ class NewVoucherTemplate(Resource):
 
         return {
             "template_id": template_res.template_id,
+            "restaurant_id": template_res.restaurant_id,
+            "restaurant_name": template_res.restaurant.name,
             "type": template_res.type,
             "discount": template_res.discount,
             "condition": template_res.condition,
             "description": template_res.description,
             "expire": template_res.expire,
             "shareable": template_res.shareable,
+            "is_collected": False,
             "remain_amount": template_res.remain_amount,
             "auto_release_info": auto_release_res,
         }, 200
@@ -180,24 +167,93 @@ class NewVoucherTemplate(Resource):
 ############################################################
 
 
-@api.route("/get/by_restaurant/<int:restaurant_id>")
+@api.route("/get/template/by_id/<int:template_id>")
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=False,
+    _in="header",
+)
+@api.param("template_id", "Template id", type="int", required=True)
+@api.response(200, "Success", body=info_model)
+@api.response(403, "Template not exist")
+class GetTemplateById(Resource):
+    @api.doc("get_template_by_id")
+    @api.marshal_with(info_model)
+    @jwt_required(optional=True)
+    def get(self, template_id: int) -> tuple[dict, int]:
+        """Get voucher template by id.
+        Args:
+            template_id (int): The ID of the template to get voucher templates for.
+
+        Returns:
+            A tuple containing a dictionary with the voucher template information and an HTTP status code.
+        """
+        template = models.VoucherTemplate.get_voucher_template_by_id(template_id)
+        if template is None:
+            return {"message": "Template not exist"}, 403
+
+        auto_release = models.VouchersAutoReleaseTimer.get_by_template_id(
+            template.template_id
+        )
+
+        is_collected = False
+
+        if user := current_user:
+            if models.Vouchers.query.filter_by(
+                owner_id=user.user_id, template_id=template.template_id
+            ).first():
+                is_collected = True
+
+        temp = {
+            "template_id": template.template_id,
+            "restaurant_id": template.restaurant_id,
+            "restaurant_name": template.restaurant.name,
+            "type": template.type,
+            "discount": template.discount,
+            "condition": template.condition,
+            "description": template.description,
+            "expire": template.expire,
+            "shareable": template.shareable,
+            "is_collected": is_collected,
+            "remain_amount": template.remain_amount,
+            "auto_release_info": auto_release,
+        }
+
+        return {"info": temp}, 200
+
+
+############################################################
+
+
+@api.route("/get/template/by_restaurant/<int:restaurant_id>")
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=False,
+    _in="header",
+)
 @api.param("restaurant_id", "Restaurant id", type="int", required=True)
 @api.response(200, "Success", body=info_list_model)
 @api.response(403, "Restaurant not exist")
 class GetByRestaurant(Resource):
     @api.doc("get_by_restaurant")
     @api.marshal_with(info_list_model)
+    @jwt_required(optional=True)
     def get(self, restaurant_id: int) -> tuple[dict, int]:
         """Get all voucher templates and auto release info for a given restaurant.
 
         Args:
-        - restaurant_id (int): The ID of the restaurant to get voucher templates for.
+            restaurant_id (int): The ID of the restaurant to get voucher templates for.
 
         Returns:
-        - A tuple containing a dictionary with the voucher template information and an HTTP status code.
+            A tuple containing a dictionary with the voucher template information and an HTTP status code.
 
         If the restaurant does not exist, returns a 403 error.
         """
+
         if models.Restaurants.get_restaurant_by_id(restaurant_id) is None:
             return {"message": "Restaurant not exist"}, 403
 
@@ -212,14 +268,25 @@ class GetByRestaurant(Resource):
                 template.template_id
             )
 
+            is_collected = False
+
+            if user := current_user:
+                if models.Vouchers.query.filter_by(
+                    owner_id=user.user_id, template_id=template.template_id
+                ).first():
+                    is_collected = True
+
             temp = {
                 "template_id": template.template_id,
+                "restaurant_id": template.restaurant_id,
+                "restaurant_name": template.restaurant.name,
                 "type": template.type,
                 "discount": template.discount,
                 "condition": template.condition,
                 "description": template.description,
                 "expire": template.expire,
                 "shareable": template.shareable,
+                "is_collected": is_collected,
                 "remain_amount": template.remain_amount,
                 "auto_release_info": auto_release,
             }
@@ -308,6 +375,9 @@ class ResetTemplate(Resource):
     _in="header",
 )
 @api.response(200, "Success")
+@api.response(
+    400, "Voucher already collected, user can only collect one voucher for one template"
+)
 @api.response(401, "Unauthorized, invalid JWT token")
 @api.response(403, "Template not exist")
 class CollectVoucher(Resource):
@@ -315,13 +385,20 @@ class CollectVoucher(Resource):
     @jwt_required()
     def post(self, template_id: int) -> tuple[dict, int]:
         """
-        Collect a voucher.
+        Collect a voucher for the user associated with the JWT token.
 
         Returns:
             A tuple containing a dictionary with a success message and an HTTP status code.
             If the template does not exist, returns a 403 error.
         """
         user: models.Users = current_user
+
+        if models.Vouchers.query.filter_by(
+            owner_id=user.user_id, template_id=template_id
+        ).first():
+            return {
+                "message": "Voucher already collected, user can only collect one voucher for one template"
+            }, 400
 
         template = models.VoucherTemplate.get_voucher_template_by_id(template_id)
 
@@ -336,6 +413,11 @@ class CollectVoucher(Resource):
         template.set_remain_amount(template.remain_amount - 1)
 
         return {"message": "Success"}, 200
+
+
+############################################################
+
+# TODO: get_single_vouchers_by_user
 
 
 ############################################################
