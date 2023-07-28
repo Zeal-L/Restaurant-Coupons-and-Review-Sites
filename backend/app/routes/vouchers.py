@@ -238,7 +238,7 @@ class GetTemplateById(Resource):
         if user := current_user:
             if models.Vouchers.query.filter_by(
                 owner_id=user.user_id, template_id=template.template_id
-            ).first():
+            ).one_or_none():
                 is_collected = True
 
         temp = {
@@ -309,7 +309,7 @@ class GetByRestaurant(Resource):
             if user := current_user:
                 if models.Vouchers.query.filter_by(
                     owner_id=user.user_id, template_id=template.template_id
-                ).first():
+                ).one_or_none():
                     is_collected = True
 
             temp = {
@@ -432,7 +432,7 @@ class CollectVoucher(Resource):
 
         if models.Vouchers.query.filter_by(
             owner_id=user.user_id, template_id=template_id
-        ).first():
+        ).one_or_none() is None:
             return {
                 "message": "Voucher already collected, user can only collect one voucher for one template"
             }, 400
@@ -477,7 +477,28 @@ class GetVoucherById(Resource):
         if voucher is None:
             return {"message": "Voucher not exist"}, 403
 
-        return {"voucher": voucher.to_dict()}, 200
+        template = models.VoucherTemplate.get_voucher_template_by_id(
+            voucher.template_id
+        )
+
+        return {
+            "voucher_id": voucher.voucher_id,
+            "owner_id": voucher.owner_id,
+            "is_used": voucher.is_used,
+            "used_time": voucher.used_time,
+            "template_id": voucher.template_id,
+            "restaurant_id": template.restaurant_id,
+            "restaurant_name": template.restaurant.name,
+            "type": template.type,
+            "discount": template.discount,
+            "condition": template.condition,
+            "description": template.description,
+            "expire": template.expire,
+            "shareable": template.shareable,
+            "remain_amount": template.remain_amount,
+            "is_collected": True,
+            "total_amount": template.total_amount,
+        }, 200
 
 
 ############################################################
