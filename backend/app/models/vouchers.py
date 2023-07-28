@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Boolean, Date, Text, ForeignKey
+from sqlalchemy import Column, Integer, Boolean, Float, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
 from . import db
@@ -14,9 +14,9 @@ class Vouchers(db.Model):
     )
     owner_id = Column(Integer, ForeignKey("Users.user_id"), nullable=False)
     is_used = Column(Boolean, nullable=False)
-    used_time = Column(Date, nullable=True)
+    used_time = Column(Float, nullable=True)
     code = Column(Text, nullable=True)
-    code_time = Column(Date, nullable=True)
+    code_time = Column(Float, nullable=True)
 
     template = relationship(models.VoucherTemplate)
     owner = relationship(models.Users)
@@ -27,7 +27,7 @@ class Vouchers(db.Model):
         self.is_used = is_used
         db.session.commit()
 
-    def set_used_time(self, used_time: Date) -> None:
+    def set_used_time(self, used_time: float) -> None:
         self.used_time = used_time
         db.session.commit()
 
@@ -35,7 +35,7 @@ class Vouchers(db.Model):
         self.code = code
         db.session.commit()
 
-    def set_code_time(self, code_time: Date) -> None:
+    def set_code_time(self, code_time: float) -> None:
         self.code_time = code_time
         db.session.commit()
 
