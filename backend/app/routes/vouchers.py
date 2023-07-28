@@ -432,7 +432,7 @@ class CollectVoucher(Resource):
 
         if models.Vouchers.query.filter_by(
             owner_id=user.user_id, template_id=template_id
-        ).one_or_none() is None:
+        ).one_or_none() is not None:
             return {
                 "message": "Voucher already collected, user can only collect one voucher for one template"
             }, 400
