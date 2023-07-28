@@ -336,3 +336,20 @@ class CollectVoucher(Resource):
         template.set_remain_amount(template.remain_amount - 1)
 
         return {"message": "Success"}, 200
+
+
+############################################################
+
+# TODO: get_all_vouchers_by_user
+
+############################################################
+
+# TODO: user_use_voucher
+
+############################################################
+
+# TODO: verify_voucher
+
+############################################################
+
+# TODO: transfer_voucher

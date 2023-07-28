@@ -417,7 +417,7 @@ def test_liked_by_add_success(client: FlaskClient) -> None:
         headers={"Authorization": f"Bearer {user_info['token']}"},
     )
 
-    assert res.json["liked_by"] is True
+    assert res.json["liked"] is True
 
 
 def test_liked_by_add_already_liked(client: FlaskClient) -> None:
@@ -493,8 +493,8 @@ def test_liked_by_add_will_romeve_dislike(client: FlaskClient) -> None:
         headers={"Authorization": f"Bearer {user_info['token']}"},
     )
 
-    assert res.json["liked_by"] is True
-    assert res.json["disliked_by"] is False
+    assert res.json["liked"] is True
+    assert res.json["disliked"] is False
 
 
 ############################################################
@@ -528,7 +528,7 @@ def test_liked_by_remove_success(client: FlaskClient) -> None:
         headers={"Authorization": f"Bearer {user_info['token']}"},
     )
 
-    assert res.json["liked_by"] is False
+    assert res.json["liked"] is False
 
 
 def test_liked_by_remove_not_liked(client: FlaskClient) -> None:
@@ -581,7 +581,7 @@ def test_disliked_by_add_success(client: FlaskClient) -> None:
         headers={"Authorization": f"Bearer {user_info['token']}"},
     )
 
-    assert res.json["disliked_by"] is True
+    assert res.json["disliked"] is True
 
 
 def test_disliked_by_add_already_disliked(client: FlaskClient) -> None:
@@ -656,8 +656,8 @@ def test_disliked_by_add_will_romeve_like(client: FlaskClient) -> None:
         headers={"Authorization": f"Bearer {user_info['token']}"},
     )
 
-    assert res.json["disliked_by"] is True
-    assert res.json["liked_by"] is False
+    assert res.json["disliked"] is True
+    assert res.json["liked"] is False
 
 
 ############################################################
@@ -691,7 +691,7 @@ def test_disliked_by_remove_success(client: FlaskClient) -> None:
         headers={"Authorization": f"Bearer {user_info['token']}"},
     )
 
-    assert res.json["disliked_by"] is False
+    assert res.json["disliked"] is False
 
 
 def test_disliked_by_remove_not_disliked(client: FlaskClient) -> None:
