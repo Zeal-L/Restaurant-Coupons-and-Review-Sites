@@ -49,7 +49,7 @@ auto_release_info_model = api.model(
 )
 
 
-info_model = api.model(
+template_info_model = api.model(
     "Info",
     {
         "template_id": fields.Integer(required=True, description="Voucher id"),
@@ -74,10 +74,45 @@ info_model = api.model(
     },
 )
 
-info_list_model = api.model(
+template_info_list_model = api.model(
     "InfoList",
     {
-        "info": fields.List(fields.Nested(info_model), required=True),
+        "info": fields.List(fields.Nested(template_info_model), required=True),
+    },
+)
+
+voucher_info_model = api.model(
+    "VoucherInfo",
+    {
+        "voucher_id": fields.Integer(required=True, description="Voucher id"),
+        "owner_id": fields.Integer(required=True, description="Owner id"),
+        "is_used": fields.Boolean(required=True, description="Voucher is used"),
+        "used_time": fields.Float(required=False, description="Voucher used time"),
+        "template_id": fields.Integer(required=True, description="Voucher id"),
+        "restaurant_id": fields.Integer(required=True, description="Template id"),
+        "restaurant_name": fields.String(required=True, description="Restaurant name"),
+        "type": fields.String(required=True, description="Voucher type"),
+        "discount": fields.String(required=True, description="Voucher discount"),
+        "condition": fields.String(required=True, description="Voucher condition"),
+        "description": fields.String(required=True, description="Voucher description"),
+        "expire": fields.Float(required=True, description="Voucher expire date"),
+        "shareable": fields.Boolean(required=True, description="Voucher shareable"),
+        "remain_amount": fields.Integer(
+            required=True, description="Voucher remain amount"
+        ),
+        "is_collected": fields.Boolean(
+            required=False, description="Voucher is collected"
+        ),
+        "total_amount": fields.Integer(
+            required=True, description="Voucher total amount"
+        ),
+    },
+)
+
+voucher_info_list_model = api.model(
+    "VoucherInfoList",
+    {
+        "info": fields.List(fields.Nested(voucher_info_model), required=True),
     },
 )
 
@@ -111,12 +146,12 @@ reset_model = api.model(
     required=True,
     _in="header",
 )
-@api.response(200, "Success", model=info_model)
+@api.response(200, "Success", model=template_info_model)
 @api.response(401, "Unauthorized, invalid JWT token or user not have a restaurant")
 class NewVoucherTemplate(Resource):
     @api.doc("new_voucher_template", body=new_voucher_model)
     @jwt_required()
-    @api.marshal_with(info_model)
+    @api.marshal_with(template_info_model)
     def post(self) -> tuple[dict, int]:
         """Create a new voucher template.
 
@@ -176,11 +211,11 @@ class NewVoucherTemplate(Resource):
     _in="header",
 )
 @api.param("template_id", "Template id", type="int", required=True)
-@api.response(200, "Success", body=info_model)
+@api.response(200, "Success", body=template_info_model)
 @api.response(403, "Template not exist")
 class GetTemplateById(Resource):
     @api.doc("get_template_by_id")
-    @api.marshal_with(info_model)
+    @api.marshal_with(template_info_model)
     @jwt_required(optional=True)
     def get(self, template_id: int) -> tuple[dict, int]:
         """Get voucher template by id.
@@ -221,7 +256,7 @@ class GetTemplateById(Resource):
             "auto_release_info": auto_release,
         }
 
-        return {"info": temp}, 200
+        return temp, 200
 
 
 ############################################################
@@ -236,11 +271,11 @@ class GetTemplateById(Resource):
     _in="header",
 )
 @api.param("restaurant_id", "Restaurant id", type="int", required=True)
-@api.response(200, "Success", body=info_list_model)
+@api.response(200, "Success", body=template_info_list_model)
 @api.response(403, "Restaurant not exist")
 class GetByRestaurant(Resource):
     @api.doc("get_by_restaurant")
-    @api.marshal_with(info_list_model)
+    @api.marshal_with(template_info_list_model)
     @jwt_required(optional=True)
     def get(self, restaurant_id: int) -> tuple[dict, int]:
         """Get all voucher templates and auto release info for a given restaurant.
@@ -417,12 +452,43 @@ class CollectVoucher(Resource):
 
 ############################################################
 
+
 # TODO: get_single_vouchers_by_user
+@api.route("/get/voucher/by_id/<int:voucher_id>")
+@api.param("voucher_id", "Voucher id", type="int", required=True)
+@api.response(200, "Success", body=voucher_info_model)
+@api.response(403, "Voucher not exist")
+class GetVoucherById(Resource):
+    @api.doc("get_voucher_by_id")
+    @jwt_required()
+    @api.marshal_with(voucher_info_model)
+    def get(self, voucher_id: int) -> tuple[dict, int]:
+        """
+        Get a voucher by id.
+
+        Returns:
+            A tuple containing a dictionary with a success message and an HTTP status code.
+            If the voucher does not exist, returns a 403 error.
+        """
+        voucher = models.Vouchers.get_voucher_by_id(voucher_id)
+
+        if voucher is None:
+            return {"message": "Voucher not exist"}, 403
+
+        return {"voucher": voucher.to_dict()}, 200
 
 
 ############################################################
 
 # TODO: get_all_vouchers_by_user
+# @api.route("/get/voucher/by_user")
+# @api.param(
+#     "Authorization",
+#     "JWT Authorization header",
+#     type="string",
+#     required=True,
+#     _in="header",
+# )
 
 ############################################################
 
