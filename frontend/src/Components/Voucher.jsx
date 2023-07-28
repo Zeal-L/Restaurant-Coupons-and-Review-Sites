@@ -10,6 +10,7 @@ import purpleVoucher from "../Resource/voucher/purple.png";
 import yellowVoucher from "../Resource/voucher/yellow.png";
 import PropTypes from "prop-types";
 import VoucherInfoPop from "./VoucherInfoPop";
+import dayjs from "dayjs";
 
 function Voucher(props) {
   const {type, condition, discount, expire, isListing = false} = props;
@@ -42,7 +43,6 @@ function Voucher(props) {
         cursor: props.pop === true || props.pop === undefined ? "pointer" : "default",
         filter: disabled || used ? "grayscale(100%)" : "none",
       }}
-
       onClick={() => setPopOpen(true)}
       >
         <Grid item xs={12} sx={{alignSelf: "center"}}>
@@ -58,7 +58,7 @@ function Voucher(props) {
         </Grid>
         <Grid item xs={12} sx={{alignSelf: "center"}}>
           <Typography variant="body1" color="white" sx={{textAlign: "center"}}>
-            {expire}
+            {dayjs.unix(expire).format("DD MMM YYYY")}
           </Typography>
         </Grid>
       </Grid> :
@@ -91,7 +91,8 @@ function Voucher(props) {
           </Grid>
           <Grid item xs={12} sx={{alignSelf: "center"}}>
             <Typography color="white" sx={{textAlign: "center", fontSize: "x-small", transform: "scale(0.7)"}}>
-              {expire}
+              {/*{expire}*/}
+              {dayjs.unix(expire).format("DD MMM YYYY")}
             </Typography>
           </Grid>
         </Grid>}
@@ -107,6 +108,7 @@ function Voucher(props) {
 }
 
 Voucher.protoType = {
+  id: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   condition: PropTypes.string.isRequired,
   discount: PropTypes.string.isRequired,

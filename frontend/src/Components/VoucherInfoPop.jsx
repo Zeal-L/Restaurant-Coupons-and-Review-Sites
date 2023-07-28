@@ -1,32 +1,45 @@
 import React from "react";
-import {Context, useContext} from "../context.js";
+import {Context, NotificationType, useContext} from "../context.js";
 import {useNavigate} from "react-router-dom";
 import {TransitionUp} from "../styles";
-import {Button, Chip, colors, Dialog, DialogTitle, Grid, Link, Typography} from "@mui/material";
+import {Button, Chip, CircularProgress, colors, Dialog, DialogTitle, Grid, Link, Typography} from "@mui/material";
 import Voucher from "./Voucher";
 import TransforPop from "./TransferPop.jsx";
+import {CallApi, CallApiWithToken} from "../CallApi";
+import dayjs from "dayjs";
 
 function VoucherInfoPop(props) {
   const {getter, setter} = useContext(Context);
   const [transferOpen, setTransferOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate();
   const isRestaurant = props.isRestaurant;
   const used = false ? props.used === undefined : props.used;
-  console.log(used);
-  const info = {
-    id: "1",
-    type: "Percentage",
-    condition: "Spending over $100",
-    discount: "10% OFF",
-    expire: "2023-12-31",
-    count: 109,
-    total: 1000,
-    description: "This is the description of the Percentage voucher.",
-    restaurant: {
-      id: "1",
-      name: "Restaurant 1",
+  console.log(props.id);
+  const [info, setInfo] = React.useState({});
+  React.useEffect(() => {
+    if (isRestaurant) {
+      setLoading(true);
+      CallApiWithToken("/vouchers/get/template/by_id/" + props.id, "GET").then((res) => {
+        if (res.status === 200) {
+          console.log(res);
+          setInfo(res.data);
+          setLoading(false);
+        }
+      });
     }
-  };
+  }, []);
+
+  const getVoucher = () => {
+    CallApiWithToken("/vouchers/user/collect/" + props.id, "POST").then((res) => {
+      if (res.status === 200) {
+        setter.showNotification(res.data.message, NotificationType.Success);
+        props.setOpen(false);
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
+  }
 
   const descriptionStyle = {
     marginBottom: "16px",
@@ -45,29 +58,35 @@ function VoucherInfoPop(props) {
   return (
     <Dialog open={props.open} TransitionComponent={TransitionUp} onClose={() => props.setOpen(false)} fullWidth>
       <DialogTitle>Voucher Information</DialogTitle>
-      <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
+      {loading ?
+        <>
+          <CircularProgress />
+        </> :
+        // 纵向排序
+        // <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
+        <Grid container direction="column" justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
         <Grid item alignItems="center">
           <Voucher
             type={info.type}
             condition={info.condition}
             discount={info.discount}
-            expire={info.expire}
+            expire={dayjs.unix(info.expire).format("DD/MM/YYYY")}
             pop={false}
           />
         </Grid>
         {isRestaurant &&
           <Grid item>
-            <Chip label={`Total ${info.total} vouchers, ${info.count} left.`}/>
+            <Chip label={`Total ${info.total_amount} vouchers, ${info.remain_amount} left.`}/>
           </Grid>
         }
         <Grid item xs={12}>
           <Typography variant="body2" style={descriptionStyle}>
             This voucher is provided by{" "}
             <Link
-              href={`/restaurant/${info.restaurant.id}`}
+              href={`/restaurant/${info.restaurant_id}`}
               sx={linkStyle}
             >
-              {info.restaurant.name}
+              {info.restaurant_name}
             </Link>
             .
           </Typography>
@@ -79,7 +98,7 @@ function VoucherInfoPop(props) {
         </Grid>
         <Grid item xs={12}>
           <Typography variant="body2" style={descriptionStyle}>
-            This voucher expires on {info.expire}.
+            This voucher expires on {dayjs.unix(info.expire).format("DD/MM/YYYY")}
           </Typography>
         </Grid>
         <Grid item xs={12}>
@@ -91,7 +110,7 @@ function VoucherInfoPop(props) {
           <>
             {isRestaurant ?
               <Grid item xs={12}>
-                <Button variant="contained" color="primary" fullWidth>
+                <Button variant="contained" color="primary" fullWidth onClick={() => {getVoucher()}}>
                   Get this voucher
                 </Button>
               </Grid>
@@ -99,7 +118,7 @@ function VoucherInfoPop(props) {
               <>
                 <Grid item xs={12}>
                   <Button variant="contained" color="primary" onClick={() => {
-                    navigate("/user/voucher/" + info.id);
+                    navigate("/user/voucher/" + info.voucher_id);
                   }} fullWidth>
                     Use this voucher
                   </Button>
@@ -122,7 +141,8 @@ function VoucherInfoPop(props) {
           </Button>
         </Grid>
       </Grid>
-      {transferOpen === true && <TransforPop open={transferOpen} setOpen={setTransferOpen} id={props.id}/>}
+      }
+      {transferOpen === true && <TransforPop open={transferOpen} setOpen={setTransferOpen} id={props.voucher_id}/>}
     </Dialog>
   );
 }

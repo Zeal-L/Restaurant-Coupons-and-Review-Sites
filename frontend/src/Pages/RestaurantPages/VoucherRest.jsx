@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {
   Box,
   Button,
@@ -37,70 +37,16 @@ import dayjs from "dayjs";
 import EditIcon from "@mui/icons-material/Edit";
 import {useParams} from "react-router-dom";
 import PropTypes from "prop-types";
-import {CallApiWithToken} from "../../CallApi";
+import {CallApi, CallApiWithToken} from "../../CallApi";
+import {Context, NotificationType} from "../../context";
 
 function VoucherRest(props) {
   const restaurantId = props.id;
-  const menuItems = [
-    {
-      id: "1",
-      type: "Percentage",
-      condition: "Percentage",
-      discount: "10% OFF",
-      expire: "2023-12-31",
-      count: 109,
-      description: "this is the description of Percentage voucher.",
-      isClaimed: false,
-      autoRelease: {
-        range: 102,
-        count: 10,
-        start: dayjs().format("YYYY-MM-DD"),
-        end: dayjs().add(1, "year").format("YYYY-MM-DD")
-      }
-    },
-    {
-      id: "2",
-      type: "CFree",
-      condition: "Spend $50 or more",
-      discount: "10% OFF",
-      expire: "2023-12-31",
-      count: 10,
-      description: "this is the description of Percentage voucher.",
-      isClaimed: true,
-    },
-    {
-      id: "3",
-      type: "Free",
-      condition: "Spend $50 or more",
-      discount: "10% OFF",
-      expire: "2023-12-31",
-      count: 130,
-      description: "this is the description of Percentage voucher.",
-      isClaimed: false,
-      autoRelease: {
-        range: 102,
-        count: 10,
-        start: dayjs().format("YYYY-MM-DD"),
-        end: dayjs().add(1, "year").format("YYYY-MM-DD")
-      }
-    },
-    {
-      id: "4",
-      type: "CFree",
-      condition: "Spend $50 or more",
-      discount: "10% OFF",
-      expire: "2023-12-31",
-      count: 10,
-      description: "this is the description of Percentage voucher.",
-      isClaimed: false,
-    }
-
-  ];
+  const [menuItems, setMenuItems] = useState([]);
   const [open, setOpen] = useState(false);
   const [popOpen, setPopOpen] = useState(false);
   const [selectVendor, setSelectVendor] = useState(menuItems[0]);
-  const [isOwner, setIsOwner] = useState(true);
-
+  const [isOwner, setIsOwner] = useState(false);
   React.useEffect(() => {
     CallApiWithToken("/restaurants/get/by_token", "GET").then((res) => {
       if (res.status === 200) {
@@ -109,6 +55,21 @@ function VoucherRest(props) {
         setIsOwner(false);
       }
     })
+  }, []);
+  const {getter, setter} = useContext(Context);
+  React.useEffect(() => {
+    CallApiWithToken("/vouchers/get/template/by_restaurant/" + restaurantId, "GET").then((res) => {
+        if (res.status === 200) {
+            for (let i = 0; i < res.data.info.length; i++) {
+              if(res.data.info[i].auto_release_info.timer_id === null) {
+                res.data.info[i].auto_release_info = undefined;
+              }
+            }
+            setMenuItems(res.data.info);
+        } else {
+          setter.showNotification(res.data.message, NotificationType.Error);
+        }
+    });
   }, []);
 
   return (
@@ -127,7 +88,7 @@ function VoucherRest(props) {
         }}
       >
         {menuItems.map((item) => (
-          <Grid item key={item.id}>
+          <Grid item key={item.template_id}>
             {isOwner &&
               <>
                 <IconButton sx={{position: "relative"}} id="iconButtonS" onClick={() => {
@@ -142,11 +103,12 @@ function VoucherRest(props) {
               </>
             }
             <Voucher
+              id={item.template_id}
               type={item.type}
               condition={item.condition}
               discount={item.discount}
               expire={item.expire}
-              disabled={item.isClaimed}
+              disabled={item.is_collected}
               isRestaurant={true}
             />
           </Grid>
@@ -162,7 +124,9 @@ function VoucherRest(props) {
             onClick={() => setOpen(true)}
           />
           <CreateVoucher open={open} onClose={() => setOpen(false)}/>
-          <EditVoucher open={popOpen} onClose={() => setPopOpen(false)} defV={selectVendor} setDefV={setSelectVendor}/>
+          {selectVendor &&
+            <EditVoucher open={popOpen} onClose={() => setPopOpen(false)} defV={selectVendor} setDefV={setSelectVendor}/>
+          }
         </>
       }
     </>
@@ -171,11 +135,12 @@ function VoucherRest(props) {
 
 const options = {
   "Free": {
-    img: blueVoucher, defV: {
+    img: purpleVoucher,
+    defV: {
       condition: "No condition",
       discount: "20$ OFF",
       expire: dayjs().add(1, "year").format("YYYY-MM-DD"),
-      autoRelease: {
+      auto_release_info: {
         range: 500,
         count: 60,
         start: dayjs().format("YYYY-MM-DD"),
@@ -184,11 +149,12 @@ const options = {
     }
   },
   "CFree": {
-    img: greenVoucher, defV: {
+    img: yellowVoucher,
+    defV: {
       condition: "Spend 50$ or more",
       discount: "Free gift",
       expire: dayjs().add(1, "year").format("YYYY-MM-DD"),
-      autoRelease: {
+      auto_release_info: {
         range: 102,
         count: 10,
         start: dayjs().format("YYYY-MM-DD"),
@@ -197,11 +163,12 @@ const options = {
     }
   },
   "Fixed_Amount": {
-    img: purpleVoucher, defV: {
+    img: blueVoucher,
+    defV: {
       condition: "Spend 50$ or more",
       discount: "20$ OFF",
       expire: dayjs().add(1, "year").format("YYYY-MM-DD"),
-      autoRelease: {
+      auto_release_info: {
         range: 300,
         count: 10,
         start: dayjs().format("YYYY-MM-DD"),
@@ -210,11 +177,12 @@ const options = {
     }
   },
   "Percentage": {
-    img: yellowVoucher, defV: {
+    img: greenVoucher,
+    defV: {
       condition: "Spend 50$ or more",
       discount: "20% OFF",
       expire: dayjs().add(1, "year").format("YYYY-MM-DD"),
-      autoRelease: {
+      auto_release_info: {
         range: 100,
         count: 20,
         start: dayjs().format("YYYY-MM-DD"),
@@ -496,6 +464,7 @@ function VoucherDialog(props) {
 }
 
 function CreateVoucher(props) {
+  const {getter, setter} = useContext(Context);
   const [selectedOption, setSelectedOption] = useState("Free");
   const [condition, setCondition] = useState(options[selectedOption].defV.condition);
   const [discount, setDiscount] = useState(options[selectedOption].defV.discount);
@@ -533,7 +502,7 @@ function CreateVoucher(props) {
       discount: discount,
       condition: condition,
       description: description,
-      expire: expire.unix(),
+      expire: dayjs(expire).unix(),
       shareable: isShareable,
       total_amount: count,
     }
@@ -545,12 +514,16 @@ function CreateVoucher(props) {
             interval: autoReleaseTimeRange.unix(),
         }
     }
+    console.log(expire);
+    console.log(expire.unix());
+    console.log(expire.format("YYYY-MM-DD HH:mm:ss"));
+    console.log(body);
     CallApiWithToken("/vouchers/new", "POST", body).then((res) => {
       if (res.status === 200) {
-          alert("success");
-          props.onClose();
+        props.onClose();
+        setter.showNotification(res.data.message, NotificationType.Success);
       } else {
-          alert("fail");
+        setter.showNotification(res.data.message, NotificationType.Error);
       }
     });
   };
@@ -664,49 +637,49 @@ function EditVoucher(props) {
       setDescription={(e) => {
         props.setDefV({...props.defV, description: e});
       }}
-      count={props.defV.count}
+      count={props.defV.total_amount}
       setCount={(e) => {
-        props.setDefV({...props.defV, count: e});
+        props.setDefV({...props.defV, total_amount: e});
       }}
-      isAutoRelease={props.defV.autoRelease !== undefined}
-      autoReleaseTimeRange={props.defV.autoRelease !== undefined ? props.defV.autoRelease.range : 60}
-      autoReleaseCount={props.defV.autoRelease !== undefined ? props.defV.autoRelease.count : 10}
-      autoReleaseStart={props.defV.autoRelease !== undefined ? dayjs(props.defV.autoRelease.start) : dayjs()}
-      autoReleaseEnd={props.defV.autoRelease !== undefined ? dayjs(props.defV.autoRelease.end) : dayjs(props.defV.expire)}
+      isAutoRelease={props.defV.auto_release_info !== undefined}
+      autoReleaseTimeRange={props.defV.auto_release_info !== undefined ? props.defV.auto_release_info.range : 60}
+      autoReleaseCount={props.defV.auto_release_info !== undefined ? props.defV.auto_release_info.amount : 10}
+      autoReleaseStart={props.defV.auto_release_info !== undefined ? dayjs(props.defV.auto_release_info.start) : dayjs()}
+      autoReleaseEnd={props.defV.auto_release_info !== undefined ? dayjs(props.defV.auto_release_info.end) : dayjs(props.defV.expire)}
       setIsAutoRelease={(e) => {
         if (e) {
           props.setDefV({
             ...props.defV,
-            autoRelease: {
+            auto_release_info: {
               range: 120,
-              count: 10,
+              amount: 10,
               start: dayjs(),
               end: dayjs(props.defV.expire),
             }
           });
         } else {
-          props.setDefV({...props.defV, autoRelease: undefined});
+          props.setDefV({...props.defV, auto_release_info: undefined});
         }
       }}
       setAutoReleaseTimeRange={(e) => {
         props.setDefV({
           ...props.defV,
-          autoRelease: {
+          auto_release_info: {
             range: e,
-            count: props.defV.autoRelease.count,
-            start: dayjs(props.defV.autoRelease.start),
-            end: dayjs(props.defV.autoRelease.end),
+            amount: props.defV.auto_release_info.amount,
+            start: dayjs(props.defV.auto_release_info.start),
+            end: dayjs(props.defV.auto_release_info.end),
           }
         });
       }}
       setAutoReleaseCount={(e) => {
         props.setDefV({
           ...props.defV,
-          autoRelease: {
-            range: props.defV.autoRelease.range,
-            count: e,
-            start: dayjs(props.defV.autoRelease.start),
-            end: dayjs(props.defV.autoRelease.end),
+          auto_release_info: {
+            range: props.defV.auto_release_info.range,
+            amount: e,
+            start: dayjs(props.defV.auto_release_info.start),
+            end: dayjs(props.defV.auto_release_info.end),
           }
         });
       }}
@@ -714,11 +687,11 @@ function EditVoucher(props) {
         (e) => {
           props.setDefV({
             ...props.defV,
-            autoRelease: {
-              range: props.defV.autoRelease.range,
-              count: props.defV.autoRelease.count,
+            auto_release_info: {
+              range: props.defV.auto_release_info.range,
+              amount: props.defV.auto_release_info.amount,
               start: e,
-              end: dayjs(props.defV.autoRelease.end),
+              end: dayjs(props.defV.auto_release_info.end),
             }
           });
         }
@@ -727,17 +700,17 @@ function EditVoucher(props) {
         (e) => {
           props.setDefV({
             ...props.defV,
-            autoRelease: {
-              range: props.defV.autoRelease.range,
-              count: props.defV.autoRelease.count,
-              start: dayjs(props.defV.autoRelease.start),
+            auto_release_info: {
+              range: props.defV.auto_release_info.range,
+              amount: props.defV.auto_release_info.amount,
+              start: dayjs(props.defV.auto_release_info.start),
               end: e,
             }
           });
         }
       }
     >
-      <Grid item key={props.defV.id}>
+      <Grid item key={props.defV.template_id}>
         <Voucher
           type={props.defV.type}
           condition={props.defV.condition}

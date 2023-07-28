@@ -43,7 +43,7 @@ const Comment = ({comment_id,
   const handleLike = () => {
     // /comments/liked_by/add/{comment_id}
     if (!liked) {
-      CallApiWithToken(`/comments/liked_by/add/${comment_id}`, "POST", {}, getter.token).then((res) => {
+      CallApiWithToken(`/comments/liked_by/add/${comment_id}`, "POST").then((res) => {
           if (res.status === 200) {
             setLikeCount(likeCount + 1);
             if (disliked) {
@@ -278,14 +278,14 @@ function Review (props){
   const [userName, setUserName] = useState(userDetail.name);
   const [userImage, setUserImage] = useState(userDetail.image);
   const [comments, setComments] = useState([]);
-  const [isAtBottom, setIsAtBottom] = useState(false);
   const [numberOfComments, setNumberOfComments] = useState(0);
   const [maxComments, setMaxComments] = useState(0);
+
+  const [isAtBottom, setIsAtBottom] = useState(false);
   React.useEffect(() => {
     const handleScroll = () => {
       setIsAtBottom( (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight === document.documentElement.scrollHeight);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);

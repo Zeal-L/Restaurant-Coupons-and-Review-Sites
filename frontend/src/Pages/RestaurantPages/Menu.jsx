@@ -88,7 +88,7 @@ function Menu(props) {
         setMenuItems(tmpList);
         setPopOpen(false);
       } else {
-          setter.showNotification(res.data.message, NotificationType.Error);
+        setter.showNotification(res.data.message, NotificationType.Error);
       }
     });
   };
