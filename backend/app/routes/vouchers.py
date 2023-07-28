@@ -61,11 +61,11 @@ template_info_model = api.model(
         "description": fields.String(required=True, description="Voucher description"),
         "expire": fields.Float(required=True, description="Voucher expire date"),
         "shareable": fields.Boolean(required=True, description="Voucher shareable"),
-        "remain_amount": fields.Integer(
-            required=True, description="Voucher remain amount"
-        ),
         "is_collected": fields.Boolean(
             required=False, description="Voucher is collected"
+        ),
+        "remain_amount": fields.Integer(
+            required=True, description="Voucher remain amount"
         ),
         "total_amount": fields.Integer(
             required=True, description="Voucher total amount"
@@ -253,6 +253,7 @@ class GetTemplateById(Resource):
             "shareable": template.shareable,
             "is_collected": is_collected,
             "remain_amount": template.remain_amount,
+            "total_amount": template.total_amount,
             "auto_release_info": auto_release,
         }
 
@@ -323,6 +324,7 @@ class GetByRestaurant(Resource):
                 "shareable": template.shareable,
                 "is_collected": is_collected,
                 "remain_amount": template.remain_amount,
+                "total_amount": template.total_amount,
                 "auto_release_info": auto_release,
             }
 
