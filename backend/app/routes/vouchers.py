@@ -147,6 +147,7 @@ reset_model = api.model(
     _in="header",
 )
 @api.response(200, "Success", model=template_info_model)
+@api.response(400, "Expire date is invalid")
 @api.response(401, "Unauthorized, invalid JWT token or user not have a restaurant")
 class NewVoucherTemplate(Resource):
     @api.doc("new_voucher_template", body=new_voucher_model)
@@ -305,11 +306,13 @@ class GetByRestaurant(Resource):
             )
 
             is_collected = False
+            print(current_user)
 
             if user := current_user:
                 if models.Vouchers.query.filter_by(
                     owner_id=user.user_id, template_id=template.template_id
                 ).one_or_none():
+                    print("collected", template.template_id, user.user_id)
                     is_collected = True
 
             temp = {
@@ -496,7 +499,7 @@ class GetVoucherById(Resource):
             "expire": template.expire,
             "shareable": template.shareable,
             "remain_amount": template.remain_amount,
-            "is_collected": True,
+            "is_collected": False,
             "total_amount": template.total_amount,
         }, 200
 
