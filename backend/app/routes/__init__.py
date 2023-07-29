@@ -95,7 +95,7 @@ class DatabaseSize(Resource):
 class Fake_Data(Resource):
     @api.doc("generate_fake_data")
     def get(self) -> tuple[dict, int]:
-        """Generate fake data
+        """Generate fake data, it will also delete all current data in the database
 
         Returns:
             dict: Fake data
