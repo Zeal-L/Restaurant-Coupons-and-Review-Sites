@@ -1,3 +1,16 @@
+import csv
+import base64
+import random
+import requests
+from retrying import retry
+from tqdm import tqdm
+from faker import Faker
+from faker_food import FoodProvider
+from werkzeug.security import generate_password_hash
+from flask_jwt_extended import create_access_token
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+
 from flask import Flask
 from flask_restx import Api, Resource
 from flask_jwt_extended import JWTManager, decode_token
@@ -55,9 +68,14 @@ api = Api(
     description="3900Project API Doc",
 )
 
+my_app = None
+
 
 def init_app(app: Flask) -> None:
     jwt.init_app(app)
+
+    global my_app
+    my_app = app
 
     api.add_namespace(users.api)
     api.add_namespace(restaurants.api)
@@ -100,35 +118,206 @@ class Fake_Data(Resource):
         Returns:
             dict: Fake data
         """
-        import csv
-        import random
-        import requests
-        from tqdm import tqdm
-        from faker import Faker
-        from faker_food import FoodProvider
-        from werkzeug.security import generate_password_hash
-
-        fake = Faker()
-        fake.add_provider(FoodProvider)
 
         # Delete all current data in the database
         models.db.session.close_all()
         models.db.drop_all()
         models.db.create_all()
 
-
         # Generate Fake Users
-        for _ in tqdm(range(100)):
-            name = fake.name()
-            gender = random.choice(["male", "female", "other"])
-            photo = people_url = requests.get(
-                "https://loremflickr.com/500/500/people", allow_redirects=True
-            ).url
-            email = fake.email()
-            password = fake.password()
-            password_hash = generate_password_hash(password)
+        user_info = []
+        print("Generating fake users...")
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            futures = [executor.submit(generate_user) for _ in range(100)]
+            user_info.extend(
+                future.result()
+                for future in tqdm(as_completed(futures), total=len(futures))
+            )
+
+        # Generate Fake Restaurants
+        restaurant_info = []
+        print("Generating fake restaurants...")
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            futures = [
+                executor.submit(generate_restaurant, user_info[i]["user_id"])
+                for i in range(20)
+            ]
+            restaurant_info.extend(
+                future.result()
+                for future in tqdm(as_completed(futures), total=len(futures))
+            )
+
+        # Generate Fake Dishes
+        for restaurant in tqdm(restaurant_info, desc="Generating fake dishes..."):
+            with ThreadPoolExecutor(max_workers=32) as executor:
+                futures = [
+                    executor.submit(generate_dish, restaurant["restaurant_id"])
+                    for _ in range(50)
+                ]
+                for _future in tqdm(
+                    as_completed(futures),
+                    total=len(futures),
+                    desc=f"For restaurant id:{restaurant['restaurant_id']} - {restaurant['name']}",
+                ):
+                    pass
+
+        # Generate Fake Comments
+        for restaurant in tqdm(restaurant_info, desc="Generating fake comments..."):
+            with ThreadPoolExecutor(max_workers=32) as executor:
+                user_ids = [user["user_id"] for user in user_info]
+                futures = [
+                    executor.submit(
+                        generate_comments, user_ids, restaurant["restaurant_id"]
+                    )
+                    for _ in range(100)
+                ]
+                for _future in as_completed(futures):
+                    pass
+
+        # Organize return data
+        user_info = [
+            {
+                "user_id": user["user_id"],
+                "email": user["email"],
+                "password": user["password"],
+            }
+            for user in user_info
+        ]
+
+        restaurant_info = [
+            {
+                "restaurant_id": restaurant["restaurant_id"],
+                "owner_id": restaurant["owner_id"],
+                "name": restaurant["name"],
+            }
+            for restaurant in restaurant_info
+        ]
+
+        return {
+            "message": "Fake data generated",
+            "users": user_info,
+            "restaurants": restaurant_info,
+        }, 200
 
 
+def generate_comments(user_ids: list, restaurant_id: int) -> dict:
+    with my_app.app_context():
+        fake = Faker()
+        fake.add_provider(FoodProvider)
+
+        sender = random.choice(user_ids)
+        user_ids = [user_id for user_id in user_ids if user_id != sender]
+
+        liked_by = random.sample(user_ids, random.randint(0, len(user_ids)))
+        disliked_by = random.sample(user_ids, random.randint(0, len(user_ids)))
+
+        for user_id in liked_by:
+            if user_id in disliked_by:
+                disliked_by.remove(user_id)
+
+        new_comment = models.Comments(
+            user_id=sender,
+            restaurant_id=restaurant_id,
+            content=fake.dish_description(),
+            rate=random.uniform(1, 5),
+            date=fake.date(),
+            anonymity=random.choice([True, False]),
+            report_by=None,
+            liked_by=liked_by,
+            disliked_by=disliked_by,
+        )
+        models.db.session.add(new_comment)
+        models.db.session.commit()
 
 
-        return {"message": "Fake data generated"}, 200
+def generate_dish(restaurant_id: int) -> dict:
+    with my_app.app_context():
+        fake = Faker()
+        fake.add_provider(FoodProvider)
+
+        @retry(stop_max_attempt_number=3)
+        def _():
+            return requests.get(
+                "https://loremflickr.com/500/500/food",
+                allow_redirects=True,
+                timeout=5,
+            )
+
+        res = _()
+
+        new_dish = models.Dishes(
+            restaurant_id=restaurant_id,
+            name=fake.dish(),
+            price=random.uniform(1, 100),
+            description=fake.dish_description(),
+            image=base64.b64encode(res.content).decode("utf-8"),
+        )
+        models.db.session.add(new_dish)
+        models.db.session.commit()
+
+
+def generate_restaurant(owner_id: int) -> dict:
+    with my_app.app_context():
+        fake = Faker()
+
+        @retry(stop_max_attempt_number=3)
+        def _():
+            return requests.get(
+                "https://loremflickr.com/500/500/restaurant",
+                allow_redirects=True,
+                timeout=5,
+            )
+
+        res = _()
+
+        new_restaurant = models.Restaurants(
+            owner_id=owner_id,
+            name=fake.company(),
+            address=fake.address(),
+            image=base64.b64encode(res.content).decode("utf-8"),
+        )
+        models.db.session.add(new_restaurant)
+        models.db.session.commit()
+
+        return {
+            "restaurant_id": new_restaurant.restaurant_id,
+            "owner_id": new_restaurant.owner_id,
+            "name": new_restaurant.name,
+            "restaurant": new_restaurant,
+        }
+
+
+def generate_user() -> dict:
+    with my_app.app_context():
+        fake = Faker()
+
+        @retry(stop_max_attempt_number=3)
+        def _():
+            return requests.get(
+                "https://loremflickr.com/500/500/people",
+                allow_redirects=True,
+                timeout=5,
+            )
+
+        res = _()
+        email = fake.email()
+        password = fake.password()
+
+        new_user = models.Users(
+            name=fake.name(),
+            email=email,
+            password_hash=generate_password_hash(password),
+            photo=base64.b64encode(res.content).decode("utf-8"),
+            token=create_access_token(identity=email),
+            favorite_restaurants=None,
+        )
+
+        models.db.session.add(new_user)
+        models.db.session.commit()
+
+        return {
+            "user_id": new_user.user_id,
+            "email": email,
+            "password": password,
+            "user": new_user,
+        }
