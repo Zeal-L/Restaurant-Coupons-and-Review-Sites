@@ -808,13 +808,17 @@ class GetVerifiedVoucherList(Resource):
 
         user: models.Users = current_user
 
-        if models.Restaurants.get_restaurant_by_owner(user.user_id) is None:
+        restaurant: models.Restaurants = models.Restaurants.get_restaurant_by_owner(
+            user.user_id
+        )
+
+        if restaurant is None:
             return {"message": "User does not have a restaurant"}, 403
 
         template_list: list[
             models.VoucherTemplate
         ] = models.VoucherTemplate.get_voucher_templates_by_restaurant(
-            user.restaurant_id
+            restaurant.restaurant_id
         )
 
         voucher_list = []
