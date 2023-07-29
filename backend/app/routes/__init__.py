@@ -161,6 +161,18 @@ class Fake_Data(Resource):
                 ):
                     pass
 
+        # Generate Fake Comments
+        for restaurant in tqdm(restaurant_info, desc="Generating fake comments..."):
+            with ThreadPoolExecutor(max_workers=32) as executor:
+                sender = random.choice(user_info)["user_id"]
+                user_ids = [user["user_id"] for user in user_info if user["user_id"] != sender]
+                futures = [
+                    executor.submit(generate_comments, sender, user_ids, restaurant["restaurant_id"])
+                    for _ in range(100)
+                ]
+                for _future in as_completed(futures):
+                    pass
+
         # Organize return data
         user_info = [
             {
@@ -185,6 +197,31 @@ class Fake_Data(Resource):
             "users": user_info,
             "restaurants": restaurant_info,
         }, 200
+
+
+def generate_comments(sender: int, user_ids: list, restaurant_id: int) -> dict:
+    with my_app.app_context():
+        fake = Faker()
+        fake.add_provider(FoodProvider)
+        liked_by = random.sample(user_ids, random.randint(0, len(user_ids)))
+        disliked_by = random.sample(user_ids, random.randint(0, len(user_ids)))
+        for user_id in liked_by:
+            if user_id in disliked_by:
+                disliked_by.remove(user_id)
+
+        new_comment = models.Comments(
+            user_id=sender,
+            restaurant_id=restaurant_id,
+            content=fake.dish_description(),
+            rate=random.uniform(1, 5),
+            date=fake.date(),
+            anonymity=random.choice([True, False]),
+            report_by=None,
+            liked_by=liked_by,
+            disliked_by=disliked_by,
+        )
+        models.db.session.add(new_comment)
+        models.db.session.commit()
 
 
 def generate_dish(restaurant_id: int) -> dict:
