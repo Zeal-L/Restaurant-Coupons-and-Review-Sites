@@ -46,8 +46,7 @@ class Vouchers(db.Model):
     ############################################################
 
     @staticmethod
-    def create_voucher(
-        template_id: int, owner_id: int) -> "Vouchers":
+    def create_voucher(template_id: int, owner_id: int) -> "Vouchers":
         voucher = Vouchers(
             template_id=template_id,
             owner_id=owner_id,
