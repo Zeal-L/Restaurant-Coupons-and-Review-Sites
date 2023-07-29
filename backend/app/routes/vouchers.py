@@ -781,7 +781,9 @@ class Transfer_voucher(Resource):
 ############################################################
 
 
-@api.route("/get/verified_voucher_list/by_restaurant")
+@api.route("/get/verified_voucher_list/by_restaurant/<int:start>/<int:end>")
+@api.param("start", "Start index", type="int", required=True)
+@api.param("end", "End index", type="int", required=True)
 @api.param(
     "Authorization",
     "JWT Authorization header",
@@ -792,16 +794,19 @@ class Transfer_voucher(Resource):
 @api.response(200, "Success", body=voucher_info_list_model)
 @api.response(401, "Unauthorized, invalid JWT token")
 @api.response(403, "User does not have a restaurant")
+@api.response(405, "Invalid start and end index")
 class GetVerifiedVoucherList(Resource):
     @api.doc("get_verified_voucher_list")
     @jwt_required()
     @api.marshal_with(voucher_info_list_model)
-    def get(self) -> tuple[dict, int]:
-        """Get a list of verified vouchers for the current user's restaurant.
+    def get(self, start: int, end: int) -> tuple[dict, int]:
+        """Get a list of verified vouchers. Range is inclusive.
 
         Returns:
             A tuple containing a dictionary with the voucher information and an HTTP status code.
         """
+        info = api.payload
+
         user: models.Users = current_user
 
         if user.restaurant is None:
@@ -822,9 +827,17 @@ class GetVerifiedVoucherList(Resource):
                 ).all()
             )
 
+        start = info["start"]
+        end = info["end"]
+
+        if start < 0 or start > len(voucher_list) or end < 1 or end < start:
+            return {"message": "Invalid start and end index"}, 405
+
+        end = min(end, len(voucher_list))
+
         info = []
 
-        for voucher in voucher_list:
+        for voucher in voucher_list[start:end]:
             template = models.VoucherTemplate.get_voucher_template_by_id(
                 voucher.template_id
             )

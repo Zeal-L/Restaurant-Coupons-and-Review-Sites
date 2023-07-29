@@ -64,7 +64,9 @@ def init_app(app: Flask) -> None:
     api.add_namespace(dishes.api)
     api.add_namespace(comments.api)
     api.add_namespace(replies.api)
-    api.add_namespace(vouchers.api, )
+    api.add_namespace(
+        vouchers.api,
+    )
 
     api.init_app(app)
 
@@ -86,3 +88,18 @@ class DatabaseSize(Resource):
         return {
             "message": f"The size of the database is {models.get_database_size()}"
         }, 200
+
+
+# @api.route("/database/generate/fake_data")
+# @api.response(200, "Success")
+# class Fake_Data(Resource):
+#     @api.doc("generate_fake_data")
+#     def get(self) -> tuple[dict, int]:
+#         """Generate fake data
+
+#         Returns:
+#             dict: Fake data
+#         """
+
+#         models.generate_fake_data()
+#         return {"message": "Fake data generated"}, 200
