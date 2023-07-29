@@ -7,7 +7,7 @@ import Login from "./Pages/Login";
 import TopBar from "./Components/TopBar";
 import Register from "./Pages/Register";
 import {Notification} from "./Components/Notification.js";
-import VoucherVerify from "./Pages/tmp";
+import VoucherVerify from "./Pages/Manage/VoucherVerify";
 import Restaurant from "./Pages/Restaurant";
 import CreateRestaurant from "./Pages/Manage/CreateRestaurant";
 import Listing from "./Pages/Listing";

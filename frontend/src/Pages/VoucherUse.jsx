@@ -3,7 +3,7 @@ import {useParams} from "react-router-dom";
 import React, {useContext, useEffect, useState} from "react";
 import Voucher from "../Components/Voucher";
 import dayjs from "dayjs";
-import {CallApiWithToken} from "../CallApi";
+import {CallApi, CallApiWithToken} from "../CallApi";
 import {Context, NotificationType} from "../context";
 
 function VoucherUse() {
@@ -14,46 +14,31 @@ function VoucherUse() {
   const [editPopOpen, setEditPopopen] = React.useState(false);
   const {voucherId} = useParams();
   //const [voucherList, setVoucherList] = React.useState([]);
-  const deadline = Date.now() + 60 * 60;
-  const [timeLeft, setTimeLeft] = React.useState(deadline - Date.now());
+  const [timeLeft, setTimeLeft] = React.useState(Date.now());
   const [loading, setLoading] = React.useState(true);
-  // const info =
-  //   {
-  //     id: "1",
-  //     type: "Percentage",
-  //     condition: "Percentage",
-  //     discount: "10% OFF",
-  //     expire: "2023-12-31",
-  //     count: 109,
-  //     description: "this is the description of Percentage voucher.",
-  //     isClaimed: false,
-  //     restaurant: {
-  //       id: "1",
-  //       name: "Restaurant 1",
-  //     },
-  //     autoRelease: {
-  //       range: 102,
-  //       count: 10,
-  //       start: dayjs().format("YYYY-MM-DD"),
-  //       end: dayjs().add(1, "year").format("YYYY-MM-DD")
-  //     }
-  //   };
+  const [code, setCode] = useState("A1E4");
   const [info, setInfo] = React.useState({});
-  // const [inf]
-  // /vouchers/get/voucher/by_id/{voucher_id}
   useEffect(() => {
-    CallApiWithToken(`/vouchers/get/voucher/by_id/${voucherId}`, "GET", null, null).then((res) => {
+    CallApi(`/vouchers/get/voucher/by_id/${voucherId}`, "GET").then((res) => {
       if (res.status === 200) {
-        console.log(res);
         setInfo(res.data);
+        setLoading(false);
       } else {
-        setter.showNotification(res.data.message, NotificationType.Success);
+        setter.showNotification(res.data.message, NotificationType.Error);
       }
-      setLoading(false);
+    });
+    CallApiWithToken(`/vouchers/use/${voucherId}`, "POST").then((res) => {
+      if (res.status === 200) {
+        setCode(res.data.code);
+        const expTime = new Date(res.data.code_time * 1000);
+        setTimeLeft(expTime - Date.now());
+      } else {
+        setTimeLeft(new Date(0) - Date.now());
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
     });
   }, []);
   // let code = "A1E4"
-  const [code, setCode] = useState("A1E4");
   const getTime = () => {
     const remainingTime = timeLeft;
     if (remainingTime <= 0) {
@@ -137,7 +122,7 @@ function VoucherUse() {
         </Grid>
         <Grid item xs={12}>
           <Typography variant="body2" style={descriptionStyle}>
-            This voucher will expire on {info.expire}.
+            This voucher will expire on {dayjs.unix(info.expire).format("DD/MM/YYYY")}.
           </Typography>
         </Grid>
         <Grid item xs={12}>
@@ -179,8 +164,16 @@ function VoucherUse() {
               color="primary"
               fullWidth
               onClick={() => {
-                setCode("A1E4");
-                setTimeLeft(deadline - Date.now());
+                CallApiWithToken(`/vouchers/use/${voucherId}`, "POST").then((res) => {
+                  if (res.status === 200) {
+                    setCode(res.data.code);
+                    const expTime = new Date(res.data.code_time * 1000);
+                    setTimeLeft(expTime - Date.now());
+                  } else {
+                    setTimeLeft(new Date(0) - Date.now());
+                    setter.showNotification(res.data.message, NotificationType.Error);
+                  }
+                });
               }}
             >
               Reacquire

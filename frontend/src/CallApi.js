@@ -1,4 +1,4 @@
-const backendUrl = "http://127.0.0.1:5000/";
+const backendUrl = "http://127.0.0.1:5001/";
 
 export function CallApi(path, type, data) {
   if (data !== undefined) {

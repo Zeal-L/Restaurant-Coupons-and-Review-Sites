@@ -24,8 +24,19 @@ function VoucherInfoPop(props) {
         if (res.status === 200) {
           console.log(res);
           setInfo(res.data);
-          setLoading(false);
         }
+        setLoading(false);
+        console.log(res);
+      });
+    } else {
+      setLoading(true);
+      CallApiWithToken("/vouchers/get/by_id/" + props.id, "GET").then((res) => {
+        if (res.status === 200) {
+          console.log(res);
+          setInfo(res.data);
+        }
+        setLoading(false);
+        console.log(res);
       });
     }
   }, []);
