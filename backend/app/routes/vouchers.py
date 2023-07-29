@@ -612,7 +612,20 @@ class UseVoucher(Resource):
                 "message": "Unauthorized, user is not the owner of the voucher"
             }, 401
 
-        code = services.util.generate_random_number(4)
+
+        if voucher.code is not None and voucher.code_time < datetime.now().timestamp():
+            return {"message": "Success", "code": voucher.code, "code_time": voucher.code_time}, 200
+
+
+        code = services.util.generate_random_string_and_number(4)
+
+        # Check if code is unique
+        while (
+            models.Vouchers.query.filter_by(code=code).one_or_none() is not None
+        ):
+            code = services.util.generate_random_string_and_number(4)
+
+
         voucher.set_code(code)
         code_time = datetime.now().timestamp() + 300
         voucher.set_code_time(code_time)
@@ -623,8 +636,8 @@ class UseVoucher(Resource):
 ############################################################
 
 
-@api.route("/verify/<int:code>")
-@api.param("code", "Voucher code", type="int", required=True)
+@api.route("/verify/<str:code>")
+@api.param("code", "Voucher code", type="str", required=True)
 @api.param(
     "Authorization",
     "JWT Authorization header",
@@ -641,7 +654,7 @@ class UseVoucher(Resource):
 class VerifyVoucher(Resource):
     @api.doc("verify_voucher")
     @jwt_required()
-    def post(self, code: int) -> tuple[dict, int]:
+    def post(self, code: str) -> tuple[dict, int]:
         """Verify a voucher by its code.
 
         Returns:
@@ -652,7 +665,6 @@ class VerifyVoucher(Resource):
         """
         user: models.Users = current_user
 
-        # Potential bug: duplicate code
         voucher: models.Vouchers = models.Vouchers.query.filter_by(code=code).first()
 
         if voucher is None:
@@ -662,6 +674,12 @@ class VerifyVoucher(Resource):
             return {
                 "message": "Unauthorized, user is not the owner of the restaurant that the voucher belongs to"
             }, 401
+
+        if voucher.is_used:
+            return {"message": "Voucher is used"}, 403
+
+        if str(voucher.code) != code:
+            return {"message": "Voucher code is invalid"}, 403
 
         if voucher.code_time < datetime.now().timestamp():
             voucher.set_code(None)
