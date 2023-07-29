@@ -292,8 +292,6 @@ function Review (props){
     };
   }, []);
 
-
-
   React.useEffect(() => {
     CallApiWithToken(`/users/get/by_token`, "GET", ).then((response) => {
       if (response.status === 200) {

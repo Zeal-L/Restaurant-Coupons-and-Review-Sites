@@ -33,13 +33,15 @@ export default function TopBar() {
   const [userImage, setUserImage] = React.useState("");
   const [userName, setUserName] = React.useState("");
   React.useEffect(() => {
-    if (restaurantId !== "") {
+    if (!getter.login) {
+      setPages([]);
+    }
+    else if (restaurantId !== "") {
       setPages(["My Restaurant", "Voucher verify"]);
     } else {
       setPages(["Create Restaurant"]);
     }
-
-  }, [restaurantId]);
+  }, [restaurantId, getter.login]);
 
   React.useEffect(() => {
     CallApiWithToken("/restaurants/get/by_token", "GET").then((res) => {

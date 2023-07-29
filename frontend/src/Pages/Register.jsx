@@ -73,7 +73,7 @@ function Register() {
         setNameErr(true);
         setter.showNotification(res.data.message, NotificationType.Error);
       } else {
-        setter.showNotification("Unknown error: " + res.status, NotificationType.Error);
+        setter.showNotification("Unknown error: " + res.data.message, NotificationType.Error);
       }
       setLoading(false);
     });

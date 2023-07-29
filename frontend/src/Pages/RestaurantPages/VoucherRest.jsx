@@ -253,12 +253,12 @@ function VoucherDialog(props) {
             }
           }}
           fullWidth
-          disabled={props.selectedOption === "Free"}
+          disabled={props.selectedOption === "Free" || props.editable === false}
           margin="normal"
         />
 
         <TextField
-          label="Count"
+          label="Total Amount"
           value={props.count}
           onChange={(e) => {
             props.setCount(e.target.value);
@@ -277,6 +277,7 @@ function VoucherDialog(props) {
           value={props.discount}
           onChange={props.handleDiscountChange}
           fullWidth
+          disabled={props.editable === false}
           margin="normal"
         />
 
@@ -297,13 +298,17 @@ function VoucherDialog(props) {
             onChange={props.handleExpireChange}
             sx={{width: "100%", marginTop: "16px"}}
             label="Expire"
+            disabled={props.editable === false}
           />
         </LocalizationProvider>
 
-        <FormControlLabel control={<Switch checked={props.isAutoRelease} onClick={(event) => {
+        <FormControlLabel control={<Switch checked={props.isAutoRelease}
+                                           disabled={props.editable === false}
+                                           onClick={(event) => {
           props.setIsAutoRelease(event.target.checked);
         }}/>} label="Auto Release" sx={{marginLeft: 1}}/>
-        <FormControlLabel control={<Switch checked={props.Shareable} onClick={(event) => {
+        <FormControlLabel control={<Switch checked={props.Shareable}
+                                           onClick={(event) => {
           props.setShareable(event.target.checked);
         }}/>} label="is Shareable" sx={{marginLeft: 1}}/>
         {props.isAutoRelease &&
@@ -314,6 +319,7 @@ function VoucherDialog(props) {
                 onChange={(e) => {
                   props.setAutoReleaseStart(e);
                 }}
+                disabled={props.editable === false}
                 sx={{width: "100%", marginTop: "16px"}}
                 label="Auto Release Start"
               />
@@ -325,6 +331,7 @@ function VoucherDialog(props) {
                 onChange={(e) => {
                   props.setAutoReleaseEnd(e);
                 }}
+                disabled={props.editable === false}
                 sx={{width: "100%", marginTop: "16px"}}
                 label="Auto Release End"
               />
@@ -384,6 +391,7 @@ function VoucherDialog(props) {
                 <Box component="form" sx={{display: "flex", flexWrap: "wrap"}}>
                   <FormControl sx={{m: 1, minWidth: 120}}>
                     <TextField label="days" type="number"
+                     disabled={props.editable === false}
                       value={ReleasePeriodDay}
                       onChange={(e) => {
                         if (e.target.value < 0) {
@@ -397,7 +405,8 @@ function VoucherDialog(props) {
                     />
                   </FormControl>
                   <FormControl sx={{m: 1, minWidth: 120}}>
-                    <InputLabel htmlFor="demo-dialog-native-hour">hour</InputLabel>
+                    <InputLabel
+                      htmlFor="demo-dialog-native-hour">hour</InputLabel>
                     <Select
                       native
                       input={<OutlinedInput label="hour" id="demo-dialog-native-hour"/>}
@@ -412,9 +421,12 @@ function VoucherDialog(props) {
                       })}
                     </Select>
                   </FormControl>
-                  <FormControl sx={{m: 1, minWidth: 120}}>
+                  <FormControl
+                    disabled={props.editable === false}
+                    sx={{m: 1, minWidth: 120}}>
                     <InputLabel htmlFor="demo-dialog-native-Minute">Minute</InputLabel>
                     <Select
+                      disabled={props.editable === false}
                       native
                       input={<OutlinedInput label="Minute" id="demo-dialog-native-Minute"/>}
                       value={ReleasePeriodMinute}
@@ -439,6 +451,7 @@ function VoucherDialog(props) {
 
             <TextField
               label="Number of Vouchers per Release"
+              disabled={props.editable === false}
               value={props.autoReleaseCount}
               onChange={(e) => {
                 props.setAutoReleaseCount(e.target.value);
@@ -473,7 +486,7 @@ function CreateVoucher(props) {
   const [description, setDescription] = useState("");
   const [isAutoRelease, setIsAutoRelease] = useState(false);
   const [isShareable, setIsShareable] = useState(false);
-  const [autoReleaseTimeRange, setAutoReleaseTimeRange] = useState(dayjs().add(1, "hour"));
+  const [autoReleaseTimeRange, setAutoReleaseTimeRange] = useState(10);
   const [autoReleaseCount, setAutoReleaseCount] = useState(10);
   const [autoReleaseStart, setAutoReleaseStart] = useState(dayjs());
   const [autoReleaseEnd, setAutoReleaseEnd] = useState(dayjs(options[selectedOption].defV.expire));
@@ -511,7 +524,7 @@ function CreateVoucher(props) {
             amount: autoReleaseCount,
             start_date: autoReleaseStart.unix(),
             end_date: autoReleaseEnd.unix(),
-            interval: autoReleaseTimeRange.unix(),
+            interval: autoReleaseTimeRange,
         }
     }
     console.log(expire);
@@ -530,6 +543,8 @@ function CreateVoucher(props) {
 
   return (
     <VoucherDialog
+      selectedOption={selectedOption}
+      editable={true}
       open={props.open}
       onClose={props.onClose}
       condition={condition}
@@ -611,9 +626,12 @@ function EditVoucher(props) {
     // TODO
     // console.log(selectedOption);
   };
+
   console.log(props.defV);
   return (
     <VoucherDialog
+      selectedOption={props.defV.type}
+      editable={false}
       open={props.open}
       onClose={props.onClose}
       condition={props.defV.condition}
@@ -624,7 +642,7 @@ function EditVoucher(props) {
       handleDiscountChange={(event) => {
         props.setDefV({...props.defV, discount: event.target.value});
       }}
-      expire={dayjs(props.defV.expire)}
+      expire={dayjs.unix(props.defV.expire)}
       handleExpireChange={(newValue) => {
         props.setDefV({...props.defV, expire: newValue});
       }}
@@ -641,74 +659,23 @@ function EditVoucher(props) {
       setCount={(e) => {
         props.setDefV({...props.defV, total_amount: e});
       }}
-      isAutoRelease={props.defV.auto_release_info !== undefined}
-      autoReleaseTimeRange={props.defV.auto_release_info !== undefined ? props.defV.auto_release_info.range : 60}
-      autoReleaseCount={props.defV.auto_release_info !== undefined ? props.defV.auto_release_info.amount : 10}
-      autoReleaseStart={props.defV.auto_release_info !== undefined ? dayjs(props.defV.auto_release_info.start) : dayjs()}
-      autoReleaseEnd={props.defV.auto_release_info !== undefined ? dayjs(props.defV.auto_release_info.end) : dayjs(props.defV.expire)}
+      isAutoRelease={props.defV.auto_release_info.amount !== undefined}
+      autoReleaseTimeRange={props.defV.auto_release_info.amount !== undefined ? props.defV.auto_release_info.interval : 60}
+      autoReleaseCount={props.defV.auto_release_info.amount !== undefined ? props.defV.auto_release_info.amount : 10}
+      autoReleaseStart={props.defV.auto_release_info.amount !== undefined ? dayjs.unix(props.defV.auto_release_info.start_date) : dayjs()}
+      autoReleaseEnd={props.defV.auto_release_info.amount !== undefined ? dayjs.unix(props.defV.auto_release_info.end_date) : dayjs.unix(props.defV.expire)}
       setIsAutoRelease={(e) => {
-        if (e) {
-          props.setDefV({
-            ...props.defV,
-            auto_release_info: {
-              range: 120,
-              amount: 10,
-              start: dayjs(),
-              end: dayjs(props.defV.expire),
-            }
-          });
-        } else {
-          props.setDefV({...props.defV, auto_release_info: undefined});
-        }
       }}
       setAutoReleaseTimeRange={(e) => {
-        props.setDefV({
-          ...props.defV,
-          auto_release_info: {
-            range: e,
-            amount: props.defV.auto_release_info.amount,
-            start: dayjs(props.defV.auto_release_info.start),
-            end: dayjs(props.defV.auto_release_info.end),
-          }
-        });
       }}
       setAutoReleaseCount={(e) => {
-        props.setDefV({
-          ...props.defV,
-          auto_release_info: {
-            range: props.defV.auto_release_info.range,
-            amount: e,
-            start: dayjs(props.defV.auto_release_info.start),
-            end: dayjs(props.defV.auto_release_info.end),
-          }
-        });
       }}
-      setAutoReleaseStart={
-        (e) => {
-          props.setDefV({
-            ...props.defV,
-            auto_release_info: {
-              range: props.defV.auto_release_info.range,
-              amount: props.defV.auto_release_info.amount,
-              start: e,
-              end: dayjs(props.defV.auto_release_info.end),
-            }
-          });
-        }
+      setAutoReleaseStart={(e) => {
       }
-      setAutoReleaseEnd={
-        (e) => {
-          props.setDefV({
-            ...props.defV,
-            auto_release_info: {
-              range: props.defV.auto_release_info.range,
-              amount: props.defV.auto_release_info.amount,
-              start: dayjs(props.defV.auto_release_info.start),
-              end: e,
-            }
-          });
-        }
       }
+      setAutoReleaseEnd={(e) => {
+      }
+    }
     >
       <Grid item key={props.defV.template_id}>
         <Voucher

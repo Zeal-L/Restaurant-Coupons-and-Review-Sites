@@ -1,19 +1,57 @@
-import {Box, Button, colors, Grid, Link, Typography} from "@mui/material";
+import {Backdrop, Box, Button, CircularProgress, colors, Grid, Link, Typography} from "@mui/material";
 import {useParams} from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import Voucher from "../Components/Voucher";
 import dayjs from "dayjs";
+import {CallApiWithToken} from "../CallApi";
+import {Context, NotificationType} from "../context";
 
 function VoucherUse() {
   useEffect(() => {
     document.title = "Voucher";
   }, []);
+  const {getter, setter} = useContext(Context);
   const [editPopOpen, setEditPopopen] = React.useState(false);
   const {voucherId} = useParams();
   //const [voucherList, setVoucherList] = React.useState([]);
   const deadline = Date.now() + 60 * 60;
   const [timeLeft, setTimeLeft] = React.useState(deadline - Date.now());
-
+  const [loading, setLoading] = React.useState(true);
+  // const info =
+  //   {
+  //     id: "1",
+  //     type: "Percentage",
+  //     condition: "Percentage",
+  //     discount: "10% OFF",
+  //     expire: "2023-12-31",
+  //     count: 109,
+  //     description: "this is the description of Percentage voucher.",
+  //     isClaimed: false,
+  //     restaurant: {
+  //       id: "1",
+  //       name: "Restaurant 1",
+  //     },
+  //     autoRelease: {
+  //       range: 102,
+  //       count: 10,
+  //       start: dayjs().format("YYYY-MM-DD"),
+  //       end: dayjs().add(1, "year").format("YYYY-MM-DD")
+  //     }
+  //   };
+  const [info, setInfo] = React.useState({});
+  // const [inf]
+  // /vouchers/get/voucher/by_id/{voucher_id}
+  useEffect(() => {
+    CallApiWithToken(`/vouchers/get/voucher/by_id/${voucherId}`, "GET", null, null).then((res) => {
+      if (res.status === 200) {
+        console.log(res);
+        setInfo(res.data);
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Success);
+      }
+      setLoading(false);
+    });
+  }, []);
   // let code = "A1E4"
   const [code, setCode] = useState("A1E4");
   const getTime = () => {
@@ -48,12 +86,10 @@ function VoucherUse() {
     }
     return () => clearTimeout(timer);
   }, [timeLeft]);
-
   const descriptionStyle = {
     marginBottom: "16px",
     textAlign: "center",
   };
-
   const linkStyle = {
     cursor: "pointer",
     color: "#1976D2",
@@ -62,29 +98,16 @@ function VoucherUse() {
       textDecoration: "underline",
     },
   };
-  const info =
-    {
-      id: "1",
-      type: "Percentage",
-      condition: "Percentage",
-      discount: "10% OFF",
-      expire: "2023-12-31",
-      count: 109,
-      description: "this is the description of Percentage voucher.",
-      isClaimed: false,
-      restaurant: {
-        id: "1",
-        name: "Restaurant 1",
-      },
-      autoRelease: {
-        range: 102,
-        count: 10,
-        start: dayjs().format("YYYY-MM-DD"),
-        end: dayjs().add(1, "year").format("YYYY-MM-DD")
-      }
-    };
   return (
-    <>
+    loading ? (
+        <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={loading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+    ) :
+    (<>
       <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
         <Grid item alignItems="center">
           <Voucher
@@ -99,10 +122,10 @@ function VoucherUse() {
           <Typography variant="body2" style={descriptionStyle}>
             This voucher is provided by{" "}
             <Link
-              href={`/restaurant/${info.restaurant.id}`}
+              href={`/restaurant/${info.restaurant_id}`}
               sx={linkStyle}
             >
-              {info.restaurant.name}
+              {info.restaurant_name}
             </Link>
             .
           </Typography>
@@ -126,7 +149,8 @@ function VoucherUse() {
       {/*    show time as red and 加粗*/}
       <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
         <Grid item xs={12}>
-          <Typography variant="body2" sx={{...descriptionStyle, fontWeight: "bold", color: "red", fontSize: "36px"}}>
+          <Typography variant="body2"
+                      sx={{...descriptionStyle, fontWeight: "bold", color: "red", fontSize: "36px"}}>
             Time left: {getTime()}
           </Typography>
         </Grid>
@@ -164,11 +188,8 @@ function VoucherUse() {
           </Grid>
         </Grid>
       )}
-    </>
-
+    </>)
   );
-
-
 }
 
 export default VoucherUse;
