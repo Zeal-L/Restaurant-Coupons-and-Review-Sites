@@ -39,6 +39,27 @@ def user_lookup_callback(_jwt_header: dict, jwt_payload: dict) -> models.Users o
     return models.Users.query.filter_by(email=identity).one_or_none()
 
 
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blocklist(_jwt_header: dict, jwt_payload: dict) -> bool:
+    """
+    Callback function for JWTManager to check if token is in blocklist.
+    Determine if you are blacklisted by matching the expiration time to the user token.
+    Args:
+        _jwt_header (dict): JWT header
+        jwt_payload (dict): JWT data
+
+    Returns:
+        bool: True if token is in blocklist, False otherwise
+    """
+
+    identity = jwt_payload["sub"]
+    user = models.Users.query.filter_by(email=identity).one_or_none()
+    if user is None:
+        return True
+
+    return jwt_payload["exp"] != decode_token(user.token)["exp"]
+
+
 # The following callbacks are used for customizing jwt response/error messages.
 # The original ones may not be in a very pretty format (opinionated)
 @jwt.expired_token_loader
@@ -58,7 +79,7 @@ def invalid_token_callback(error):
     return (
         jsonify(
             {
-                "message": "Signature verification failed.",
+                "message": f"Signature verification failed.\n{error}",
             }
         ),
         401,
@@ -70,7 +91,7 @@ def missing_token_callback(error):
     return (
         jsonify(
             {
-                "message": "Request does not contain an access token.",
+                "message": f"Request does not contain an access token.\n{error}",
             }
         ),
         401,
@@ -99,27 +120,6 @@ def revoked_token_callback():
         ),
         401,
     )
-
-
-@jwt.token_in_blocklist_loader
-def check_if_token_in_blocklist(_jwt_header: dict, jwt_payload: dict) -> bool:
-    """
-    Callback function for JWTManager to check if token is in blocklist.
-    Determine if you are blacklisted by matching the expiration time to the user token.
-    Args:
-        _jwt_header (dict): JWT header
-        jwt_payload (dict): JWT data
-
-    Returns:
-        bool: True if token is in blocklist, False otherwise
-    """
-
-    identity = jwt_payload["sub"]
-    user = models.Users.query.filter_by(email=identity).one_or_none()
-    if user is None:
-        return True
-
-    return jwt_payload["exp"] != decode_token(user.token)["exp"]
 
 
 ############################################################
