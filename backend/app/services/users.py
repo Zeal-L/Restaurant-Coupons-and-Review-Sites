@@ -196,7 +196,8 @@ def clear_unconfirmed_user_v1() -> None:
         None
     """
     for unconfirmed_user in models.UnconfirmedUsers.query.all():
-        if time.time() > unconfirmed_user.confirm_code["expiration"] and (
+        confirm_code = json.loads(unconfirmed_user.confirm_code)
+        if time.time() > confirm_code["expiration"] and (
             models.Users.query.filter_by(email=unconfirmed_user.email).first() is None
         ):
             models.UnconfirmedUsers.delete_unconfirmed_user_by_id(
