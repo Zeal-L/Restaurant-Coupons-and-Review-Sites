@@ -19,7 +19,7 @@ specific_password = "txweqsodfbjxanme"
 
 class Config(object):
     JWT_SECRET_KEY = "super-secret"
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
     SQLALCHEMY_DATABASE_URI = f"postgresql://{user}:{password}@{host}/{database}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
