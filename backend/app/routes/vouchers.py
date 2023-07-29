@@ -636,8 +636,8 @@ class UseVoucher(Resource):
 ############################################################
 
 
-@api.route("/verify/<str:code>")
-@api.param("code", "Voucher code", type="str", required=True)
+@api.route("/verify/<string:code>")
+@api.param("code", "Voucher code", type="string", required=True)
 @api.param(
     "Authorization",
     "JWT Authorization header",
