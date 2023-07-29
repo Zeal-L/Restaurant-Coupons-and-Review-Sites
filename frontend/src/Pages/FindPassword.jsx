@@ -33,22 +33,21 @@ export function EMailVerification() {
         setLoading(false);
     });
   };
-
   const submit = (form) => {
     setLoading(true);
     form.preventDefault();
-    const email = form.target.email.value;
+    console.log(form.target);
     const new_password = form.target.password.value;
-    const code = form.target.code.value;
+    const reset_code = form.target.code.value;
     // /users/reset/password/verify_reset_code
-    CallApi("/users/reset/password/verify_reset_code", "PUT", {email, new_password, code}).then((res) => {
+    CallApi("/users/reset/password/verify_reset_code", "PUT", {email, new_password, reset_code}).then((res) => {
+        setLoading(false);
         if (res.status === 200) {
             setter.showNotification("Password reset success.", NotificationType.Success);
             navigate("/login");
         } else {
-            setter.showNotification("Password reset failed.", NotificationType.Error);
+            setter.showNotification(res.body, NotificationType.Error);
         }
-        setLoading(false);
     })
 
   };
@@ -104,7 +103,7 @@ export function EMailVerification() {
                 </Grid>
 
                 <Grid item>
-                  <TextField id="newPassword" label="New Password" variant="outlined" type="text" name="newPassword"
+                  <TextField id="password" label="New Password" variant="outlined" type="password" name="password"
                              disabled={!sended}
                              sx={styles.sameWidth} required/>
                 </Grid>
