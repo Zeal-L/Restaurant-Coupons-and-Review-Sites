@@ -130,7 +130,8 @@ class Users(db.Model):
             self.favorite_restaurants = []
         if restaurant_id in self.favorite_restaurants:
             return False
-        self.favorite_restaurants.append(restaurant_id)
+        temp = self.favorite_restaurants + [restaurant_id]
+        self.favorite_restaurants = temp
         db.session.commit()
         return True
 
