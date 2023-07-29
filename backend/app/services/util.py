@@ -47,16 +47,16 @@ def generate_random_number(length: int) -> str:
 
 def generate_random_string_and_number(length: int) -> str:
     """
-    Generates a random string of letters and digits with the specified length.
+    Generates a random string of uppercase letters with the specified length.
 
     Args:
         length (int): The length of the random string to generate.
 
     Returns:
-        str: A random string of letters and digits with the specified length.
+        str: A random string of uppercase letters with the specified length.
     """
 
-    letters = string.ascii_letters + string.digits
+    letters = string.ascii_uppercase
     return "".join(random.choice(letters) for _ in range(length))
 
 
