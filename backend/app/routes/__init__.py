@@ -219,7 +219,7 @@ def generate_comments(user_ids: list, restaurant_id: int) -> dict:
             user_id=sender,
             restaurant_id=restaurant_id,
             content=fake.dish_description(),
-            rate=random.uniform(1, 5),
+            rate=round(random.randint(10, 50) / 10 * 2) / 2,
             date=fake.date(),
             anonymity=random.choice([True, False]),
             report_by=None,
@@ -248,7 +248,7 @@ def generate_dish(restaurant_id: int) -> dict:
         new_dish = models.Dishes(
             restaurant_id=restaurant_id,
             name=fake.dish(),
-            price=random.uniform(1, 100),
+            price=round(random.uniform(1, 100), 1),
             description=fake.dish_description(),
             image=base64.b64encode(res.content).decode("utf-8"),
         )
