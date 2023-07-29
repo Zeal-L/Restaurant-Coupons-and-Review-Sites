@@ -11,7 +11,7 @@ from flask_jwt_extended import create_access_token
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restx import Api, Resource
 from flask_jwt_extended import JWTManager, decode_token
 from . import users, restaurants, dishes, comments, replies, vouchers
@@ -37,6 +37,68 @@ def user_lookup_callback(_jwt_header: dict, jwt_payload: dict) -> models.Users o
 
     identity = jwt_payload["sub"]
     return models.Users.query.filter_by(email=identity).one_or_none()
+
+
+# The following callbacks are used for customizing jwt response/error messages.
+# The original ones may not be in a very pretty format (opinionated)
+@jwt.expired_token_loader
+def expired_token_callback():
+    return (
+        jsonify(
+            {
+                "message": "The token has expired.",
+            }
+        ),
+        401,
+    )
+
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return (
+        jsonify(
+            {
+                "message": "Signature verification failed.",
+            }
+        ),
+        401,
+    )
+
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return (
+        jsonify(
+            {
+                "message": "Request does not contain an access token.",
+            }
+        ),
+        401,
+    )
+
+
+@jwt.needs_fresh_token_loader
+def token_not_fresh_callback():
+    return (
+        jsonify(
+            {
+                "message": "The token is not fresh.",
+            }
+        ),
+        401,
+    )
+
+
+@jwt.revoked_token_loader
+def revoked_token_callback():
+    return (
+        jsonify(
+            {
+                "message": "The token has been revoked.",
+            }
+        ),
+        401,
+    )
 
 
 @jwt.token_in_blocklist_loader
