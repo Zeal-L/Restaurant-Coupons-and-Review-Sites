@@ -612,19 +612,18 @@ class UseVoucher(Resource):
                 "message": "Unauthorized, user is not the owner of the voucher"
             }, 401
 
-
-        if voucher.code is not None and voucher.code_time < datetime.now().timestamp():
-            return {"message": "Success", "code": voucher.code, "code_time": voucher.code_time}, 200
-
+        if voucher.code is not None and voucher.code_time > datetime.now().timestamp():
+            return {
+                "message": "Success",
+                "code": voucher.code,
+                "code_time": voucher.code_time,
+            }, 200
 
         code = services.util.generate_random_string_and_number(4)
 
         # Check if code is unique
-        while (
-            models.Vouchers.query.filter_by(code=code).one_or_none() is not None
-        ):
+        while models.Vouchers.query.filter_by(code=code).one_or_none() is not None:
             code = services.util.generate_random_string_and_number(4)
-
 
         voucher.set_code(code)
         code_time = datetime.now().timestamp() + 300
