@@ -147,7 +147,7 @@ class Fake_Data(Resource):
                 for future in tqdm(as_completed(futures), total=len(futures))
             )
 
-        # Generate Fake Restaurants
+        # Generate Fake Dishes
         for restaurant in tqdm(restaurant_info, desc="Generating fake dishes..."):
             with ThreadPoolExecutor(max_workers=32) as executor:
                 futures = [
@@ -164,10 +164,11 @@ class Fake_Data(Resource):
         # Generate Fake Comments
         for restaurant in tqdm(restaurant_info, desc="Generating fake comments..."):
             with ThreadPoolExecutor(max_workers=32) as executor:
-                sender = random.choice(user_info)["user_id"]
-                user_ids = [user["user_id"] for user in user_info if user["user_id"] != sender]
+                user_ids = [user["user_id"] for user in user_info]
                 futures = [
-                    executor.submit(generate_comments, sender, user_ids, restaurant["restaurant_id"])
+                    executor.submit(
+                        generate_comments, user_ids, restaurant["restaurant_id"]
+                    )
                     for _ in range(100)
                 ]
                 for _future in as_completed(futures):
@@ -199,12 +200,17 @@ class Fake_Data(Resource):
         }, 200
 
 
-def generate_comments(sender: int, user_ids: list, restaurant_id: int) -> dict:
+def generate_comments(user_ids: list, restaurant_id: int) -> dict:
     with my_app.app_context():
         fake = Faker()
         fake.add_provider(FoodProvider)
+
+        sender = random.choice(user_ids)
+        user_ids = [user_id for user_id in user_ids if user_id != sender]
+
         liked_by = random.sample(user_ids, random.randint(0, len(user_ids)))
         disliked_by = random.sample(user_ids, random.randint(0, len(user_ids)))
+
         for user_id in liked_by:
             if user_id in disliked_by:
                 disliked_by.remove(user_id)
