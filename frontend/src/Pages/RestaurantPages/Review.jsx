@@ -109,10 +109,11 @@ const Comment = ({comment_id,
     const toggleReplies = () => {
       setShowReplies(!showReplies);
     };
+    console.log("user", user);
   return (
     <Box display="flex" alignItems="flex-start" marginBottom={2}
       sx={{padding: 2, borderRadius: 4, boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"}}>
-      <Avatar src={user.avatar} alt={user.name}/>
+      <Avatar src={`data:image/png;base64,${user.avatar}`} alt={user.name}/>
       <Box marginLeft={2} flexGrow={1}>
         <Typography variant="subtitle1">{user.name}</Typography>
         <Box display="flex" alignItems="center">
@@ -297,8 +298,6 @@ function Review (props){
       if (response.status === 200) {
         setUserName(response.data.name);
         setUserImage(response.data.image);
-      } else {
-        setter.showNotification(response.data.message, NotificationType.Error);
       }
     });
   }, [restaurantId]);

@@ -18,12 +18,14 @@ export function CallApi(path, type, data) {
         return response.json();
       })
       .then(data => {
+        // console.log(data);
         resolve({
           status: statusCode,
           data: data
         });
       })
       .catch(error => {
+        // console.log(error);
         resolve({
           status: 404,
           data: {
@@ -35,6 +37,9 @@ export function CallApi(path, type, data) {
 }
 
 export function CallApiWithToken(path, type, data) {
+  if (localStorage.getItem("token") === null) {
+    return CallApi(path, type, data);
+  }
   if (data !== undefined) {
     data = JSON.stringify(data);
   }
@@ -50,6 +55,7 @@ export function CallApiWithToken(path, type, data) {
     })
       .then(response => {
         statusCode = response.status;
+        // console.log(response);
         return response.json();
       })
       .then(data => {
@@ -59,6 +65,7 @@ export function CallApiWithToken(path, type, data) {
         });
       })
       .catch(error => {
+        // console.log(error);
         resolve({
             status: 404,
             data: {
