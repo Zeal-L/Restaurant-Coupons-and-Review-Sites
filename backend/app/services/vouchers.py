@@ -101,7 +101,6 @@ def create_auto_release_voucher_v1(
             trigger="date",
             run_date=datetime.fromtimestamp(info["start_date"]),
         )
-        print("add job")
     else:
         auto_release_create_job(
             template.template_id, info["amount"], info["end_date"], info["interval"]

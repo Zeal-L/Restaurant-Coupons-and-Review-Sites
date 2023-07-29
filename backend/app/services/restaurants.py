@@ -88,4 +88,4 @@ def get_restaurant_rating_by_id_v1(restaurant_id: int) -> dict or None:
 def get_all_user_who_favorite_v1(restaurant_id: int) -> list:
     users = models.Users.query.all()
 
-    return [user for user in users if restaurant_id in user.favorite_restaurants]
+    return [user for user in users if user.favorite_restaurants is not None and restaurant_id in user.favorite_restaurants]
