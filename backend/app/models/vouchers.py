@@ -39,6 +39,10 @@ class Vouchers(db.Model):
         self.code_time = code_time
         db.session.commit()
 
+    def set_owner_id(self, owner_id: int) -> None:
+        self.owner_id = owner_id
+        db.session.commit()
+
     ############################################################
 
     @staticmethod
