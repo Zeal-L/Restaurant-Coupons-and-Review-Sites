@@ -589,6 +589,7 @@ class GetAllVouchersByUser(Resource):
     401, "Unauthorized, invalid JWT token, user is not the owner of the voucher"
 )
 @api.response(403, "Voucher not exist")
+@api.response(400, "Voucher is already used")
 class UseVoucher(Resource):
     @api.doc("use_voucher")
     @jwt_required()
@@ -611,6 +612,9 @@ class UseVoucher(Resource):
             return {
                 "message": "Unauthorized, user is not the owner of the voucher"
             }, 401
+
+        if voucher.is_used:
+            return {"message": "Voucher is already used"}, 400
 
         if voucher.code is not None and voucher.code_time > datetime.now().timestamp():
             return {
