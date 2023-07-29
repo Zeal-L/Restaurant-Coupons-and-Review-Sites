@@ -805,7 +805,6 @@ class GetVerifiedVoucherList(Resource):
         Returns:
             A tuple containing a dictionary with the voucher information and an HTTP status code.
         """
-        info = api.payload
 
         user: models.Users = current_user
 
@@ -826,9 +825,6 @@ class GetVerifiedVoucherList(Resource):
                     template_id=template.template_id, is_used=True
                 ).all()
             )
-
-        start = info["start"]
-        end = info["end"]
 
         if start < 0 or start > len(voucher_list) or end < 1 or end < start:
             return {"message": "Invalid start and end index"}, 405
