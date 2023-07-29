@@ -864,3 +864,52 @@ class GetVerifiedVoucherList(Resource):
             info.append(temp)
 
         return {"info": info}, 200
+
+############################################################
+
+@api.route("/get/verified_voucher_list/count/by_restaurant")
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success")
+@api.response(401, "Unauthorized, invalid JWT token")
+@api.response(403, "User does not have a restaurant")
+class GetVerifiedVoucherListCount(Resource):
+    @api.doc("get_verified_voucher_list_count")
+    @jwt_required()
+    def get(self) -> tuple[dict, int]:
+        """Get the number of verified vouchers by restaurant.
+
+        Returns:
+            A tuple containing a dictionary with the voucher information and an HTTP status code.
+        """
+
+        user: models.Users = current_user
+
+        restaurant: models.Restaurants = models.Restaurants.get_restaurant_by_owner(
+            user.user_id
+        )
+
+        if restaurant is None:
+            return {"message": "User does not have a restaurant"}, 403
+
+        template_list: list[
+            models.VoucherTemplate
+        ] = models.VoucherTemplate.get_voucher_templates_by_restaurant(
+            restaurant.restaurant_id
+        )
+
+        voucher_list = []
+
+        for template in template_list:
+            voucher_list.extend(
+                models.Vouchers.query.filter_by(
+                    template_id=template.template_id, is_used=True
+                ).all()
+            )
+
+        return {"count": len(voucher_list)}, 200

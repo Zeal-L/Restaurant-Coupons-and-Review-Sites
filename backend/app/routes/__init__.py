@@ -100,6 +100,16 @@ class Fake_Data(Resource):
         Returns:
             dict: Fake data
         """
+        import csv
+        import random
+        import requests
+        from tqdm import tqdm
+        from faker import Faker
+        from faker_food import FoodProvider
+        from werkzeug.security import generate_password_hash
+
+        fake = Faker()
+        fake.add_provider(FoodProvider)
 
         # Delete all current data in the database
         models.db.session.close_all()
@@ -107,7 +117,16 @@ class Fake_Data(Resource):
         models.db.create_all()
 
 
-
+        # Generate Fake Users
+        for _ in tqdm(range(100)):
+            name = fake.name()
+            gender = random.choice(["male", "female", "other"])
+            photo = people_url = requests.get(
+                "https://loremflickr.com/500/500/people", allow_redirects=True
+            ).url
+            email = fake.email()
+            password = fake.password()
+            password_hash = generate_password_hash(password)
 
 
 
