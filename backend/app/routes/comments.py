@@ -228,7 +228,9 @@ class GetComment(Resource):
             "liked": liked_by,
             "like_count": 0 if comment.liked_by is None else len(comment.liked_by),
             "disliked": disliked_by,
-            "dislike_count": 0 if comment.disliked_by is None else len(comment.disliked_by),
+            "dislike_count": 0
+            if comment.disliked_by is None
+            else len(comment.disliked_by),
         }, 200
 
 
