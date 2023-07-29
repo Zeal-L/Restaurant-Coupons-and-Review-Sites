@@ -90,16 +90,26 @@ class DatabaseSize(Resource):
         }, 200
 
 
-# @api.route("/database/generate/fake_data")
-# @api.response(200, "Success")
-# class Fake_Data(Resource):
-#     @api.doc("generate_fake_data")
-#     def get(self) -> tuple[dict, int]:
-#         """Generate fake data
+@api.route("/database/generate/fake_data")
+@api.response(200, "Success")
+class Fake_Data(Resource):
+    @api.doc("generate_fake_data")
+    def get(self) -> tuple[dict, int]:
+        """Generate fake data
 
-#         Returns:
-#             dict: Fake data
-#         """
+        Returns:
+            dict: Fake data
+        """
 
-#         models.generate_fake_data()
-#         return {"message": "Fake data generated"}, 200
+        # Delete all current data in the database
+        models.db.session.close_all()
+        models.db.drop_all()
+        models.db.create_all()
+
+
+
+
+
+
+
+        return {"message": "Fake data generated"}, 200
