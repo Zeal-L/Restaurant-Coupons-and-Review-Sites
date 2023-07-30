@@ -179,7 +179,15 @@ const Comment = ({
             </Button>
           </Box>
           <Box sx={{marginLeft: "auto"}}>
-            <IconButton color="error">
+            <IconButton color="error" onClick={() => {
+              CallApiWithToken(`/comments/report/${comment_id}`, "POST").then((res) => {
+                if (res.status === 200) {
+                  setter.showNotification(res.data.message, NotificationType.Success);
+                } else {
+                  setter.showNotification(res.data.message, NotificationType.Error);
+                }
+              });
+            }}>
               <ReportIcon/>
             </IconButton>
             <IconButton onClick={toggleReplies}>
@@ -339,10 +347,6 @@ function Review(props) {
   React.useEffect(() => {
     updateReview();
   }, [restaurantId, maxComments]);
-
-  // React.useEffect(() => {
-  //   updateReview();
-  // }, [numberOfComments]);
 
   React.useEffect(() => {
     console.log("sort changed");
