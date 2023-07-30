@@ -238,7 +238,7 @@ class GetRestaurantListByName(Resource):
         end = info["end"]
 
         if restaurant_list := models.Restaurants.query.filter(
-            models.Restaurants.name.like(f"%{info['name']}%")
+            models.Restaurants.name.ilike(f"%{info['name']}%")
         ).all():
             restaurant_info_list = []
             for restaurant in restaurant_list:
