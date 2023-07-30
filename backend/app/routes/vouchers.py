@@ -205,6 +205,7 @@ class NewVoucherTemplate(Resource):
             "shareable": template_res.shareable,
             "is_collected": False,
             "remain_amount": template_res.remain_amount,
+            "total_amount": template_res.total_amount,
             "auto_release_info": auto_release_res,
         }, 200
 
