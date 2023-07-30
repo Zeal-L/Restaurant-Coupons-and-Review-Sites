@@ -79,6 +79,9 @@ const StyledInputBase = styled(InputBase)(({theme}) => ({
 
 
 function Profile() {
+  useEffect(() => {
+    document.title = 'Profile';
+  }, []);
   const [ChangePasswordOpen, setChangePasswordOpen] = React.useState(false);
   const {setter, getter} = useContext(Context);
   // const {voucherId} = useParams();
@@ -109,6 +112,7 @@ function Profile() {
     CallApiWithToken("/vouchers/get/voucher/by_user", "GET").then((res) => {
       if (res.status === 200) {
         setAllVoucher(res.data.info);
+        console.log(res.data.info);
       } else {
         setter.showNotification(res.data.message, NotificationType.Error);
       }
@@ -137,9 +141,9 @@ function Profile() {
       const reader = new FileReader();
       reader.readAsDataURL(image);
       reader.onloadend = () => {
-        setCurrImage(reader.result);
+        setCurrImage(reader.result.replace(/^data:image\/[a-z]+;base64,/, ""),);
         const data = {
-          "base64":reader.result,
+          "base64": reader.result.replace(/^data:image\/[a-z]+;base64,/, ""),
         }
         CallApiWithToken("/users/reset/photo", "PUT", data) .then((res) => {
           if (res.status === 200) {
@@ -184,7 +188,8 @@ function Profile() {
             <Box fullWidth  display="flex" flexDirection="column" alignItems="center" justifyContent="center">
               <label htmlFor="contained-button-file">
                 <IconButton component="span">
-                  <Avatar alt={name} src={currImage} sx={{ width: 150, height: 150 }}/>
+                  <Avatar alt={name}
+                          src={`data:image/png;base64,${currImage}`} sx={{ width: 150, height: 150 }}/>
                 </IconButton>
               </label>
               <input accept="image/*" id="contained-button-file" hidden multiple type="file" onChange={updateImage}/>
@@ -300,30 +305,40 @@ function Profile() {
                 marginTop: 1,
               }}
             >
-              {allVoucher.map((item) => (
-                (voucherFilterType === "All" || item.type === voucherFilterType) &&
-                  <Grid item key={item.id}>
-                    {
-                          <>
-                              <IconButton sx={{position: "relative"}} id="iconButtonS"
-                                          onClick={() => {
-                                              setDeletePopOpen(true);
-                                          }}>
-                                  <DeleteIcon color="white"/>
-                              </IconButton>
-                          </>
-                      }
+              {
+                allVoucher.map((item) => {
+                  console.log(item); // Print the item object to the console
 
-                    <Voucher
-                      type={item.type}
-                      condition={item.condition}
-                      discount={item.discount}
-                      expire={item.expire}
-                      disabled={item.isClaimed}
-                      isRestaurant={false}
-                    />
-                  </Grid>
-              ))}
+                  return (
+                    (voucherFilterType === "All" || item.type === voucherFilterType) && (
+                      <Grid item key={item.id}>
+                        <>
+                          <IconButton
+                            sx={{ position: "relative" }}
+                            id="iconButtonS"
+                            onClick={() => {
+                              setDeletePopOpen(true);
+                            }}
+                          >
+                            <DeleteIcon color="white" />
+                          </IconButton>
+                        </>
+                        <Voucher
+                          id={item.voucher_id}
+                          type={item.type}
+                          condition={item.condition}
+                          discount={item.discount}
+                          expire={item.expire}
+                          disabled={item.isClaimed}
+                          isRestaurant={false}
+                        />
+                      </Grid>
+                    )
+                  );
+                })
+              }
+
+
             </Grid>
             <Box
               component="div"
@@ -375,6 +390,7 @@ function Profile() {
                         </>
                     } */}
                     <Voucher
+                      id={item.voucher_id}
                       type={item.type}
                       condition={item.condition}
                       discount={item.discount}

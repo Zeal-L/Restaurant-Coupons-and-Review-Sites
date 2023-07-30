@@ -30,7 +30,7 @@ function VoucherInfoPop(props) {
       });
     } else {
       setLoading(true);
-      CallApiWithToken("/vouchers/get/by_id/" + props.id, "GET").then((res) => {
+      CallApiWithToken("/vouchers/get/voucher/by_id/" + props.id, "GET").then((res) => {
         if (res.status === 200) {
           console.log(res);
           setInfo(res.data);
@@ -39,7 +39,7 @@ function VoucherInfoPop(props) {
         console.log(res);
       });
     }
-  }, []);
+  }, [props.open]);
 
   const getVoucher = () => {
     CallApiWithToken("/vouchers/user/collect/" + props.id, "POST").then((res) => {
