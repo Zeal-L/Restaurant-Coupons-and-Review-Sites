@@ -304,6 +304,40 @@ class GetRestaurantListByRating(Resource):
 ############################################################
 
 
+@api.route("/get/list/by_favorite")
+@api.param(
+    "Authorization",
+    "JWT Authorization header",
+    type="string",
+    required=True,
+    _in="header",
+)
+@api.response(200, "Success", model=restaurant_info_list_model)
+@api.response(403, "Invalid start and end index")
+class GetRestaurantListByFavorite(Resource):
+    @api.doc(
+        "get_restaurant_list_by_favorite",
+    )
+    @jwt_required()
+    @api.marshal_with(restaurant_info_list_model)
+    def post(self) -> tuple[dict, int]:
+        user: models.Users = current_user
+
+        # get all restaurant and rating
+        restaurant_info_list = []
+        for f_id in user.favorite_restaurants:
+            restaurant = models.Restaurants.query.get(f_id)
+            rating_info = services.restaurants.get_restaurant_rating_by_id_v1(
+                restaurant.restaurant_id
+            )
+            restaurant_info_list.append(restaurant.__dict__ | rating_info)
+
+        return {"Restaurants": restaurant_info_list}, 200
+
+
+############################################################
+
+
 @api.route("/reset/name/<string:name>")
 @api.param("name", "The new name of the restaurant", type="string", required=True)
 @api.param(
