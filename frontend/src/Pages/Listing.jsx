@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState, useRef} from "react";
 import {
   Box,
   Card,
@@ -13,101 +13,12 @@ import {
   Tooltip
 } from "@mui/material";
 import {alpha, styled} from "@mui/material/styles";
-import {Favorite, FavoriteBorderRounded, PinDrop, Restaurant, Search as SearchIcon, Sort} from "@mui/icons-material";
-import {pink} from "@mui/material/colors";
-import Voucher from "../Components/Voucher.jsx";
-import restaurant1 from "../Resource/image/restaurant1.png";
-import restaurant2 from "../Resource/image/restaurant2.png";
-import restaurant3 from "../Resource/image/restaurant3.png";
-import restaurant4 from "../Resource/image/restaurant4.png";
-import restaurant5 from "../Resource/image/restaurant5.png";
-import restaurant6 from "../Resource/image/restaurant6.png";
-import restaurant7 from "../Resource/image/restaurant7.png";
+import { Restaurant, Search as SearchIcon, Sort } from "@mui/icons-material";
 import {styles} from "../styles.js";
 import "./index.css";
 import {useNavigate} from "react-router-dom";
-
-const defaultRestaurantsList = [
-  {
-    id: 1,
-    name: "test1",
-    rate: "4",
-    evaluationsNum: 153,
-    address: "testAddress1111111111111111111111111111111111111111",
-    image: restaurant1,
-    favourite: false,
-  },
-  {
-    id: 2,
-    name: "test2",
-    rate: "5",
-    evaluationsNum: 34,
-    address: "address2222222222222222222222222",
-    image: restaurant2,
-    favourite: true
-  },
-  {
-    id: 3,
-    name: "test3",
-    rate: "3",
-    evaluationsNum: 1123,
-    address: "Sydney",
-    image: restaurant3,
-    favourite: false,
-    vouchersInfo: [
-      {
-        id: "1",
-        type: "Percentage",
-        condition: "Spending over $100",
-        discount: "10% OFF",
-        expire: "2023-12-31",
-        count: 109,
-        total: 1000,
-        description: "This is the description of the Percentage voucher.",
-        restaurant: {
-          id: "1",
-          name: "Restaurant 1",
-        }
-      }
-    ]
-  },
-  {
-    id: 4,
-    name: "test4",
-    rate: "3",
-    evaluationsNum: 179,
-    address: "address444...",
-    image: restaurant4,
-    favourite: false
-  },
-  {
-    id: 5,
-    name: "test5",
-    rate: "5",
-    evaluationsNum: 8,
-    address: "address......",
-    image: restaurant5,
-    favourite: false
-  },
-  {
-    id: 6,
-    name: "test6",
-    rate: "3",
-    evaluationsNum: 99,
-    address: "address......",
-    image: restaurant6,
-    favourite: false
-  },
-  {
-    id: 7,
-    name: "test7",
-    rate: "1",
-    evaluationsNum: 1,
-    address: "address......",
-    image: restaurant7,
-    favourite: false
-  }
-];
+import { CallApi, CallApiWithToken } from "../CallApi.js";
+import ListingCard from "../Components/listingCard.jsx";
 
 const Search = styled("div")(({theme}) => ({
   position: "relative",
@@ -152,26 +63,77 @@ const StyledInputBase = styled(InputBase)(({theme}) => ({
 }));
 
 function Listing() {
-  useEffect(() => {
-    document.title = 'Listing';
-  }, []);
-  const [restaurantsList, setRestaurantsList] = useState(defaultRestaurantsList);
+  const scrollDivRef = useRef(null);
+  const [restaurantsList, setRestaurantsList] = useState([]);
   const [maxWidth, setMaxWidth] = useState(1051);
   const [width, setWidth] = useState();
-
+  const [cardStatus, forceRenderCard] = useState(false)
   const [sortValue, setSortValue] = React.useState("default");
   const navigate = useNavigate();
+  const [isAtBottom, setIsAtBottom] = useState(false);
+  const [pageNum, setPageNum] = useState(1)
+
+  useEffect(() => {
+    const div = scrollDivRef.current;
+    if (div) {
+      div.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (div) {
+        div.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
+
+  const handleScroll = () => {
+    const div = scrollDivRef.current;
+    if (div) {
+      const atBottom = div.scrollHeight - div.scrollTop - div.clientHeight < 1;
+      console.log('atBottom:', atBottom)
+      setIsAtBottom(atBottom)
+    }
+  };
+  // auto load
+  useEffect(() => {
+    if (isAtBottom) {
+      setPageNum(pageNum+1);
+      getRestInfo(pageNum+1);
+    }
+  }, [isAtBottom]);
+
+  const getRestInfo = useCallback((num) => {
+    CallApi("/restaurants/get/list/by_name", "POST", {
+      name: "",
+      start: 0,
+      end: (num || pageNum) * 10
+    }).then((res) => {
+      if (res.status === 200) {
+        setRestaurantsList(res.data.Restaurants || [])
+      }
+    })
+  }, [pageNum])
+
+  useEffect(() => {
+    document.title = 'Listing';
+    getRestInfo()
+  }, []);
+
   const handleSort = (event, data) => {
     setSortValue(data);
-    if (data === "default") return setRestaurantsList([...defaultRestaurantsList]);
-    const newRestaurantsList = [...restaurantsList].sort((a, b) => {
-      if (data === "rate") {
-        return parseFloat(b.rate) - parseFloat(a.rate);
-      } else if (data === "count") {
-        return b.evaluationsNum - a.evaluationsNum;
-      }
-    });
-    setRestaurantsList(newRestaurantsList);
+    if (data === "default") {
+      getRestInfo()
+    } else if (data === "rate") {
+      CallApi("/restaurants/get/list/by_rating", "POST", {
+        ascending_order: true,
+        start: 0,
+        end: 10
+      }).then((res) => {
+        if (res.status === 200) {
+          setRestaurantsList(res.data.Restaurants || [])
+        }
+      })
+    }
   };
 
   const resizeWidth = (e) => {
@@ -199,15 +161,20 @@ function Listing() {
   }, [width]);
 
   // collect/delete collect
-  const collect = ({id, favourite}) => {
-    const newList = [...restaurantsList].map(item => {
-      if (item.id === id) return {
-        ...item,
-        favourite: !favourite
-      };
-      return item;
-    });
-    setRestaurantsList(newList);
+  const collect = (type, id) => {
+    if (type === 'collect') {
+      CallApiWithToken(`/users/favorites/add/${id}`, "POST").then((res) => {
+        if (res.status === 200) {
+          forceRenderCard(!cardStatus)
+        }
+      })
+    } else {
+      CallApiWithToken(`/users/favorites/remove/${id}`, "DELETE").then((res) => {
+        if (res.status === 200) {
+          forceRenderCard(!cardStatus)
+        }
+      })
+    }
   };
 
   // enter detail page
@@ -228,12 +195,15 @@ function Listing() {
 
   // filter
   const handleChange = debounceFilter((data) => {
-    if (data[0]) {
-      const newRestaurantsList = [...defaultRestaurantsList].filter((i) => i.name.includes(data[0])).filter(i => i);
-      setRestaurantsList(newRestaurantsList);
-    } else {
-      setRestaurantsList([...defaultRestaurantsList]);
-    }
+    CallApi("/restaurants/get/list/by_name", "POST", {
+      name: data[0],
+      start: 0,
+      end: 10
+    }).then((res) => {
+      if (res.status === 200) {
+        setRestaurantsList(res.data.Restaurants || [])
+      }
+    })
   }, 800);
 
   const sortBoxStyle = {
@@ -248,7 +218,7 @@ function Listing() {
   return (
     <div style={{width: "100%", display: "flex", justifyContent: "center"}}>
       <div style={{background: "rgb(255, 243, 209)", width: `${maxWidth}px`}}>
-        <Box sx={styles.sameColor} style={{height: "calc(100vh - 64px)", overflow: "auto"}}>
+        <Box ref={scrollDivRef} sx={styles.sameColor} style={{height: "calc(100vh - 64px)", overflow: "auto"}}>
           <div style={{height: "calc(100% - 5px)", width: "100%", paddingTop: "5px"}}>
             <div className="list-nav" style={{margin: "0 10px", justifyContent: "space-between"}}>
               <div style={{display: "flex", alignItems: "center"}}>
@@ -257,13 +227,6 @@ function Listing() {
                 </div>
                 <h2>Restaurant</h2>
               </div>
-              {/* <Autocomplete
-                                id="combo-box-demo"
-                                options={defaultRestaurantsList.map(i => ({ label: i.name, value: i.id }))}
-                                sx={{ width: 300 }}
-                                renderInput={(params) => <TextField {...params} label="Search for restaurants" />}
-                                onChange={handleChange}
-                            /> */}
               <Search>
                 <SearchIconWrapper>
                   <SearchIcon/>
@@ -287,88 +250,18 @@ function Listing() {
                 >
                   <FormControlLabel value="default" control={<Radio/>} label="Default sorting"/>
                   <FormControlLabel value="rate" control={<Radio/>} label="High rating"/>
-                  <FormControlLabel value="count" control={<Radio/>} label="High comment count"/>
                 </RadioGroup>
               </FormControl>
             </div>
             <div>
               {
                 restaurantsList.map((item) => (
-                  <Card
-                    sx={{width: "320px", height: "388px", display: "inline-block", boxShadow: "none", margin: "10px"}}>
-                    <Grid container>
-                      <Grid item xs={12} sx={{height: 200, padding: "10px"}}>
-                        <CardMedia
-                          component="img"
-                          image={item.image}
-                          onClick={() => restaurantDetail(item.id)}
-                          sx={{cursor: "pointer", maxHeight: "100%", maxWidth: "100%"}}
-                        />
-                      </Grid>
-                      <Grid item xs={12} className="restaurant-introduction">
-                        <div style={{display: "flex", alignItems: "end"}}>
-                          <div
-                            style={{
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              cursor: "pointer",
-                              fontSize: "x-large"
-                            }}
-                            onClick={() => restaurantDetail(item.id)}
-                          >
-                            {item.name}
-                          </div>
-                          {
-                            item.favourite ?
-                              <Favorite
-                                onClick={() => collect(item)}
-                                sx={{
-                                  width: "1.2em",
-                                  height: "1.2em",
-                                  marginLeft: "10px",
-                                  color: pink[500],
-                                  cursor: "pointer"
-                                }}
-                              /> :
-                              <FavoriteBorderRounded
-                                onClick={() => collect(item)}
-                                sx={{width: "1.2em", height: "1.2em", marginLeft: "10px", cursor: "pointer"}}
-                              />
-                          }
-                        </div>
-                        <div style={{fontSize: "x-small", display: "flex", margin: "8px 0"}}>
-                          <Rating sx={{fontSize: "1rem", marginRight: "8px"}} name="read-only" value={item.rate}
-                            readOnly/>
-                          {`${item.evaluationsNum} evaluations`}
-                        </div>
-                        <Tooltip title={item.address} placement="top-start">
-                          <div style={{display: "flex", alignItems: "center"}}>
-                            <PinDrop sx={{width: "0.9rem", marginRight: "5px"}}/>
-                            <div style={{fontSize: "small", overflow: "hidden", textOverflow: "ellipsis"}}>
-                              {item.address}
-                            </div>
-                          </div>
-                        </Tooltip>
-                        {/* <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}> */}
-                        <div style={{float: "left", marginTop: "10px", maxHeight: "60px"}}>
-                          {/* voucher  */}
-                          {
-                            item.vouchersInfo?.length > 0 && item.vouchersInfo.map(voucher => (
-                              <Voucher
-                                type={voucher.type}
-                                condition={voucher.condition}
-                                discount={voucher.discount}
-                                expire={voucher.expire}
-                                transform={0.3}
-                                isListing
-                                sx={{marginRight: "10px", display: "inline-block"}}
-                              />
-                            ))
-                          }
-                        </div>
-                      </Grid>
-                    </Grid>
-                  </Card>
+                  <ListingCard
+                    restaurantInfo={item}
+                    restaurantDetail={restaurantDetail}
+                    collect={collect}
+                    cardStatus={cardStatus}
+                  />
                 ))
               }
             </div>

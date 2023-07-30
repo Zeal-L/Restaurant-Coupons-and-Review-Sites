@@ -6,6 +6,7 @@ import MenuCard from "../../Components/menuCard";
 import {Context, NotificationType, useContext} from "../../context.js";
 import {styles} from "../../styles.js";
 import sampleMenuImage from "../../Resource/image/Dongpo pork.png";
+import { CallApi, CallApiWithToken } from "../../CallApi";
 
 const PlusIcon = createSvgIcon(
   // credit: plus icon from https://heroicons.com/
@@ -47,93 +48,140 @@ function CreateRestaurant() {
   }, []);
   const {setter, getter} = useContext(Context);
   const navigate = useNavigate();
-
-  const [nameErr, setNameErr] = React.useState(false);
-  const [emailErr, setEmailErr] = React.useState(false);
-  const [passwordErr, setPasswordErr] = React.useState(false);
-  const [confirmPasswordErr, setConfirmPasswordErr] = React.useState(false);
-  const [emailVerified, setEmailVerified] = React.useState(false);
-  const [verificationErr, setVerificationErr] = React.useState(false);
-  const [menuList, setMenuList] = useState([{
-    id: Math.random(),
-    name: "DongPo Pork",
-    price: "20",
-    image: sampleMenuImage,
-    describe: "Top quality pork topped with secret sauce..."
-  }]);
+  const [menuList, setMenuList] = useState([]);
   const [updateMenuVis, setUpdateMenuVis] = useState(false);
   const [isAdd, setIsAdd] = useState(true);
   const [editMenu, setEditMenu] = useState({});
   const [restaurantImgUrl, setRestaurantImgUrl] = useState("");
   const [menuImgUrl, setMenuImgUrl] = useState("");
+  const [restaurantId, setRestaurantId] = useState("")
+  const [forceRender, setForceRender] = useState(false)
+  const [restaurantInfo, setRestaurantInfo] = useState({})
   const formRef = useRef(null);
 
+  const queryMenuList = (id) => {
+    CallApi(`/dishes/get/by_restaurant/${id}`, "GET").then((ress) => {
+      if(ress.status === 200) {
+        const ids = ress.data.dish_ids
+        setMenuList(ids)
+        setForceRender(!forceRender)
+      }
+    })
+  }
+
+  useEffect(() => {
+    CallApiWithToken("/restaurants/get/by_token", "GET").then((res) => {
+      if (res.status === 200) {
+        setRestaurantId(res.data.restaurant_id)
+        queryMenuList(res.data.restaurant_id)
+        console.log('form:', formRef)
+        // formRef.current.setFieldsValue({
+        //   name: res.data.name,
+        //   address: res.data.address,
+        // })
+        setRestaurantInfo(res.data)
+        setRestaurantImgUrl(`data:image/png;base64,${res.data.image}`)
+      } else (
+        setter.showNotification(res.data.message, NotificationType.Error)
+      )
+    })
+  }, [])
+
   const submit = () => {
-    console.log(formRef.current.name.value);
-    console.log(formRef.current.address.value);
     const name = formRef.current.name.value;
     const address = formRef.current.address.value;
-    setter.showNotification("Create Success!", NotificationType.Success);
+    const image = restaurantImgUrl.replace(/^data:image\/[a-z]+;base64,/, "");
+    if (restaurantId) {
+      CallApiWithToken(`/restaurants/reset/address/${address}`, "PUT")
+      CallApiWithToken(`/restaurants/reset/image`, "PUT", {
+        base64: image
+      })
+      CallApiWithToken(`/restaurants/reset/name/${name}`, "PUT")
+      setter.showNotification("edit Success!", NotificationType.Success);
+    } else {
+      if (name && address && image) {
+        CallApiWithToken("/restaurants/new", "POST", {
+          name,
+          address,
+          image
+        }).then((res) => {
+          if (res.status === 200) {
+            setter.showNotification("Create Success!", NotificationType.Success);
+          } else {
+            setter.showNotification(res.data.message, NotificationType.Error);
+          }
+        })
+      } else {
+        setter.showNotification("Incomplete information!", NotificationType.Error);
+      }
+    }
   };
 
   const addMenuSubmit = (form) => {
+    if (!restaurantId) return setter.showNotification("Please create your restaurant first", NotificationType.Warning);
     form.preventDefault();
-    console.log(form.target.name.value);
-    console.log(form.target.price.value);
-    console.log(menuImgUrl);
     if (isAdd) {
-      setMenuList([...menuList, {
-        id: Math.random(),
+      CallApiWithToken("/dishes/new", "POST", {
         name: form.target.name.value,
         price: form.target.price.value,
-        describe: form.target.describe.value,
-        image: menuImgUrl
-      }]);
+        description: form.target.description.value,
+        image: menuImgUrl.replace(/^data:image\/[a-z]+;base64,/, ""),
+      }).then((res) => {
+        if (res.status === 200) {
+          setter.showNotification('Success!', NotificationType.Success);
+          queryMenuList(restaurantId)
+        } else {
+          setter.showNotification(res.data.message, NotificationType.Error);
+        }
+      })
     } else {
-      const newList = [...menuList].map(item => {
-        if (item.id === editMenu.id) return {
-          ...item,
-          name: form.target.name.value,
-          price: form.target.price.value,
-          describe: form.target.describe.value,
-          image: menuImgUrl
-        };
-        return item;
-      });
-      setMenuList(newList);
+      CallApiWithToken(`/dishes/reset/info/${editMenu.dish_id}`, "PUT", {
+        name: form.target.name.value,
+        price: form.target.price.value,
+        description: form.target.description.value,
+        image: menuImgUrl.replace(/^data:image\/[a-z]+;base64,/, ""),
+      }).then((res) => {
+        if (res.status === 200) {
+          setter.showNotification('Success!', NotificationType.Success);
+          queryMenuList(restaurantId)
+        } else {
+          setter.showNotification(res.data.message, NotificationType.Error);
+        }
+      })
     }
     setUpdateMenuVis(false);
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    console.log(file);
-    if (file) {
-      const windowURL = window.URL || window.webkitURL;
-      const dataURl = windowURL.createObjectURL(file);
-      setRestaurantImgUrl(dataURl);
-      let param = new FormData();
-      param.append("file", file);
-      console.log("param:", param);
+  const uploadFileHandle = (e) => {
+    let files = e.target.files;
+    if (files.length > 0) {
+      //使用 FileReader() 构造器去创建一个新的 FileReader.
+      const fr = new FileReader();
+      fr.onload = (e) => {
+        setRestaurantImgUrl(e.currentTarget.result);
+      };
+      fr.readAsDataURL(files[0]);
     }
-  };
+  }
 
   const handleMenuImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const windowURL = window.URL || window.webkitURL;
-      const dataURl = windowURL.createObjectURL(file);
-      setMenuImgUrl(dataURl);
-      let param = new FormData();
-      param.append("file", file);
-      console.log("param:", param);
+    let files = e.target.files;
+    if (files.length > 0) {
+      //使用 FileReader() 构造器去创建一个新的 FileReader.
+      const fr = new FileReader();
+      fr.onload = (e) => {
+        setMenuImgUrl(e.currentTarget.result);
+      };
+      fr.readAsDataURL(files[0]);
     }
   };
 
-  const onDelete = (menuInfo, index) => {
-    const newList = [...menuList];
-    newList[index] = null;
-    setMenuList(newList.filter(i => i));
+  const onDelete = (id, index) => {
+    CallApiWithToken(`/dishes/delete/by_id/${id}`, "DELETE").then((res) => {
+      if (res.status === 200) {
+        queryMenuList(restaurantId)
+      }
+    })
   };
 
   const modalStyle = {
@@ -155,25 +203,32 @@ function CreateRestaurant() {
           <Card variant="outlined" sx={{maxWidth: 600, backgroundColor: "rgb(255, 243, 209)", minWidth: 600}}>
             <CardContent>
               <h2 style={{display: "flex", justifyContent: "center", marginTop: "0"}}>Create Your Restaurant</h2>
-              <Grid container direction="row" sx={{marginBottom: "10px"}}>
+              <Grid container direction="row" sx={{marginBottom: "10px", justifyContent: "center"}}>
                 <Grid item xs={7} sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>
                   <form onSubmit={submit} ref={formRef}>
                     <Grid container direction="column" justifyContent="center" spacing={2}>
                       <Grid item alignItems="center">
-                        <TextField id="name" label="Restaurant Name" variant="outlined"
+                        <TextField
+                          key={restaurantInfo.name}
+                          id="name"
+                          label="Restaurant Name"
+                          variant="outlined"
                           name="name"
                           sx={styles.sameWidth}
                           required
+                          defaultValue={restaurantInfo.name}
                         />
                       </Grid>
                       <Grid item>
                         <TextField
+                          key={restaurantInfo.address}
                           id="address"
                           label="Restaurant Address"
                           multiline
                           rows={4}
                           sx={styles.sameWidth}
                           required
+                          defaultValue={restaurantInfo.address}
                         />
                       </Grid>
                     </Grid>
@@ -215,8 +270,11 @@ function CreateRestaurant() {
                         <img style={{width: "auto", height: "auto", maxWidth: "100%", maxHeight: "100%"}}
                           src={restaurantImgUrl} alt="thumbnail"/>
                       )}
-                    <input hidden accept="image/*" type="file" onChange={handleImageChange}/>
+                    <input hidden accept="image/*" type="file" onChange={uploadFileHandle}/>
                   </Button>
+                </Grid>
+                <Grid item sx={{ marginTop: '25px' }}>
+                  <Button variant="contained" onClick={submit}>Create!</Button>
                 </Grid>
               </Grid>
               <h3 style={{display: "flex", justifyContent: "center", marginTop: "0"}}>Update your menu</h3>
@@ -242,27 +300,27 @@ function CreateRestaurant() {
                   </Box>
                   <TabPanel value={0} index={0} style={{overflow: "auto", maxHeight: 250}}>
                     {
-                      menuList.map((item, index) => (
+                      menuList.map((id, index) => (
                         <MenuCard
-                          name={item.name}
-                          price={item.price}
-                          image={item.image}
-                          desc={item.describe}
-                          onDelete={() => onDelete(item, index)}
+                          forceRender={forceRender}
+                          id={id}
+                          onDelete={() => onDelete(id, index)}
                           onEdit={() => {
                             setIsAdd(false);
-                            setUpdateMenuVis(true);
-                            setEditMenu(item);
-                            setMenuImgUrl(item.image);
+                            // setUpdateMenuVis(true);
+                            CallApi(`/dishes/get/by_id/${id}`, "GET").then((res) => {
+                              if (res.status === 200) {
+                                setEditMenu(res.data)
+                                setMenuImgUrl(res.data.image);
+                                setUpdateMenuVis(true);
+                              }
+                            })
                           }}
                         />
                       ))
                     }
                   </TabPanel>
                 </Box>
-              </Grid>
-              <Grid item sx={{display: "flex", justifyContent: "center"}}>
-                <Button variant="contained" onClick={submit}>Create!</Button>
               </Grid>
             </CardContent>
           </Card>
@@ -309,12 +367,12 @@ function CreateRestaurant() {
                 </Grid>
                 <Grid item>
                   <TextField
-                    id="describe"
-                    label="describe"
+                    id="description"
+                    label="description"
                     multiline
                     rows={3}
                     sx={styles.sameWidth}
-                    defaultValue={isAdd ? "" : editMenu.describe}
+                    defaultValue={isAdd ? "" : editMenu.description}
                   />
                 </Grid>
                 <Grid item sx={{paddingLeft: "10px", height: "253px"}}>
@@ -351,7 +409,7 @@ function CreateRestaurant() {
                       )
                       : (
                         <img style={{width: "auto", height: "auto", maxWidth: "100%", maxHeight: "100%"}}
-                          src={menuImgUrl} alt="thumbnail"/>
+                          src={`data:image/png;base64,${menuImgUrl}`} alt="thumbnail"/>
                       )}
                     <input hidden accept="image/*" type="file" onChange={handleMenuImageChange}/>
                   </Button>

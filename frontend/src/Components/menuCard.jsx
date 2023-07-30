@@ -1,18 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {Card, CardActions, CardContent, CardMedia, IconButton, Tooltip, Typography} from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import noPicture from "../Resource/image/no-upload-picture.png";
+import { CallApi } from "../CallApi";
 
 function MenuCard(props) {
-  const {name, price, image, onEdit, onDelete, desc} = props;
+  const {onEdit, onDelete, id, forceRender} = props;
+  const [dishInfo, setDishInfo] = useState({})
+  const { name, price, image, description } = dishInfo
+
+  useEffect(() => {
+    CallApi(`/dishes/get/by_id/${id}`, "GET").then((res) => {
+      if (res.status === 200) {
+        setDishInfo(res.data)
+      }
+    })
+  }, [forceRender])
 
   return (
     <Card sx={{width: 163, display: "inline-block", marginRight: "5px"}}>
       <CardMedia
         component="img"
         height="100"
-        image={image || noPicture}
+        image={`data:image/png;base64,${image}` || noPicture}
       />
 
       <CardContent sx={{padding: "5px", display: "flex", justifyContent: "space-between", flexWrap: "wrap"}}>
@@ -26,7 +37,7 @@ function MenuCard(props) {
         <Typography variant="body2" color="text.secondary">
           ${price}
         </Typography>
-        <Tooltip title={desc} placement="top">
+        <Tooltip title={description} placement="top">
           <div
             style={{
               fontSize: "12px",
@@ -37,7 +48,7 @@ function MenuCard(props) {
               width: "100%"
             }}
           >
-            {desc}
+            {description}
           </div>
         </Tooltip>
       </CardContent>
