@@ -153,7 +153,7 @@ export default function VoucherVerify() {
         setOpen={setPopupOpen}
         id={popupId}
         isRestaurant={true}
-        used={false}
+        used={true}
       />
       }
     </>

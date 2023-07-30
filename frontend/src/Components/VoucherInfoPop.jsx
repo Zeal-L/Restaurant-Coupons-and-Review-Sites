@@ -14,7 +14,7 @@ function VoucherInfoPop(props) {
   const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate();
   const isRestaurant = props.isRestaurant;
-  const used = false ? props.used === undefined : props.used;
+  const used = props.used;
   console.log(props.id);
   const [info, setInfo] = React.useState({});
   React.useEffect(() => {
@@ -73,15 +73,13 @@ function VoucherInfoPop(props) {
         <>
           <CircularProgress />
         </> :
-        // 纵向排序
-        // <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
         <Grid container direction="column" justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
         <Grid item alignItems="center">
           <Voucher
             type={info.type}
             condition={info.condition}
             discount={info.discount}
-            expire={dayjs.unix(info.expire).format("DD/MM/YYYY")}
+            expire={info.expire}
             pop={false}
           />
         </Grid>
