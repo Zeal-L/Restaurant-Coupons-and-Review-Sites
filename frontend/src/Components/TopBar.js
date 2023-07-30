@@ -221,7 +221,7 @@ export default function TopBar() {
           <Box sx={{flexGrow: 0}}>
               {getter.login ? (
                 <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                  <Avatar alt={userName} src={userImage}/>
+                  <Avatar alt={userName} src={`data:image/png;base64,${userImage}`}/>
                 </IconButton>
                 ) : (
                 <Tooltip title="Login" arrow>

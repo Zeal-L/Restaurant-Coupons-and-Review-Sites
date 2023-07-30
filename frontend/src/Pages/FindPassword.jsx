@@ -39,7 +39,6 @@ export function EMailVerification() {
     console.log(form.target);
     const new_password = form.target.password.value;
     const reset_code = form.target.code.value;
-    // /users/reset/password/verify_reset_code
     CallApi("/users/reset/password/verify_reset_code", "PUT", {email, new_password, reset_code}).then((res) => {
         setLoading(false);
         if (res.status === 200) {
