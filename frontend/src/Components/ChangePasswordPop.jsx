@@ -2,6 +2,7 @@ import React from "react";
 import {TransitionUp} from "../styles";
 import {Context, NotificationType, useContext} from "../context.js";
 import {Button, Dialog, DialogTitle, Grid, TextField} from "@mui/material";
+import { CallApiWithToken } from "../CallApi";
 
 function ChangePasswordPop(props) {
   const {setter} = useContext(Context);
@@ -14,11 +15,6 @@ function ChangePasswordPop(props) {
 
   const currentPassword = props.currentPassword;
   const editProfile = () => {
-    if (oldPassword !== currentPassword) {
-      setOldPasswordErr(true);
-      setter.showNotification("Please enter old password right.", NotificationType.Error);
-      return;
-    }
     const isPasswordValid =
     password.length >= 8 &&
     /[A-Z]/.test(password) &&
@@ -34,8 +30,18 @@ function ChangePasswordPop(props) {
       setter.showNotification("Password and confirm password must be the same.", NotificationType.Error);
       return;
     }
-    props.setPassword(password);
-    props.setOpen(false);
+    const data = {
+      "old_password": oldPassword,   
+      "new_password": password,
+    }
+    CallApiWithToken("/users/reset/password/with_old_password", "PUT", data).then((res) => {
+      if (res.status === 200) {
+        props.setOpen(false);
+        localStorage.setItem("token", res.data.token);
+      } else {
+        setter.showNotification("Unknown error: " + res.data.message, NotificationType.Error);
+      }
+    });
   };
   return (
     <Dialog open={props.open} TransitionComponent={TransitionUp} onClose={() => props.setOpen(false)} fullWidth>
