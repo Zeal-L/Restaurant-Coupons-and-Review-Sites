@@ -183,8 +183,19 @@ class NewVoucherTemplate(Resource):
 
         if not info.get("auto_release"):
             return {
-                "template_info": template_res,
-                "auto_release_info": None,
+            "template_id": template_res.template_id,
+            "restaurant_id": template_res.restaurant_id,
+            "restaurant_name": template_res.restaurant.name,
+            "type": template_res.type,
+            "discount": template_res.discount,
+            "condition": template_res.condition,
+            "description": template_res.description,
+            "expire": template_res.expire,
+            "shareable": template_res.shareable,
+            "is_collected": False,
+            "remain_amount": template_res.remain_amount,
+            "total_amount": template_res.total_amount,
+            "auto_release_info": None,
             }, 200
 
         auto_release_res = services.vouchers.create_auto_release_voucher_v1(
