@@ -120,12 +120,6 @@ function Profile() {
 
   }, []);
 
-
-  const handleFilter = (event) => {
-    console.log(event.target.value);
-    setVoucherFilter(event.target.value);
-  };
-
   const debounceFilter = (func, wait) => {
     let timeout;
     return function () {
@@ -181,7 +175,6 @@ function Profile() {
     <>
 
       {deletePopOpen && <DeletePop open={deletePopOpen} setOpen={setDeletePopOpen}/>}
-      {/* <a>展示用户信息，用户名，用户图片，性别，邮箱，都可以更改，密码不显示，但是也可以更改</a> */}
       <Grid container direction="column" alignItems="center" justifyContent="center" style={{minHeight: "80vh"}} padding="50px">
         <Card variant="outlined" sx={{width: "80%", maxWidth: 900, backgroundColor: "rgb(255, 243, 209)"}}>
           <CardContent>
@@ -310,7 +303,7 @@ function Profile() {
                   console.log(item); // Print the item object to the console
 
                   return (
-                    (voucherFilterType === "All" || item.type === voucherFilterType) && (
+                    (voucherFilterType === "All" || item.type === voucherFilterType) && !item.is_used && (
                       <Grid item key={item.id}>
                         <>
                           <IconButton
@@ -377,7 +370,7 @@ function Profile() {
               }}
             >
               {allVoucher.map((item) => (
-                (voucherFilterType === "All" || item.type === voucherFilterType) &&
+                (voucherFilterType === "All" || item.type === voucherFilterType) && item.is_used &&
                   <Grid item key={item.id*10}>
                     {/* {isOwner &&
                         <>

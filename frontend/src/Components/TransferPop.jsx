@@ -1,11 +1,30 @@
 import React from "react";
 import {TransitionUp} from "../styles";
 import {Button, Dialog, DialogTitle, Grid, TextField} from "@mui/material";
+import { CallApi, CallApiWithToken } from "../CallApi";
+import {Context, NotificationType, useContext} from "../context.js";
 
 function TransforPop(props) {
+  const {setter, getter} = useContext(Context);
   const [transferTarget, setTansferTarget] = React.useState("");
+  const [transferid, setTransgerId] = React.useState("");
   const transferVoucher = () => {
     props.setOpen(false);
+    CallApi(`/users/get/by_email/${transferTarget}`, "GET").then((res) => {
+      if (res.status === 200) {
+        setTransgerId(res.data.user_id);
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
+    CallApiWithToken(`/vouchers/transfer/${props.id}/${transferid}` + props.id, "POST").then((res) => {
+      if (res.status === 200) {
+        setter.showNotification(res.data.message, NotificationType.Success);
+        props.setOpen(false);
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
   };
   return (
     <Dialog open={props.open} TransitionComponent={TransitionUp} onClose={() => props.setOpen(false)} fullWidth>

@@ -153,7 +153,7 @@ function VoucherInfoPop(props) {
         </Grid>
       </Grid>
       }
-      {transferOpen === true && <TransforPop open={transferOpen} setOpen={setTransferOpen} id={props.voucher_id}/>}
+      {transferOpen === true && <TransforPop open={transferOpen} setOpen={setTransferOpen} id={props.id}/>}
     </Dialog>
   );
 }
