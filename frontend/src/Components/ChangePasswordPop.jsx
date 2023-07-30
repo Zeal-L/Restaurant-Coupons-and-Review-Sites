@@ -38,6 +38,7 @@ function ChangePasswordPop(props) {
       if (res.status === 200) {
         props.setOpen(false);
         localStorage.setItem("token", res.data.token);
+        setter.showNotification("success", NotificationType.Success);
       } else {
         setter.showNotification("Unknown error: " + res.data.message, NotificationType.Error);
       }

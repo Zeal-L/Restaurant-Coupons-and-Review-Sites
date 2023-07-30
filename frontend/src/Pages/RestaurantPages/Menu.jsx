@@ -48,7 +48,7 @@ function Menu(props) {
         if (res.status === 200) {
           setIsOwner(res.data.restaurant_id.toString() === restaurantId);
         } else {
-            setIsOwner(false);
+          setIsOwner(false);
         }
     })
   }, []);

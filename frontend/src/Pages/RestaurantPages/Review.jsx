@@ -1,16 +1,30 @@
 import React, {useState} from "react";
-import {Avatar, Box, Button, FormControlLabel, Rating, Switch, TextField, Typography} from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  Radio,
+  RadioGroup,
+  Rating,
+  Switch,
+  TextField,
+  Typography
+} from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ReplyIcon from "@mui/icons-material/Reply";
 import StarIcon from "@mui/icons-material/Star";
 import ReportIcon from "@mui/icons-material/Report";
 import IconButton from "@mui/material/IconButton";
-import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
-import ThumbDownAltOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
+import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
+import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
 import {CallApiWithToken} from "../../CallApi";
 import PropTypes from "prop-types";
 import {Context, NotificationType, useContext} from "../../context";
+import {CalendarToday, Star, ThumbUp} from "@mui/icons-material";
 
 const currentDateTime = () => {
   const now = new Date();
@@ -20,7 +34,8 @@ const currentDateTime = () => {
   return `${year}-${month}-${day}`;
 };
 
-const Comment = ({comment_id,
+const Comment = ({
+  comment_id,
   user,
   rating,
   timestamp,
@@ -31,7 +46,8 @@ const Comment = ({comment_id,
   Numdislike,
   reviews,
   allComments,
-  setCurrentComment}) => {
+  setCurrentComment
+}) => {
   const [liked, setLiked] = useState(likes);
   const [disliked, setDisliked] = useState(dislikes);
   const [likeCount, setLikeCount] = useState(Numlike);
@@ -44,32 +60,32 @@ const Comment = ({comment_id,
     // /comments/liked_by/add/{comment_id}
     if (!liked) {
       CallApiWithToken(`/comments/liked_by/add/${comment_id}`, "POST").then((res) => {
-          if (res.status === 200) {
-            setLikeCount(likeCount + 1);
-            if (disliked) {
-              setDisliked(false);
-              setDislikeCount(dislikeCount - 1);
-            }
-            setLiked(!liked);
-            setter.showNotification(res.data.message, NotificationType.Success);
-          } else {
-              setter.showNotification(res.data.message, NotificationType.Error);
+        if (res.status === 200) {
+          setLikeCount(likeCount + 1);
+          if (disliked) {
+            setDisliked(false);
+            setDislikeCount(dislikeCount - 1);
           }
-      })
+          setLiked(!liked);
+          setter.showNotification(res.data.message, NotificationType.Success);
+        } else {
+          setter.showNotification(res.data.message, NotificationType.Error);
+        }
+      });
     } else {
       CallApiWithToken(`/comments/liked_by/remove/${comment_id}`, "DELETE", {}, getter.token).then((res) => {
-          if (res.status === 200) {
-              setLikeCount(likeCount - 1);
-              if (disliked) {
-                  setDisliked(false);
-                  setDislikeCount(dislikeCount - 1);
-              }
-              setLiked(!liked);
-            setter.showNotification(res.data.message, NotificationType.Success);
-          } else {
-              setter.showNotification(res.data.message, NotificationType.Error);
+        if (res.status === 200) {
+          setLikeCount(likeCount - 1);
+          if (disliked) {
+            setDisliked(false);
+            setDislikeCount(dislikeCount - 1);
           }
-      })
+          setLiked(!liked);
+          setter.showNotification(res.data.message, NotificationType.Success);
+        } else {
+          setter.showNotification(res.data.message, NotificationType.Error);
+        }
+      });
     }
   };
 
@@ -79,40 +95,38 @@ const Comment = ({comment_id,
         if (res.status === 200) {
           setDislikeCount(dislikeCount + 1);
           if (liked) {
-              setLiked(false);
-              setLikeCount(likeCount - 1);
+            setLiked(false);
+            setLikeCount(likeCount - 1);
           }
           setDisliked(!disliked);
           setter.showNotification(res.data.message, NotificationType.Success);
         } else {
-            setter.showNotification(res.data.message, NotificationType.Error);
+          setter.showNotification(res.data.message, NotificationType.Error);
         }
-        })
+      });
     } else {
-        CallApiWithToken(`/comments/disliked_by/remove/${comment_id}`, "DELETE", {}, getter.token).then((res) => {
-            if (res.status === 200) {
-              setDislikeCount(dislikeCount - 1);
-              if (liked) {
-                  setLiked(false);
-                  setLikeCount(likeCount - 1);
-              }
-              setDisliked(!disliked);
-              setter.showNotification(res.data.message, NotificationType.Success);
-            } else {
-                setter.showNotification(res.data.message, NotificationType.Error);
-            }
-        })
+      CallApiWithToken(`/comments/disliked_by/remove/${comment_id}`, "DELETE", {}, getter.token).then((res) => {
+        if (res.status === 200) {
+          setDislikeCount(dislikeCount - 1);
+          if (liked) {
+            setLiked(false);
+            setLikeCount(likeCount - 1);
+          }
+          setDisliked(!disliked);
+          setter.showNotification(res.data.message, NotificationType.Success);
+        } else {
+          setter.showNotification(res.data.message, NotificationType.Error);
+        }
+      });
     }
   };
+  const toggleReplies = () => {
+    setShowReplies(!showReplies);
+  };
 
-
-    const toggleReplies = () => {
-      setShowReplies(!showReplies);
-    };
-    console.log("user", user);
   return (
     <Box display="flex" alignItems="flex-start" marginBottom={2}
-      sx={{padding: 2, borderRadius: 4, boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"}}>
+         sx={{padding: 2, borderRadius: 4, boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"}}>
       <Avatar src={`data:image/png;base64,${user.avatar}`} alt={user.name}/>
       <Box marginLeft={2} flexGrow={1}>
         <Typography variant="subtitle1">{user.name}</Typography>
@@ -141,10 +155,10 @@ const Comment = ({comment_id,
               color="primary"
               startIcon={
                 liked ?
-              <ThumbUpIcon/>
-                :
-                <ThumbUpOutlinedIcon/>
-            }
+                  <ThumbUpIcon/>
+                  :
+                  <ThumbUpOutlinedIcon/>
+              }
               onClick={handleLike}
             >
               {likeCount}
@@ -154,10 +168,10 @@ const Comment = ({comment_id,
               color="secondary"
               startIcon={
                 disliked ?
-                <ThumbDownIcon/>
-                :
-                <ThumbDownAltOutlinedIcon/>
-                }
+                  <ThumbDownIcon/>
+                  :
+                  <ThumbDownAltOutlinedIcon/>
+              }
               onClick={handleDislike}
               sx={{marginLeft: 1}}
             >
@@ -173,6 +187,7 @@ const Comment = ({comment_id,
             </IconButton>
           </Box>
         </Box>
+
         <Box sx={{marginLeft: 4}}>
           {reviews.map((review) => (
             <Box
@@ -206,7 +221,7 @@ const Comment = ({comment_id,
               }}
             >
               <Avatar src={"https://example.com/avatar2.jpg"}
-                alt={isAnonymous ? "Anonymous" : "Jane Smith"} /*Anonymous Setting*/ />
+                      alt={isAnonymous ? "Anonymous" : "Jane Smith"} /*Anonymous Setting*/ />
               <Box marginLeft={2} flexGrow={1}>
                 <Typography variant="subtitle2">{isAnonymous ? "Anonymous" : "Jane Smith"}</Typography>
                 <Box display="flex" alignItems="center">
@@ -231,12 +246,12 @@ const Comment = ({comment_id,
                 <Button variant="contained" color="primary" onClick={() => {
                   const content = reply;
                   const anonymity = isAnonymous;
-                  console.log(comment_id);
+
                   CallApiWithToken("/replies/new", "POST", {
                     comment_id,
                     content,
                     anonymity,
-                    }).then((res) => {
+                  }).then((res) => {
                       setReply("");
                       setShowReplies(false);
                       setter.showNotification("Reply added successfully!", NotificationType.Success);
@@ -250,8 +265,8 @@ const Comment = ({comment_id,
                       //     setCurrentComment(newAllComments[commentIndex]);
                       //   }
                       // });
-                      }
-                    );
+                    }
+                  );
                 }} sx={{marginTop: 1}}>
                   Submit
                 </Button>
@@ -266,7 +281,7 @@ const Comment = ({comment_id,
 };
 
 
-function Review (props){
+function Review(props) {
   const restaurantId = props.id;
   const {getter, setter} = useContext(Context);
   const [ratingValue, setRatingValue] = useState(5);
@@ -281,23 +296,23 @@ function Review (props){
   const [comments, setComments] = useState([]);
   const [numberOfComments, setNumberOfComments] = useState(0);
   const [maxComments, setMaxComments] = useState(0);
-
+  const [sort, setSort] = useState("by_date");
   const [isAtBottom, setIsAtBottom] = useState(false);
   React.useEffect(() => {
     const handleScroll = () => {
-      setIsAtBottom( (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight === document.documentElement.scrollHeight);
+      setIsAtBottom((window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight === document.documentElement.scrollHeight);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
   React.useEffect(() => {
-    CallApiWithToken(`/users/get/by_token`, "GET", ).then((response) => {
+    CallApiWithToken(`/users/get/by_token`, "GET",).then((response) => {
       if (response.status === 200) {
         setUserName(response.data.name);
-        setUserImage(response.data.image);
+        setUserImage(response.data.photo);
       }
     });
   }, [restaurantId]);
@@ -306,15 +321,15 @@ function Review (props){
     const restaurant_id = restaurantId;
     const start = numberOfComments;
     const end = numberOfComments + 5 < maxComments ? numberOfComments + 5 : maxComments;
-    if(end === 0 || start >= end) return;
-    CallApiWithToken(`/comments/get/by_restaurant`, "POST",{restaurant_id,start,end}).then((response) => {
+    console.log("start: " + start + " end: " + end);
+    if (end === 0 || start >= end) return;
+    CallApiWithToken(`/comments/get/by_restaurant/`+sort
+      , "POST", {restaurant_id, start, end}).then((response) => {
       if (response.status === 200) {
         const comment_ids = response.data.comment_ids;
-        for (let i = 0; i < comment_ids.length; i++) {
-          getReviews(comment_ids[i]).then((comment) => {
-            setComments((comments) => [...comments, comment]);
-          });
-        }
+        getReviews(comment_ids).then((reviews) => {
+            setComments((comments) => [...comments, ...reviews]);
+        });
       } else {
         setter.showNotification(response.data.message, NotificationType.Error);
       }
@@ -323,7 +338,33 @@ function Review (props){
 
   React.useEffect(() => {
     updateReview();
-  }, [restaurantId,maxComments]);
+  }, [restaurantId, maxComments]);
+
+  // React.useEffect(() => {
+  //   updateReview();
+  // }, [numberOfComments]);
+
+  React.useEffect(() => {
+    console.log("sort changed");
+    setComments([]);
+    setNumberOfComments(0);
+    const restaurant_id = restaurantId;
+    const start = 0;
+    const end = 5 < maxComments ? 5 : maxComments;
+    console.log("start: " + start + " end: " + end);
+    if (end === 0 || start >= end) return;
+    CallApiWithToken(`/comments/get/by_restaurant/`+sort
+      , "POST", {restaurant_id, start, end}).then((response) => {
+      if (response.status === 200) {
+        const comment_ids = response.data.comment_ids;
+        getReviews(comment_ids).then((reviews) => {
+          setComments(() => [...reviews]);
+        });
+      } else {
+        setter.showNotification(response.data.message, NotificationType.Error);
+      }
+    });
+  }, [sort]);
 
   React.useEffect(() => {
     CallApiWithToken(`/comments/get/count/by_restaurant/${restaurantId}`, "GET").then((response) => {
@@ -340,29 +381,11 @@ function Review (props){
   React.useEffect(() => {
     if (isAtBottom) {
       setNumberOfComments((numberOfComments) => numberOfComments + 5);
-      updateReview();
+      // updateReview();
     }
   }, [isAtBottom]);
   return (
     <div>
-      {comments.map((comment) => (
-        <Comment
-          key={comment.comment_id}
-          comment_id={comment.comment_id}
-          user={comment.user}
-          rating={comment.rate}
-          timestamp={comment.date}
-          content={comment.content}
-          likes={comment.liked}
-          dislikes={comment.disliked}
-          Numlike={comment.like_count}
-          Numdislike={comment.dislike_count}
-          reviews={comment.reviews}
-          allComments={comments}
-          setCurrentComment={setComments}
-        />
-      ))}
-
       <Box
         sx={{
           display: "flex",
@@ -371,7 +394,7 @@ function Review (props){
           marginTop: 1,
         }}
       >
-        <Avatar src={userImage} alt={userName}/>
+        <Avatar src={`data:image/png;base64,${userImage}`} alt={userName}/>
         <Box marginLeft={2} flexGrow={1}>
           <Typography variant="subtitle2">{userName}</Typography>
           <Box display="flex" alignItems="center">
@@ -416,33 +439,129 @@ function Review (props){
           />
           <Button variant="contained" color="primary" onClick={() => {
             CallApiWithToken(`/comments/new`, "POST", {
-              restaurant_id: restaurantId,
-              content: comment,
-              rate: ratingValue,
-              anonymity: isAnonymous,
+                restaurant_id: restaurantId,
+                content: comment,
+                rate: ratingValue,
+                anonymity: isAnonymous,
               }
             ).then((response) => {
               if (response.status === 200) {
-                  let comment = response.data;
-                  getReviews(comment.comment_id).then((commentData) => {
-                      setComments((comments) => [...comments, commentData]);
-                  });
-                  setter.showNotification("Comment added successfully", NotificationType.Success);
+                let comment = response.data;
+                getReview(comment.comment_id).then((commentData) => {
+                  setComments((comments) => [...comments, commentData]);
+                });
+                setter.showNotification("Comment added successfully", NotificationType.Success);
               } else {
-                  setter.showNotification(response.data.message, NotificationType.Error);
+                setter.showNotification(response.data.message, NotificationType.Error);
               }
-              });
+            });
             setComment("");
           }} sx={{marginTop: 1}}>
             Submit
           </Button>
         </Box>
       </Box>
+      <Grid container
+            alignItems="center"
+            justifyContent="center"
+            sx={{marginTop: 2}}>
+        <Grid item xs={12} md={3} sx={{textAlign: "center"}}>
+          <Typography variant="h6">
+            Sort by
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={6} sx={{textAlign: "center"}}>
+          <FormControl>
+            <RadioGroup
+              row
+              aria-labelledby="sort_option"
+              name="sort_option"
+              value={sort}
+              onChange={(event) => {
+                  setSort(event.target.value);
+              }}
+            >
+              <Grid container alignItems="center">
+                <Grid item>
+                  <FormControlLabel
+                    value="by_rate"
+                    control={<Radio/>}
+                    label={
+                      <div style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#333",
+                      }}>
+                        Rating
+                        <Star fontSize="small" style={{marginLeft: "8px"}}/>
+                      </div>
+                    }
+                  />
+                </Grid>
+                <Grid item>
+                  <FormControlLabel
+                    value="by_likes"
+                    control={<Radio/>}
+                    label={
+                      <div style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#333",
+                      }}>
+                        Likes
+                        <ThumbUp fontSize="small" style={{marginLeft: "8px"}}/>
+                      </div>
+                    }
+                  />
+                </Grid>
+                <Grid item>
+                  <FormControlLabel
+                    value="by_date"
+                    control={<Radio/>}
+                    label={
+                      <div style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#333",
+                      }}>
+                        Date
+                        <CalendarToday fontSize="small" style={{marginLeft: "8px"}}/>
+                      </div>
+                    }
+                  />
+                </Grid>
+              </Grid>
+            </RadioGroup>
+          </FormControl>
+        </Grid>
+      </Grid>
+
+      {comments.map((comment) => (
+        <Comment
+          key={comment.comment_id}
+          comment_id={comment.comment_id}
+          user={comment.user}
+          rating={comment.rate}
+          timestamp={comment.date}
+          content={comment.content}
+          likes={comment.liked}
+          dislikes={comment.disliked}
+          Numlike={comment.like_count}
+          Numdislike={comment.dislike_count}
+          reviews={comment.reviews}
+          allComments={comments}
+          setCurrentComment={setComments}
+        />
+      ))}
     </div>
   );
 };
 
-async function getReviews (comment_id){
+
+async function getReview(comment_id) {
   const response = await CallApiWithToken(`comments/get/by_id/${comment_id}`, "GET");
   if (response.status !== 200) {
     return null;
@@ -459,8 +578,7 @@ async function getReviews (comment_id){
         name: "Anonymous",
         avatar: "",
       };
-    }
-    else {
+    } else {
       response.data.user = {
         name: userResponse.data.name,
         avatar: userResponse.data.photo,
@@ -470,12 +588,16 @@ async function getReviews (comment_id){
   let replice = [];
   let repliceCount = await CallApiWithToken(`replies/get/count/by_comment/${comment_id}`, "GET");
   if (repliceCount.status !== 200) {
-      return null;
+    return null;
   }
   repliceCount = repliceCount.data.count;
 
   if (repliceCount !== 0) {
-    const repliceList = await CallApiWithToken(`/replies/get/by_comment`, "POST", {comment_id, start: 0, end: repliceCount});
+    const repliceList = await CallApiWithToken(`/replies/get/by_comment`, "POST", {
+      comment_id,
+      start: 0,
+      end: repliceCount
+    });
     if (repliceList.status === 200) {
       const repliceIds = repliceList.data.reply_ids;
       for (let i = 0; i < repliceIds.length; i++) {
@@ -486,8 +608,7 @@ async function getReviews (comment_id){
             name: "Anonymous",
             avatar: "",
           };
-        }
-        else {
+        } else {
           repliceResponse.data.user = {
             name: userResponse.data.name,
             avatar: userResponse.data.photo,
@@ -498,13 +619,24 @@ async function getReviews (comment_id){
     }
   }
   response.data.reviews = replice;
-  console.log(response.data);
+
   return response.data;
 }
 
-Review.propTypes = {
-    id: PropTypes.string.isRequired,
+async function getReviews(comment_id_list) {
+    let comments = [];
+    for (let i = 0; i < comment_id_list.length; i++) {
+        const comment = await getReview(comment_id_list[i]);
+        if (comment !== null) {
+          comments.push(comment);
+        }
+    }
+    return comments;
 }
+
+Review.propTypes = {
+  id: PropTypes.string.isRequired,
+};
 
 
 export default Review;

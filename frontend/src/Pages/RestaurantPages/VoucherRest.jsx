@@ -145,7 +145,7 @@ const options = {
     img: purpleVoucher,
     defV: {
       condition: "No condition",
-      discount: "20$ OFF",
+      discount: "$20 OFF",
       expire: dayjs().add(1, "year").format("YYYY-MM-DD"),
       auto_release_info: {
         range: 500,
@@ -158,7 +158,7 @@ const options = {
   "CFree": {
     img: yellowVoucher,
     defV: {
-      condition: "Spend 50$ or more",
+      condition: "Spend $50 or more",
       discount: "Free gift",
       expire: dayjs().add(1, "year").format("YYYY-MM-DD"),
       auto_release_info: {
@@ -172,7 +172,7 @@ const options = {
   "Fixed_Amount": {
     img: blueVoucher,
     defV: {
-      condition: "Spend 50$ or more",
+      condition: "Spend $50 or more",
       discount: "20$ OFF",
       expire: dayjs().add(1, "year").format("YYYY-MM-DD"),
       auto_release_info: {
@@ -186,7 +186,7 @@ const options = {
   "Percentage": {
     img: greenVoucher,
     defV: {
-      condition: "Spend 50$ or more",
+      condition: "Spend $50 or more",
       discount: "20% OFF",
       expire: dayjs().add(1, "year").format("YYYY-MM-DD"),
       auto_release_info: {
@@ -633,12 +633,13 @@ function EditVoucher(props) {
   const {getter, setter} = useContext(Context);
   const handleSubmit = () => {
     // TODO
-    console.log(props.defV.total_amount);
+    console.log(props.defV.remain_amount);
     console.log(props.defV.shareable);
-    const total_amount = props.defV.total_amount;
+    const remain_amount = props.defV.remain_amount;
     const shareable = props.defV.shareable;
     const template_id = props.defV.template_id;
-    CallApiWithToken("/vouchers/reset/template", "PUT", { template_id, total_amount, shareable }).then((res) => {
+    const description = props.defV.description;
+    CallApiWithToken("/vouchers/reset/template", "PUT", { template_id, remain_amount, shareable, description }).then((res) => {
         if (res.status === 200) {
             props.onClose();
             setter.showNotification("success", NotificationType.Success);
@@ -677,9 +678,9 @@ function EditVoucher(props) {
       setDescription={(e) => {
         props.setDefV({...props.defV, description: e});
       }}
-      count={props.defV.total_amount}
+      count={props.defV.remain_amount}
       setCount={(e) => {
-        props.setDefV({...props.defV, total_amount: e});
+        props.setDefV({...props.defV, remain_amount: e});
       }}
       isAutoRelease={props.defV.auto_release_info.amount !== null}
       autoReleaseTimeRange={props.defV.auto_release_info.amount !== null ? props.defV.auto_release_info.interval : 60}

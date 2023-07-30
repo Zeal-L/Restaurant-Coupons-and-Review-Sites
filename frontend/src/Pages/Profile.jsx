@@ -305,17 +305,6 @@ function Profile() {
                   return (
                     (voucherFilterType === "All" || item.type === voucherFilterType) && !item.is_used && (
                       <Grid item key={item.id}>
-                        <>
-                          <IconButton
-                            sx={{ position: "relative" }}
-                            id="iconButtonS"
-                            onClick={() => {
-                              setDeletePopOpen(true);
-                            }}
-                          >
-                            <DeleteIcon color="white" />
-                          </IconButton>
-                        </>
                         <Voucher
                           id={item.voucher_id}
                           type={item.type}
@@ -372,16 +361,6 @@ function Profile() {
               {allVoucher.map((item) => (
                 (voucherFilterType === "All" || item.type === voucherFilterType) && item.is_used &&
                   <Grid item key={item.id*10}>
-                    {/* {isOwner &&
-                        <>
-                            <IconButton sx={{position: "relative"}} id="iconButtonS"
-                                        onClick={() => {
-                                            setDeletePopOpen(true);
-                                        }}>
-                                <DeleteIcon color="white"/>
-                            </IconButton>
-                        </>
-                    } */}
                     <Voucher
                       id={item.voucher_id}
                       type={item.type}

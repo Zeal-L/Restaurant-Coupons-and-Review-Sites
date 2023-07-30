@@ -3,13 +3,15 @@ import {TransitionUp} from "../styles";
 import {Button, Dialog, DialogTitle, Grid, TextField} from "@mui/material";
 import { CallApi, CallApiWithToken } from "../CallApi";
 import {Context, NotificationType, useContext} from "../context.js";
+import {LoadingButton} from "@mui/lab";
 
 function TransforPop(props) {
   const {setter, getter} = useContext(Context);
   const [transferTarget, setTansferTarget] = React.useState("");
   const [transferid, setTransgerId] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
   const transferVoucher = () => {
-    props.setOpen(false);
+    setLoading(true);
     CallApi(`/users/get/by_email/${transferTarget}`, "GET").then((res) => {
       if (res.status === 200) {
         setTransgerId(res.data.user_id);
@@ -21,6 +23,7 @@ function TransforPop(props) {
       if (res.status === 200) {
         setter.showNotification(res.data.message, NotificationType.Success);
         props.setOpen(false);
+        setLoading(false);
       } else {
         setter.showNotification(res.data.message, NotificationType.Error);
       }
@@ -44,11 +47,13 @@ function TransforPop(props) {
         </Grid>
         <Grid item xs={12}>
           {/* <div style={{ height: '10px' }}></div> */}
-          <Button
+          <LoadingButton
+            loadingPosition="start"
+            loading={loading}
             sx={{
               padding: "10px",
             }}
-            variant="contained" onClick={transferVoucher} fullWidth>Transfer</Button>
+            variant="contained" onClick={transferVoucher} fullWidth>Transfer</LoadingButton>
           {/* <div style={{ height: '10px' }}></div> */}
         </Grid>
         <Grid item xs={12}>
