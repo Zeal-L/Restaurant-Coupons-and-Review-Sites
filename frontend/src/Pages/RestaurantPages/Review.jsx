@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {
   Avatar,
   Box,
-  Button,
+  Button, CircularProgress,
   FormControl,
   FormControlLabel,
   Grid,
@@ -306,6 +306,7 @@ function Review(props) {
   const [maxComments, setMaxComments] = useState(0);
   const [sort, setSort] = useState("by_date");
   const [isAtBottom, setIsAtBottom] = useState(false);
+  const [loading, setLoading] = useState(false);
   React.useEffect(() => {
     const handleScroll = () => {
       setIsAtBottom((window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight === document.documentElement.scrollHeight);
@@ -325,11 +326,11 @@ function Review(props) {
     });
   }, [restaurantId]);
 
-  const updateReview = () => {
+  const updateReview = (start) => {
+    console.log("maxComments: " + maxComments);
     const restaurant_id = restaurantId;
-    const start = numberOfComments;
-    const end = numberOfComments + 5 < maxComments ? numberOfComments + 5 : maxComments;
-    console.log("start: " + start + " end: " + end);
+    const end = start + 5 < maxComments ? start + 5 : maxComments;
+    console.log("starttttt: " + start + " end: " + end);
     if (end === 0 || start >= end) return;
     CallApiWithToken(`/comments/get/by_restaurant/`+sort
       , "POST", {restaurant_id, start, end}).then((response) => {
@@ -337,6 +338,7 @@ function Review(props) {
         const comment_ids = response.data.comment_ids;
         getReviews(comment_ids).then((reviews) => {
             setComments((comments) => [...comments, ...reviews]);
+            setLoading(false);
         });
       } else {
         setter.showNotification(response.data.message, NotificationType.Error);
@@ -345,13 +347,12 @@ function Review(props) {
   };
 
   React.useEffect(() => {
-    updateReview();
-  }, [restaurantId, maxComments]);
+    updateReview(0);
+  }, [maxComments]);
 
   React.useEffect(() => {
     console.log("sort changed");
     setComments([]);
-    setNumberOfComments(0);
     const restaurant_id = restaurantId;
     const start = 0;
     const end = 5 < maxComments ? 5 : maxComments;
@@ -374,7 +375,7 @@ function Review(props) {
     CallApiWithToken(`/comments/get/count/by_restaurant/${restaurantId}`, "GET").then((response) => {
       if (response.status === 200) {
         setMaxComments(response.data.count);
-        updateReview();
+        console.log("max comments: " + response.data.count);
       } else {
         setter.showNotification(response.data.message, NotificationType.Error);
       }
@@ -383,9 +384,11 @@ function Review(props) {
 
   // auto load
   React.useEffect(() => {
-    if (isAtBottom) {
-      setNumberOfComments((numberOfComments) => numberOfComments + 5);
-      // updateReview();
+    if (isAtBottom && loading === false) {
+      console.log("is at bottom");
+      console.log("number of comments 1: " + comments.length);
+      setLoading(true);
+      updateReview(parseInt(comments.length) + 5);
     }
   }, [isAtBottom]);
   return (
@@ -560,6 +563,9 @@ function Review(props) {
           setCurrentComment={setComments}
         />
       ))}
+      <Box sx={{ display: 'flex' , justifyContent: 'center', marginTop: 2, width: '100%'}}>
+        <CircularProgress />
+      </Box>
     </div>
   );
 };
