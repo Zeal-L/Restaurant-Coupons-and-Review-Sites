@@ -298,6 +298,132 @@ class GetCommentsByRestaurant(Resource):
 
         return {"message": "Success", "comment_ids": comment_ids}, 200
 
+############################################################
+
+
+@api.route("/get/by_restaurant/by_rate")
+@api.response(200, "Success", body=comment_list_model)
+@api.response(400, "Invalid start or end value")
+@api.response(404, "Restaurant not found")
+class GetCommentsByRestaurantByRate(Resource):
+    @api.doc(
+        "get_comments_by_restaurant_by_rate", model="Comment_List", body=by_restaurant_model
+    )
+    def post(self) -> tuple[dict, int]:
+        """ Get a list of comment IDs for a given restaurant, sorted by rate, with optional start and end indices.
+
+        Returns:
+            A tuple containing a dictionary with a message and a list of comment IDs, or a dictionary with an error message and an integer status code.
+        """
+
+        info = api.payload
+
+        if not models.Restaurants.query.get(info["restaurant_id"]):
+            return {"message": "Restaurant not found"}, 404
+
+        comments = (
+            models.Comments.query.filter_by(restaurant_id=info["restaurant_id"])
+            .order_by(models.Comments.comment_id)
+            .all()
+        )
+
+        # sort by rate
+        comments.sort(key=lambda x: x.rate, reverse=True)
+
+        start = info["start"]
+        end = info["end"]
+
+        if start < 0 or end < 1 or start >= end or end > len(comments):
+            return {"message": "Invalid start or end value"}, 400
+
+        comment_ids = [comment.comment_id for comment in comments[start:end]]
+
+        return {"message": "Success", "comment_ids": comment_ids}, 200
+
+############################################################
+
+
+@api.route("/get/by_restaurant/by_likes")
+@api.response(200, "Success", body=comment_list_model)
+@api.response(400, "Invalid start or end value")
+@api.response(404, "Restaurant not found")
+class GetCommentsByRestaurantByLikes(Resource):
+    @api.doc(
+        "get_comments_by_restaurant_by_likes", model="Comment_List", body=by_restaurant_model
+    )
+    def post(self) -> tuple[dict, int]:
+        """ Get a list of comment IDs for a given restaurant, sorted by likes, with optional start and end indices.
+
+        Returns:
+            A tuple containing a dictionary with a message and a list of comment IDs, or a dictionary with an error message and an integer status code.
+        """
+
+        info = api.payload
+
+        if not models.Restaurants.query.get(info["restaurant_id"]):
+            return {"message": "Restaurant not found"}, 404
+
+        comments = (
+            models.Comments.query.filter_by(restaurant_id=info["restaurant_id"])
+            .order_by(models.Comments.comment_id)
+            .all()
+        )
+
+        # sort by likes
+        comments.sort(key=lambda x: len(x.liked_by) if x.liked_by else 0, reverse=True)
+
+        start = info["start"]
+        end = info["end"]
+
+        if start < 0 or end < 1 or start >= end or end > len(comments):
+            return {"message": "Invalid start or end value"}, 400
+
+        comment_ids = [comment.comment_id for comment in comments[start:end]]
+
+        return {"message": "Success", "comment_ids": comment_ids}, 200
+
+############################################################
+
+
+@api.route("/get/by_restaurant/by_date")
+@api.response(200, "Success", body=comment_list_model)
+@api.response(400, "Invalid start or end value")
+@api.response(404, "Restaurant not found")
+class GetCommentsByRestaurantByDate(Resource):
+    @api.doc(
+        "get_comments_by_restaurant_by_date", model="Comment_List", body=by_restaurant_model
+    )
+    def post(self) -> tuple[dict, int]:
+        """Get a list of comment IDs for a given restaurant, sorted by date, with optional start and end indices.
+
+        Returns:
+            A tuple containing a dictionary with a message and a list of comment IDs, or a dictionary with an error message and an integer status code.
+        """
+
+        info = api.payload
+
+        if not models.Restaurants.query.get(info["restaurant_id"]):
+            return {"message": "Restaurant not found"}, 404
+
+        comments = (
+            models.Comments.query.filter_by(restaurant_id=info["restaurant_id"])
+            .order_by(models.Comments.comment_id)
+            .all()
+        )
+
+        # sort by date
+        comments.sort(key=lambda x: x.date, reverse=True)
+
+        start = info["start"]
+        end = info["end"]
+
+        if start < 0 or end < 1 or start >= end or end > len(comments):
+            return {"message": "Invalid start or end value"}, 400
+
+        comment_ids = [comment.comment_id for comment in comments[start:end]]
+
+        return {"message": "Success", "comment_ids": comment_ids}, 200
+
 
 ############################################################
 
