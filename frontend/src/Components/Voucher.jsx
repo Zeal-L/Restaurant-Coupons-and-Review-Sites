@@ -15,7 +15,7 @@ import dayjs from "dayjs";
 function Voucher(props) {
   const {type, condition, discount, expire, isListing = false} = props;
   let url = "";
-  if (type === "Fixed Amount") {
+  if (type === "Fixed_Amount") {
     url = blueVoucher;
   } else if (type === "Percentage") {
     url = greenVoucher;

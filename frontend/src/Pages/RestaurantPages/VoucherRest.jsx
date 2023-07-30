@@ -60,18 +60,16 @@ function VoucherRest(props) {
   React.useEffect(() => {
     CallApiWithToken("/vouchers/get/template/by_restaurant/" + restaurantId, "GET").then((res) => {
         if (res.status === 200) {
-            for (let i = 0; i < res.data.info.length; i++) {
-              if(res.data.info[i].auto_release_info.timer_id === null) {
-                res.data.info[i].auto_release_info = undefined;
-              }
-            }
             setMenuItems(res.data.info);
+            console.log(res.data.info);
         } else {
           setter.showNotification(res.data.message, NotificationType.Error);
         }
     });
   }, []);
-
+  const addVoucher = (voucher) => {
+    setMenuItems([...menuItems, voucher]);
+  }
   return (
     <>
       <Grid
@@ -123,9 +121,18 @@ function VoucherRest(props) {
             icon={<SpeedDialIcon openIcon={<CreateIcon/>}/>}
             onClick={() => setOpen(true)}
           />
-          <CreateVoucher open={open} onClose={() => setOpen(false)}/>
+          <CreateVoucher
+            addVoucher={addVoucher}
+            open={open}
+            onClose={() => setOpen(false)}
+          />
           {selectVendor &&
-            <EditVoucher open={popOpen} onClose={() => setPopOpen(false)} defV={selectVendor} setDefV={setSelectVendor}/>
+            <EditVoucher
+              addVoucher={addVoucher}
+              open={popOpen}
+              onClose={() => setPopOpen(false)}
+              defV={selectVendor}
+              setDefV={setSelectVendor}/>
           }
         </>
       }
@@ -534,7 +541,9 @@ function CreateVoucher(props) {
     CallApiWithToken("/vouchers/new", "POST", body).then((res) => {
       if (res.status === 200) {
         props.onClose();
-        setter.showNotification(res.data.message, NotificationType.Success);
+        setter.showNotification("create success", NotificationType.Success);
+        props.addVoucher(res.data);
+        console.log(res);
       } else {
         setter.showNotification(res.data.message, NotificationType.Error);
       }
@@ -621,10 +630,23 @@ function CreateVoucher(props) {
 }
 
 function EditVoucher(props) {
-
+  const {getter, setter} = useContext(Context);
   const handleSubmit = () => {
     // TODO
-    // console.log(selectedOption);
+    console.log(props.defV.total_amount);
+    console.log(props.defV.shareable);
+    const total_amount = props.defV.total_amount;
+    const shareable = props.defV.shareable;
+    const template_id = props.defV.template_id;
+    CallApiWithToken("/vouchers/reset/template", "PUT", { template_id, total_amount, shareable }).then((res) => {
+        if (res.status === 200) {
+            props.onClose();
+            setter.showNotification("success", NotificationType.Success);
+            console.log(res);
+        } else {
+            setter.showNotification(res.data.message, NotificationType.Error);
+        }
+    });
   };
 
   console.log(props.defV);
@@ -659,11 +681,11 @@ function EditVoucher(props) {
       setCount={(e) => {
         props.setDefV({...props.defV, total_amount: e});
       }}
-      isAutoRelease={props.defV.auto_release_info.amount !== undefined}
-      autoReleaseTimeRange={props.defV.auto_release_info.amount !== undefined ? props.defV.auto_release_info.interval : 60}
-      autoReleaseCount={props.defV.auto_release_info.amount !== undefined ? props.defV.auto_release_info.amount : 10}
-      autoReleaseStart={props.defV.auto_release_info.amount !== undefined ? dayjs.unix(props.defV.auto_release_info.start_date) : dayjs()}
-      autoReleaseEnd={props.defV.auto_release_info.amount !== undefined ? dayjs.unix(props.defV.auto_release_info.end_date) : dayjs.unix(props.defV.expire)}
+      isAutoRelease={props.defV.auto_release_info.amount !== null}
+      autoReleaseTimeRange={props.defV.auto_release_info.amount !== null ? props.defV.auto_release_info.interval : 60}
+      autoReleaseCount={props.defV.auto_release_info.amount !== null ? props.defV.auto_release_info.amount : 10}
+      autoReleaseStart={props.defV.auto_release_info.amount !== null ? dayjs.unix(props.defV.auto_release_info.start_date) : dayjs()}
+      autoReleaseEnd={props.defV.auto_release_info.amount !== null ? dayjs.unix(props.defV.auto_release_info.end_date) : dayjs.unix(props.defV.expire)}
       setIsAutoRelease={(e) => {
       }}
       setAutoReleaseTimeRange={(e) => {

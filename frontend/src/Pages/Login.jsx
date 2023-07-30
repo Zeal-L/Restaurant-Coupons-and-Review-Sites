@@ -25,7 +25,8 @@ function Login() {
         setter.showNotification(res.data.message, NotificationType.Success);
         localStorage.setItem("token", res.data.token);
         setter.setLogin(true);
-        navigate("/");
+        // navigate("/");
+        window.location.href = "/";
       } else {
         setter.showNotification(res.data.message, NotificationType.Error);
       }
