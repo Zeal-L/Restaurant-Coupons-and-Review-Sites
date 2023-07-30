@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import {styles} from "../styles.js";
 import ChangePasswordPop from "../Components/ChangePasswordPop";
+import {Context, NotificationType, useContext} from "../context.js";
 // import {useParams} from "react-router-dom";
 import React, {useState, useEffect} from "react";
 import {alpha, styled} from "@mui/material/styles";
@@ -22,74 +23,17 @@ import {Search as SearchIcon} from "@mui/icons-material";
 import Divider from "@mui/material/Divider";
 import Voucher from "../Components/Voucher";
 import EditForm from "../Components/EditForm";
+import {CallApi} from "../CallApi";
 
 import DeletePop from "../Components/DeletePop.jsx";
 
-// import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteIcon from "@mui/icons-material/Delete";
 import dayjs from "dayjs";
 import BadgeIcon from "@mui/icons-material/Badge";
 import EmailIcon from "@mui/icons-material/Email";
 import PersonIcon from "@mui/icons-material/Person";
 
-const voucherItems = [
-  {
-    id: "1",
-    type: "Percentage",
-    condition: "Percentage",
-    discount: "10% OFF",
-    expire: "2023-12-31",
-    count: 109,
-    description: "this is the description of Percentage voucher.",
-    isClaimed: false,
-    autoRelease: {
-      range: 102,
-      count: 10,
-      start: dayjs().format("YYYY-MM-DD"),
-      end: dayjs().add(1, "year").format("YYYY-MM-DD")
-    },
-    Restaurants: "Restaurant1"
-  },
-  {
-    id: "2",
-    type: "CFree",
-    condition: "Spend $50 or more",
-    discount: "10% OFF",
-    expire: "2023-12-31",
-    count: 10,
-    description: "this is the description of Percentage voucher.",
-    isClaimed: false,
-    Restaurants: "Restaurant1"
-  },
-  {
-    id: "3",
-    type: "Free",
-    condition: "Spend $50 or more",
-    discount: "10% OFF",
-    expire: "2023-12-31",
-    count: 130,
-    description: "this is the description of Percentage voucher.",
-    isClaimed: false,
-    autoRelease: {
-      range: 102,
-      count: 10,
-      start: dayjs().format("YYYY-MM-DD"),
-      end: dayjs().add(1, "year").format("YYYY-MM-DD")
-    },
-    Restaurants: "Restaurant2"
-  },
-  {
-    id: "4",
-    type: "CFree",
-    condition: "Spend $60 or more",
-    discount: "10% OFF",
-    expire: "2023-12-31",
-    count: 10,
-    description: "this is the description of Percentage voucher.",
-    isClaimed: false,
-    Restaurants: "Restaurant2"
-  }
-
-];
+import { CallApiWithToken } from "../CallApi";
 
 const Search = styled("div")(({theme}) => ({
   position: "relative",
@@ -133,23 +77,11 @@ const StyledInputBase = styled(InputBase)(({theme}) => ({
   },
 }));
 
-const profileData = {
-  id: "1",
-  name: "TestUser",
-  avatar: "https://media-cdn.tripadvisor.com/media/photo-s/1b/99/44/8e/kfc-faxafeni.jpg",
-  email: "test@test.com",
-  gender: "male",
-  password: "Dlf123456@"
-};
-
 
 function Profile() {
-  useEffect(() => {
-    document.title = 'Profile';
-  }, []);
   const [ChangePasswordOpen, setChangePasswordOpen] = React.useState(false);
+  const {setter, getter} = useContext(Context);
   // const {voucherId} = useParams();
-  const [voucherList, setVoucherList] = React.useState(voucherItems);
   //const [voucherList, setVoucherList] = React.useState([]);
   const [voucherFilterType, setVoucherFilter] = useState("All");
   // const [open, setOpen] = useState(false);
@@ -159,22 +91,29 @@ function Profile() {
 
   const [id, setId] = useState("");
   const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState("");
-  const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [currImage, setCurrImage] = React.useState();
+  const [allVoucher, setAllVoucher] = useState([]);
 
   useEffect(() => {
-    setId(profileData.id);
-    setName(profileData.name);
-    setEmail(profileData.email);
-    setAvatar(profileData.avatar);
-    setGender(profileData.gender);
-    setPassword(profileData.password);
-    setCurrImage(profileData.avatar);
-    console.log(id);
-    console.log(avatar);
+    CallApiWithToken("/users/get/by_token", "GET").then((res) => {
+      if (res.status === 200) {
+        setId(res.data.id);
+        setName(res.data.name);
+        setEmail(res.data.email);
+        setCurrImage(res.data.photo);
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
+    CallApiWithToken("/vouchers/get/voucher/by_user", "GET").then((res) => {
+      if (res.status === 200) {
+        setAllVoucher(res.data.info);
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
+
   }, []);
 
 
@@ -199,6 +138,16 @@ function Profile() {
       reader.readAsDataURL(image);
       reader.onloadend = () => {
         setCurrImage(reader.result);
+        const data = {
+          "base64":reader.result,
+        }
+        CallApiWithToken("/users/reset/photo", "PUT", data) .then((res) => {
+          if (res.status === 200) {
+            setter.showNotification(res.data.message, NotificationType.Success);
+          } else {
+            setter.showNotification("Unknown error: " + res.data.message, NotificationType.Error);
+          }
+        });
       };
     }
   };
@@ -214,6 +163,16 @@ function Profile() {
     }
   }, 800);
 
+
+  const saveName = (name) =>{
+    CallApiWithToken(`/users/reset/name/${name}`, "PUT").then((res) => {
+      if (res.status === 200) {
+        setter.showNotification(res.data.message, NotificationType.Success);
+      } else {
+        setter.showNotification("Unknown error: " + res.data.message, NotificationType.Error);
+      }
+    });
+  }
   return (
     <>
 
@@ -236,31 +195,33 @@ function Profile() {
               alignItems="center"
               spacing={2}
               marginTop="10px" padding="15px">
-              <Grid item container alignItems="center">
-                <Grid item marginLeft="30%">
-                  <BadgeIcon sx={{ fontSize: 30 }} color="white"/>
+                <Grid item container alignItems="center">
+                  <Grid item marginLeft="30%">
+                    <BadgeIcon sx={{ fontSize: 30 }} color="white"/>
+                  </Grid>
+                  <Grid item marginLeft="25px">
+                    <EditForm label="Name" value={name} setValue={setName} saveValue={saveName}/>
+                  </Grid>
                 </Grid>
-                <Grid item marginLeft="25px">
-                  <EditForm label="Name" value={name} setValue={setName} saveValue={setName}/>
+                
+                <Grid item container alignItems="center">
+                  <Grid item marginLeft="30%">
+                    <EmailIcon sx={{ fontSize: 30 }} color="white"/>
+                  </Grid>
+                  <Grid item marginLeft="22px">
+                    <Typography>
+                      {email}
+                    </Typography>
+                  </Grid>
                 </Grid>
-              </Grid>
-              
-              <Grid item container alignItems="center">
-                <Grid item marginLeft="30%">
-                  <EmailIcon sx={{ fontSize: 30 }} color="white"/>
-                </Grid>
-                <Grid item marginLeft="25px">
-                  <EditForm label="Email" value={email} setValue={setEmail} saveValue={setEmail}/>
-                </Grid>
-              </Grid>
-              <Grid item container alignItems="center">
-                <Grid item marginLeft="29.8%">
-                  <PersonIcon sx={{ fontSize: 32 }} color="white" />
-                </Grid>
-                <Grid item marginLeft="25px">
-                  <EditForm label="Gender" value={gender} setValue={setGender} saveValue={setGender}/>
-                </Grid>
-              </Grid>
+                {/* <Grid item container alignItems="center">
+                  <Grid item marginLeft="29.8%">
+                    <PersonIcon sx={{ fontSize: 32 }} color="white" />
+                  </Grid>
+                  <Grid item marginLeft="25px">
+                    <EditForm label="Gender" value={gender} setValue={setGender} saveValue={setGender}/>
+                  </Grid>
+                </Grid> */}
               {/* <Grid item direction="column" marginTop="15px">
                   <Button type="button" variant="contained"  sx={styles.sameWidth} onClick={() => {
                       setEditPopopen(true)
@@ -276,8 +237,8 @@ function Profile() {
                 <ProfileEditPop open={editPopOpen} profileInfo={profileInfo} setOpen={setEditPopopen}
                                 setProfileInfo={setProfileInfo}/>} */}
             {ChangePasswordOpen &&
-                <ChangePasswordPop open={ChangePasswordOpen} currentPassword={password}
-                  setOpen={setChangePasswordOpen} setPassword={setPassword}/>}
+                <ChangePasswordPop open={ChangePasswordOpen}
+                  setOpen={setChangePasswordOpen} />}
             <Box
               component="div"
               style={{
@@ -298,8 +259,8 @@ function Profile() {
               </Typography>
 
             </Box>
-            <Box margin="25px" display="flex" alignItems="center" justifyContent="left">
-              <FormControl style={{width: "30%"}}>
+            <Box margin="0px" display="flex" alignItems="center" justifyContent="left">
+              {/* <FormControl style={{width: "30%"}}>
                 <InputLabel id="demo-simple-select-label">Type</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
@@ -314,8 +275,8 @@ function Profile() {
                   <MenuItem value={"CFree"}>CFree</MenuItem>
                   <MenuItem value={"All"}>All</MenuItem>
                 </Select>
-              </FormControl>
-              <Search>
+              </FormControl> */}
+              {/* <Search>
                 <SearchIconWrapper>
                   <SearchIcon/>
                 </SearchIconWrapper>
@@ -324,7 +285,7 @@ function Profile() {
                   inputProps={{"aria-label": "search"}}
                   onChange={(e) => handSearch(e.target.value)}
                 />
-              </Search>
+              </Search> */}
             </Box>
             <Grid
               container
@@ -339,10 +300,10 @@ function Profile() {
                 marginTop: 1,
               }}
             >
-              {voucherList.map((item) => (
+              {allVoucher.map((item) => (
                 (voucherFilterType === "All" || item.type === voucherFilterType) &&
                   <Grid item key={item.id}>
-                    {/* {isOwner &&
+                    {
                           <>
                               <IconButton sx={{position: "relative"}} id="iconButtonS"
                                           onClick={() => {
@@ -351,7 +312,7 @@ function Profile() {
                                   <DeleteIcon color="white"/>
                               </IconButton>
                           </>
-                      } */}
+                      }
 
                     <Voucher
                       type={item.type}
@@ -400,7 +361,7 @@ function Profile() {
                 marginTop: 1,
               }}
             >
-              {voucherList.map((item) => (
+              {allVoucher.map((item) => (
                 (voucherFilterType === "All" || item.type === voucherFilterType) &&
                   <Grid item key={item.id*10}>
                     {/* {isOwner &&

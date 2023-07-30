@@ -22,7 +22,7 @@ def init_app(app: Flask) -> None:
 
 def create_voucher_template_v1(
     user: models.Users, info: dict
-) -> int | models.VoucherTemplate:
+) -> int or models.VoucherTemplate:
     """
     Create a voucher template for a restaurant.
 
@@ -69,7 +69,7 @@ def create_voucher_template_v1(
 
 def create_auto_release_voucher_v1(
     template: models.VoucherTemplate, info: dict
-) -> int | models.VouchersAutoReleaseTimer:
+) -> int or models.VouchersAutoReleaseTimer:
     """
     Create an auto-release voucher for a restaurant.
 

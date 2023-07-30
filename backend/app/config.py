@@ -9,7 +9,7 @@ url = f"http://{host}:{port}"
 # set up database
 host = "localhost"
 database = "backend3900"
-user = "zhangwenqian"
+user = "eleanordou"
 password = "123456"
 
 # set up email
