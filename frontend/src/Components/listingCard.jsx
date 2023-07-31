@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {Favorite, FavoriteBorderRounded, PinDrop, Search as SearchIcon } from "@mui/icons-material";
+import { Favorite, FavoriteBorderRounded, PinDrop } from "@mui/icons-material";
 import {
     Card,
     CardMedia,
@@ -9,16 +9,26 @@ import {
   } from "@mui/material";
 import {pink} from "@mui/material/colors";
 import { CallApiWithToken } from "../CallApi";
+import Voucher from "./Voucher";
 
 function ListingCard(props) {
     const { restaurantInfo: item, restaurantDetail, collect, cardStatus } = props
     const [like, setLike] = useState(false)
+    const [voucherList, setVoucherList] = useState([])
 
     useEffect(() => {
-        CallApiWithToken(`/users/favorites/check/${item.restaurant_id}`, "get").then((res) => {
+        CallApiWithToken(`/users/favorites/check/${item.restaurant_id}`, "GET").then((res) => {
             if (res.status === 200) {
               setLike(res.data.is_favorite)
             }
+        })
+        CallApiWithToken(`/vouchers/get/template/by_restaurant/${item.restaurant_id}`, "GET").then((res) => {
+          if (res.status === 200) {
+            setVoucherList(res.data.info)
+          } else {
+            setVoucherList([])
+          }
+          console.log('res:', res)
         })
     }, [cardStatus, JSON.stringify(item)])
 
@@ -78,12 +88,11 @@ function ListingCard(props) {
                 </div>
               </div>
             </Tooltip>
-            {/* <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}> */}
             <div style={{float: "left", marginTop: "10px", maxHeight: "60px"}}>
-              {/* voucher  */}
               {
-                item.vouchersInfo?.length > 0 && item.vouchersInfo.map(voucher => (
+                voucherList.map(voucher => (
                   <Voucher
+                    key={voucher.template_id}
                     type={voucher.type}
                     condition={voucher.condition}
                     discount={voucher.discount}

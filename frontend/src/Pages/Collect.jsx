@@ -5,127 +5,29 @@ import {
     Box,
     Tooltip,
     CardMedia,
-    Rating,
-    RadioGroup,
-    FormControlLabel,
-    Radio,
-    FormControl,
-    InputBase
+    Rating
 } from "@mui/material";
-import { styled, alpha } from '@mui/material/styles';
-import { FavoriteBorderRounded, PinDrop, Favorite, Search as SearchIcon, Sort  } from '@mui/icons-material';
+import { PinDrop, Favorite } from '@mui/icons-material';
 import { pink } from '@mui/material/colors';
+import {Context, NotificationType, useContext} from "../context";
 import Voucher from '../Components/Voucher.jsx';
-import restaurant4 from '../Resource/image/restaurant4.png';
-import restaurant5 from '../Resource/image/restaurant5.png';
-import restaurant6 from '../Resource/image/restaurant6.png';
-import restaurant7 from '../Resource/image/restaurant7.png';
 import { styles } from '../styles.js';
 import './index.css';
-
-const defaultRestaurantsList = [
-    {
-        id: 4,
-        name: 'test4',
-        rate: '3',
-        evaluationsNum: 179,
-        address: 'address444...',
-        image: restaurant4,
-        favourite: true
-    },
-    {
-        id: 5,
-        name: 'test5',
-        rate: '5',
-        evaluationsNum: 8,
-        address: 'address......',
-        image: restaurant5,
-        favourite: true
-    },
-    {
-        id: 6,
-        name: 'test6',
-        rate: '3',
-        evaluationsNum: 99,
-        address: 'address......',
-        image: restaurant6,
-        favourite: true
-    },
-    {
-        id: 7,
-        name: 'test7',
-        rate: '1',
-        evaluationsNum: 1,
-        address: 'address......',
-        image: restaurant7,
-        favourite: true
-    }
-]
-
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: 'auto',
-    },
-  }));
-  
-  const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }));
-  
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      width: '100%',
-      [theme.breakpoints.up('sm')]: {
-        width: '12ch',
-        '&:focus': {
-          width: '20ch',
-        },
-      }
-    },
-  }));
+import { CallApiWithToken } from '../CallApi.js';
 
 function Collect() {
+    const {setter} = useContext(Context);
     useEffect(() => {
         document.title = 'Liked Restaurants'
-    }, []);
-    const [restaurantsList, setRestaurantsList] = useState(defaultRestaurantsList)
-    const [maxWidth, setMaxWidth] = useState(1051)
-    const [width, setWidth] = useState()
-
-    const [sortValue, setSortValue] = React.useState('default');
-
-    const handleSort = (event, data) => {
-        setSortValue(data)
-        if (data === 'default') return setRestaurantsList([...defaultRestaurantsList])
-        const newRestaurantsList = [...restaurantsList].sort((a, b) => {
-            if (data === 'rate') {
-                return parseFloat(b.rate) - parseFloat(a.rate)
-            } else if (data === 'count') {
-                return b.evaluationsNum - a.evaluationsNum
+        CallApiWithToken("/restaurants/get/list/by_favorite", "POST").then((res) => {
+            if (res.status === 200) {
+                setRestaurantsList(res.data.Restaurants)
             }
         })
-        setRestaurantsList(newRestaurantsList)
-    };
+    }, []);
+    const [restaurantsList, setRestaurantsList] = useState([])
+    const [maxWidth, setMaxWidth] = useState(1051)
+    const [width, setWidth] = useState()
 
     const resizeWidth = (e) => {
         const w = e.target.innerWidth
@@ -151,57 +53,30 @@ function Collect() {
         }
     }, [width])
 
-    // collect/uncollect
-    const collect = ({id, favourite}) => {
-        const newList = [...restaurantsList].map(item => {
-            if (item.id === id) return {
-                ...item,
-                favourite: !favourite
+    const collect = (id) => {
+        CallApiWithToken(`/users/favorites/remove/${id}`, "DELETE").then((res) => {
+            if (res.status === 200) {
+                CallApiWithToken("/restaurants/get/list/by_favorite", "POST").then((res) => {
+                    if (res.status === 200) {
+                        setRestaurantsList(res.data.Restaurants)
+                    } else {
+                        setRestaurantsList([])
+                        setter.showNotification("You haven't collected any restaurants yet", NotificationType.Error);
+                    }
+                })
             }
-            return item
-        })
-        setRestaurantsList(newList)
+          })
     }
 
     // enter detail page
     const restaurantDetail = (id) => {
-        console.log('id:', id)
-    }
-
-    const debounceFilter = (func, wait) => {
-        let timeout;
-        return function () {
-          clearTimeout(timeout);
-          timeout = setTimeout(() => {
-            func(arguments);
-          }, wait);
-        };
-      };
-
-    // filter
-    const handleChange = debounceFilter((data) => {
-        if (data[0]) {
-            // filter
-            const newRestaurantsList = [...defaultRestaurantsList].filter((i) => i.name.includes(data[0])).filter(i => i)
-            setRestaurantsList(newRestaurantsList)
-        } else {
-            setRestaurantsList([...defaultRestaurantsList])
-        }
-    }, 800)
-
-    const sortBoxStyle = {
-        display: 'flex',
-        background: '#fff',
-        margin: '7px 10px -5px 10px',
-        borderRadius: '10px',
-        paddingLeft: '10px',
-        alignItems: 'center',
+        navigate(`/restaurant/${id}`);
     }
 
     return (
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
             <div style={{background: 'rgb(255, 243, 209)', width: `${maxWidth}px`}}>
-                <Box sx={styles.sameColor} style={{ height: 'calc(100vh - 64px)', marginTop: '64px', overflow: 'auto' }} >
+                <Box sx={styles.sameColor} style={{ height: 'calc(100vh - 64px)', overflow: 'auto' }} >
                     <div style={{ height: 'calc(100% - 5px)', width: '100%', paddingTop: '5px' }}>
                         <div className='list-nav' style={{ margin: '0 10px', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -210,32 +85,6 @@ function Collect() {
                                 </div>
                                 <h2>Collect</h2>
                             </div>
-                            <Search>
-                                <SearchIconWrapper>
-                                <SearchIcon />
-                                </SearchIconWrapper>
-                                <StyledInputBase
-                                    placeholder="Search…"
-                                    inputProps={{ 'aria-label': 'search' }}
-                                    onChange={(e) => handleChange(e.target.value) }
-                                />
-                            </Search>
-                        </div>
-                        <div style={sortBoxStyle}>
-                        <Sort sx={{ marginRight: '10px' }} />
-                        <FormControl>
-                            <RadioGroup
-                                row
-                                aria-labelledby="demo-row-radio-buttons-group-label"
-                                name="row-radio-buttons-group"
-                                value={sortValue}
-                                onChange={handleSort}
-                            >
-                                <FormControlLabel value="default" control={<Radio />} label="Default sorting" />
-                                <FormControlLabel value="rate" control={<Radio />} label="High rating" />
-                                <FormControlLabel value="count" control={<Radio />} label="High comment count" />
-                            </RadioGroup>
-                            </FormControl>
                         </div>
                         <div>
                         {
@@ -245,8 +94,8 @@ function Collect() {
                                     <Grid item xs={12} sx={{ height: 200, padding: '10px' }}>
                                         <CardMedia
                                             component="img"
-                                            image={item.image}
-                                            onClick={() => restaurantDetail(item.id)}
+                                            image={`data:image/png;base64,${item.image}`}
+                                            onClick={() => restaurantDetail(item.restaurant_id)}
                                             sx={{ cursor: 'pointer', maxHeight: '100%', maxWidth: '100%' }}
                                         />
                                     </Grid>
@@ -254,25 +103,20 @@ function Collect() {
                                         <div style={{display: 'flex', alignItems: 'end'}}>
                                             <div
                                                 style={{ overflow: 'hidden', textOverflow: 'ellipsis', cursor: 'pointer', fontSize: 'x-large' }}
-                                                onClick={() => restaurantDetail(item.id)}
+                                                onClick={() => restaurantDetail(item.restaurant_id)}
                                             >
                                                 {item.name}
                                             </div>
                                             {
-                                                item.favourite ?
                                                 <Favorite
-                                                    onClick={() => collect(item)}
+                                                    onClick={() => collect(item.restaurant_id)}
                                                     sx={{ width: '1.2em', height: '1.2em', marginLeft: '10px', color: pink[500], cursor: 'pointer' }}
-                                                /> :
-                                                <FavoriteBorderRounded
-                                                    onClick={() => collect(item)}
-                                                    sx={{ width: '1.2em', height: '1.2em', marginLeft: '10px', cursor: 'pointer' }}
                                                 />
                                             }
                                         </div>
                                         <div style={{ fontSize: 'x-small', display: 'flex', margin: '8px 0' }}>
-                                            <Rating sx={{ fontSize: '1rem', marginRight: '8px' }} name="read-only" value={item.rate} readOnly />
-                                            {`${item.evaluationsNum} evaluations`}
+                                            <Rating sx={{ fontSize: '1rem', marginRight: '8px' }} name="read-only" value={item.rating} readOnly />
+                                            {`${item.comment_count} evaluations`}
                                         </div>
                                         <Tooltip title={item.address} placement="top-start">
                                             <div style={{ display: 'flex', alignItems: 'center' }}>
