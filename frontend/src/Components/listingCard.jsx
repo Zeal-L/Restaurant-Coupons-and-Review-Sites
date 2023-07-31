@@ -93,10 +93,12 @@ function ListingCard(props) {
                 voucherList.map(voucher => (
                   <Voucher
                     key={voucher.template_id}
+                    id={voucher.template_id}
                     type={voucher.type}
                     condition={voucher.condition}
                     discount={voucher.discount}
                     expire={voucher.expire}
+                    isRestaurant={true}
                     transform={0.3}
                     isListing
                     sx={{marginRight: "10px", display: "inline-block"}}

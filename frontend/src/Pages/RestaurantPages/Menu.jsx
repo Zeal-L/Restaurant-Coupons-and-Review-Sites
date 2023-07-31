@@ -170,7 +170,7 @@ function Menu(props) {
               setPopName("");
               setPopPrice(0);
               setPopDescription("");
-                setPopType("Add Dish");
+              setPopType("Add Dish");
               setPopOpen(true);
             }}
           />
@@ -299,7 +299,7 @@ const MenuDialog = (props) => {
   );
 };
 
-MenuDialog.prototype = {
+MenuDialog.protoType = {
   open: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
   image: PropTypes.string.isRequired,

@@ -16,7 +16,7 @@ export default function VoucherVerify() {
   const [popupId, setPopupId] = useState(-1);
   const [totalData, setTotalData] = useState(0);
 
-  useEffect(() => {
+  const loadHistory = () => {
     setLoading(true);
     const startIndex = (page.page-1) * page.pageSize;
     const endIndex = startIndex + page.pageSize;
@@ -37,6 +37,10 @@ export default function VoucherVerify() {
       }
       setLoading(false);
     });
+  }
+
+  useEffect(() => {
+    loadHistory();
   }, []);
 
   useEffect(() => {
@@ -57,6 +61,7 @@ export default function VoucherVerify() {
           setInputCode("");
           setPopupId(res.data.template_id);
           setPopupOpen(true);
+          loadHistory();
         } else {
           setter.showNotification(res.data.message, NotificationType.Error);
         }
@@ -141,7 +146,7 @@ export default function VoucherVerify() {
           columns={columns}
           loading={loading}
           pagination
-          rowCount={totalData} // 假设总共有1000条数据
+          rowCount={totalData}
           paginationMode="server"
           onPaginationModelChange={handlePageChange}
           paginationModel={page}
