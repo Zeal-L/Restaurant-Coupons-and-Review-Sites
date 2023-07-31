@@ -27,6 +27,7 @@ function App() {
   const [login, setLogin] = React.useState(initialValue.login);
   const [listings, setListings] = React.useState(initialValue.listing);
   const [listShow, setListShow] = React.useState(initialValue.listingShow);
+  const [currentUserRestaurantId, setCurrentUserRestaurantId] = React.useState('');
 
   function showNotification(content, type) {
     setNotificationPopMessage(content);
@@ -42,7 +43,8 @@ function App() {
     notificationType,
     login,
     listings,
-    listShow
+    listShow,
+    currentUserRestaurantId
   };
   const setter = {
     setPopOpen,
@@ -53,7 +55,8 @@ function App() {
     setLogin,
     setListings,
     setListShow,
-    showNotification
+    showNotification,
+    setCurrentUserRestaurantId
   };
 
   const theme = createTheme({

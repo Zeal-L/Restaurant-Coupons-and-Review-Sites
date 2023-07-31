@@ -92,7 +92,7 @@ function CreateRestaurant() {
   const queryMenuList = (id) => {
     CallApi(`/dishes/get/by_restaurant/${id}`, "GET").then((ress) => {
       if(ress.status === 200) {
-        const ids = ress.data.dish_ids
+        const ids = ress.data.dish_ids;
         setMenuList(ids)
         setForceRender(!forceRender)
       }
@@ -106,9 +106,7 @@ function CreateRestaurant() {
         queryMenuList(res.data.restaurant_id)
         setRestaurantInfo(res.data)
         setRestaurantImgUrl(`data:image/png;base64,${res.data.image}`)
-      } else (
-        setter.showNotification(res.data.message, NotificationType.Error)
-      )
+      }
     })
   }, [])
 
@@ -261,6 +259,7 @@ function CreateRestaurant() {
           }).then((res) => {
             if (res.status === 200) {
               setter.showNotification("Create Success!", NotificationType.Success);
+              setRestaurantId(res.data.restaurant_id)
               let newSkipped = skipped;
               if (isStepSkipped(activeStep)) {
                 newSkipped = new Set(newSkipped.values());
@@ -285,6 +284,7 @@ function CreateRestaurant() {
   
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
       setSkipped(newSkipped);
+      setter.setCurrentUserRestaurantId(restaurantId)
     }
   };
 

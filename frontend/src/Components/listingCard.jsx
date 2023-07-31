@@ -46,17 +46,20 @@ function ListingCard(props) {
           </Grid>
           <Grid item xs={12} className="restaurant-introduction">
             <div style={{display: "flex", alignItems: "end"}}>
-              <div
-                style={{
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  cursor: "pointer",
-                  fontSize: "x-large"
-                }}
-                onClick={() => restaurantDetail(item.restaurant_id)}
-              >
-                {item.name}
-              </div>
+              <Tooltip title={item.name} placement="top-start">
+                <div
+                  style={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                    fontSize: "x-large"
+                  }}
+                  onClick={() => restaurantDetail(item.restaurant_id)}
+                >
+                  {item.name}
+                </div>
+              </Tooltip>
               {
                 like ?
                   <Favorite
@@ -90,7 +93,7 @@ function ListingCard(props) {
             </Tooltip>
             <div style={{float: "left", marginTop: "10px", maxHeight: "60px"}}>
               {
-                voucherList.map(voucher => (
+                voucherList.slice(0, 2).map(voucher => (
                   <Voucher
                     key={voucher.template_id}
                     id={voucher.template_id}

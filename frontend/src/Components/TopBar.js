@@ -27,19 +27,26 @@ export default function TopBar() {
   const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  // eslint-disable-next-line no-unused-vars
+  const [haveRestaurant, setHaveRestaurant] = React.useState(false);
   const [restaurantId, setRestaurantId] = React.useState("");
   const [userImage, setUserImage] = React.useState("");
   const [userName, setUserName] = React.useState("");
   React.useEffect(() => {
     if (!getter.login) {
       setPages([]);
-    }
-    else if (restaurantId !== "") {
+    } else if (restaurantId !== "") {
       setPages(["My Restaurant", "Voucher verify"]);
     } else {
       setPages(["Create Restaurant"]);
     }
   }, [restaurantId, getter.login]);
+
+  React.useEffect(() => {
+    if (getter.currentUserRestaurantId) {
+      setRestaurantId(getter.currentUserRestaurantId)
+    }
+  }, [getter.currentUserRestaurantId])
 
   React.useEffect(() => {
     CallApiWithToken("/restaurants/get/by_token", "GET").then((res) => {
@@ -49,7 +56,7 @@ export default function TopBar() {
         setRestaurantId("");
       }
     })
-  }, [restaurantId, getter.login]);
+  }, []);
 
   React.useEffect(() => {
     CallApiWithToken("users/get/by_token", "GET").then((result) => {
@@ -61,7 +68,7 @@ export default function TopBar() {
             setter.setLogin(false);
         }
     });
-  }, [restaurantId, getter.login]);
+  }, []);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
