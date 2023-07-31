@@ -115,148 +115,150 @@ export default function TopBar() {
   };
   return (
     // <Box sx={{ flexGrow: 1 , backgroundColor: 'rgb(255, 243, 209)'}}>
-    <AppBar position="static" sx={{flexGrow: 1, backgroundColor: "rgb(255, 243, 209)"}}>
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          {/*<AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />*/}
-          <Logo style={{display: {xs: "none", md: "flex"}, mr: 1, width: "50px", height: "50px", cursor: "pointer"}}
-            onClick={() => navigate("/")}/>
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            onClick={() => navigate("/")}
-            sx={{
-              mr: 2,
-              display: {xs: "none", md: "flex"},
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "black",
-              textDecoration: "none",
-              cursor: "pointer"
-            }}
-          >
-            Donut
-          </Typography>
-
-          <Box sx={{flexGrow: 1, display: {xs: "flex", md: "none"}}}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="black"
-            >
-              <MenuIcon/>
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
+    <>
+      <Box sx={{height: "68.5px", width: "100%"}}/>
+      <AppBar sx={{flexGrow: 1, backgroundColor: "rgb(255, 243, 209)"}}>
+        <Container maxWidth="xl">
+          <Toolbar disableGutters>
+            {/*<AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />*/}
+            <Logo style={{display: {xs: "none", md: "flex"}, mr: 1, width: "50px", height: "50px", cursor: "pointer"}}
+              onClick={() => navigate("/")}/>
+            <Typography
+              variant="h6"
+              noWrap
+              component="a"
+              onClick={() => navigate("/")}
               sx={{
-                display: {xs: "block", md: "none"},
+                mr: 2,
+                display: {xs: "none", md: "flex"},
+                fontFamily: "monospace",
+                fontWeight: 700,
+                letterSpacing: ".3rem",
+                color: "black",
+                textDecoration: "none",
+                cursor: "pointer"
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={() => onClickMenu(page)}>
-                  <Typography style={{color: "black"}} textAlign="center">
-                    {page}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-          {/*<AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />*/}
-          {/*<Logo style={{ display: { xs: 'flex', md: 'none' }, mr: 1 , width: '50px', height: '50px'}} onClick={() => navigate('/')} />*/}
+              Donut
+            </Typography>
 
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: {xs: "flex", md: "none"},
-              flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "black",
-              textDecoration: "none",
-            }}
-          >
-            Donut
-          </Typography>
-          <Box sx={{flexGrow: 1, display: {xs: "none", md: "flex"}}}>
-            {pages.map((page, index) => (
-              <>
-                <Button
-                  key={page}
-                  onClick={() => onClickMenu(page)}
-                  sx={{my: 2, color: "white", display: "block"}}
-                  style={{color: "black"}}
-                >
-                  {page}
-                </Button>
-                {index !== pages.length - 1 && (
-                  <Divider orientation="vertical" variant="middle" flexItem/>
-                )}
-              </>
-            ))}
-          </Box>
-          <Box sx={{flexGrow: 0}}>
-              {getter.login ? (
-                <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                  <Avatar alt={userName} src={`data:image/png;base64,${userImage}`}/>
-                </IconButton>
-                ) : (
-                <Tooltip title="Login" arrow>
-                  <IconButton aria-label="fingerprint" color="secondary" onClick={() => navigate("/login")}>
-                    <LoginIcon />
-                  </IconButton>
-                </Tooltip>
-                )
-              }
-            <Menu
-              sx={{mt: "45px"}}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
+            <Box sx={{flexGrow: 1, display: {xs: "flex", md: "none"}}}>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleOpenNavMenu}
+                color="black"
+              >
+                <MenuIcon/>
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorElNav}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                open={Boolean(anchorElNav)}
+                onClose={handleCloseNavMenu}
+                sx={{
+                  display: {xs: "block", md: "none"},
+                }}
+              >
+                {pages.map((page) => (
+                  <MenuItem key={page} onClick={() => onClickMenu(page)}>
+                    <Typography style={{color: "black"}} textAlign="center">
+                      {page}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+            {/*<AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />*/}
+            {/*<Logo style={{ display: { xs: 'flex', md: 'none' }, mr: 1 , width: '50px', height: '50px'}} onClick={() => navigate('/')} />*/}
+
+            <Typography
+              variant="h5"
+              noWrap
+              component="a"
+              href=""
+              sx={{
+                mr: 2,
+                display: {xs: "flex", md: "none"},
+                flexGrow: 1,
+                fontFamily: "monospace",
+                fontWeight: 700,
+                letterSpacing: ".3rem",
+                color: "black",
+                textDecoration: "none",
               }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={() => onClickSetting(setting)}>
-                  <Typography textAlign="center">
-                    {setting}
-                  </Typography>
-                </MenuItem>
+              Donut
+            </Typography>
+            <Box sx={{flexGrow: 1, display: {xs: "none", md: "flex"}}}>
+              {pages.map((page, index) => (
+                <>
+                  <Button
+                    key={page}
+                    onClick={() => onClickMenu(page)}
+                    sx={{my: 2, color: "white", display: "block"}}
+                    style={{color: "black"}}
+                  >
+                    {page}
+                  </Button>
+                  {index !== pages.length - 1 && (
+                    <Divider orientation="vertical" variant="middle" flexItem/>
+                  )}
+                </>
               ))}
-            </Menu>
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
-    // </Box>
+            </Box>
+            <Box sx={{flexGrow: 0}}>
+                {getter.login ? (
+                  <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                    <Avatar alt={userName} src={`data:image/png;base64,${userImage}`}/>
+                  </IconButton>
+                  ) : (
+                  <Tooltip title="Login" arrow>
+                    <IconButton aria-label="fingerprint" color="secondary" onClick={() => navigate("/login")}>
+                      <LoginIcon />
+                    </IconButton>
+                  </Tooltip>
+                  )
+                }
+              <Menu
+                sx={{mt: "45px"}}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <MenuItem key={setting} onClick={() => onClickSetting(setting)}>
+                    <Typography textAlign="center">
+                      {setting}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+    </>
   );
 }
