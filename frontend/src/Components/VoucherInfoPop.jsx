@@ -5,11 +5,11 @@ import {TransitionUp} from "../styles";
 import {Button, Chip, CircularProgress, colors, Dialog, DialogTitle, Grid, Link, Typography} from "@mui/material";
 import Voucher from "./Voucher";
 import TransforPop from "./TransferPop.jsx";
-import {CallApi, CallApiWithToken} from "../CallApi";
+import {CallApiWithToken} from "../CallApi";
 import dayjs from "dayjs";
 
 function VoucherInfoPop(props) {
-  const {getter, setter} = useContext(Context);
+  const {setter} = useContext(Context);
   const [transferOpen, setTransferOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ function VoucherInfoPop(props) {
         setter.showNotification(res.data.message, NotificationType.Error);
       }
     });
-  }
+  };
 
   const descriptionStyle = {
     marginBottom: "16px",
@@ -74,52 +74,52 @@ function VoucherInfoPop(props) {
           <CircularProgress />
         </> :
         <Grid container direction="column" justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
-        <Grid item alignItems="center">
-          <Voucher
-            type={info.type}
-            condition={info.condition}
-            discount={info.discount}
-            expire={info.expire}
-            pop={false}
-          />
-        </Grid>
-        {isRestaurant &&
+          <Grid item alignItems="center">
+            <Voucher
+              type={info.type}
+              condition={info.condition}
+              discount={info.discount}
+              expire={info.expire}
+              pop={false}
+            />
+          </Grid>
+          {isRestaurant &&
           <Grid item>
             <Chip label={`Total ${info.total_amount} vouchers, ${info.remain_amount} left.`}/>
           </Grid>
-        }
-        <Grid item xs={12}>
-          <Typography variant="body2" style={descriptionStyle}>
+          }
+          <Grid item xs={12}>
+            <Typography variant="body2" style={descriptionStyle}>
             This voucher is provided by{" "}
-            <Link
-              href={`/restaurant/${info.restaurant_id}`}
-              sx={linkStyle}
-            >
-              {info.restaurant_name}
-            </Link>
+              <Link
+                href={`/restaurant/${info.restaurant_id}`}
+                sx={linkStyle}
+              >
+                {info.restaurant_name}
+              </Link>
             .
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body2" style={descriptionStyle}>
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body2" style={descriptionStyle}>
             Discount is applicable only when you meet the following condition: {info.condition}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body2" style={descriptionStyle}>
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body2" style={descriptionStyle}>
             This voucher expires on {dayjs.unix(info.expire).format("DD/MM/YYYY")}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body2" style={{color: colors.grey[500]}}>
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body2" style={{color: colors.grey[500]}}>
             *{info.description}
-          </Typography>
-        </Grid>
-        {!used &&
+            </Typography>
+          </Grid>
+          {!used &&
           <>
             {isRestaurant ?
               <Grid item xs={12}>
-                <Button variant="contained" color="primary" fullWidth onClick={() => {getVoucher()}}>
+                <Button variant="contained" color="primary" fullWidth onClick={() => {getVoucher();}}>
                   Get this voucher
                 </Button>
               </Grid>
@@ -145,13 +145,13 @@ function VoucherInfoPop(props) {
               </>
             }
           </>
-        }
-        <Grid item xs={12}>
-          <Button variant="text" color="primary" fullWidth onClick={() => props.setOpen(false)}>
+          }
+          <Grid item xs={12}>
+            <Button variant="text" color="primary" fullWidth onClick={() => props.setOpen(false)}>
             Cancel
-          </Button>
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
       }
       {transferOpen === true && <TransforPop open={transferOpen} setOpen={setTransferOpen} id={props.id}/>}
     </Dialog>

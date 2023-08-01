@@ -15,7 +15,7 @@ import {useNavigate} from "react-router-dom";
 import {ReactComponent as Logo} from "../Resource/logo.svg";
 import {Divider} from "@mui/material";
 import {Context, useContext} from "../context";
-import LoginIcon from '@mui/icons-material/Login';
+import LoginIcon from "@mui/icons-material/Login";
 import {CallApiWithToken} from "../CallApi";
 
 export default function TopBar() {
@@ -44,9 +44,9 @@ export default function TopBar() {
 
   React.useEffect(() => {
     if (getter.currentUserRestaurantId) {
-      setRestaurantId(getter.currentUserRestaurantId)
+      setRestaurantId(getter.currentUserRestaurantId);
     }
-  }, [getter.currentUserRestaurantId])
+  }, [getter.currentUserRestaurantId]);
 
   React.useEffect(() => {
     CallApiWithToken("/restaurants/get/by_token", "GET").then((res) => {
@@ -55,18 +55,18 @@ export default function TopBar() {
       } else {
         setRestaurantId("");
       }
-    })
+    });
   }, []);
 
   React.useEffect(() => {
     CallApiWithToken("users/get/by_token", "GET").then((result) => {
-        if (result.status === 200) {
-            setUserName(result.data.name);
-            setUserImage(result.data.photo);
-            setter.setLogin(true);
-        } else {
-            setter.setLogin(false);
-        }
+      if (result.status === 200) {
+        setUserName(result.data.name);
+        setUserImage(result.data.photo);
+        setter.setLogin(true);
+      } else {
+        setter.setLogin(false);
+      }
     });
   }, []);
 
@@ -226,18 +226,18 @@ export default function TopBar() {
               ))}
             </Box>
             <Box sx={{flexGrow: 0}}>
-                {getter.login ? (
-                  <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                    <Avatar alt={userName} src={`data:image/png;base64,${userImage}`}/>
+              {getter.login ? (
+                <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                  <Avatar alt={userName} src={`data:image/png;base64,${userImage}`}/>
+                </IconButton>
+              ) : (
+                <Tooltip title="Login" arrow>
+                  <IconButton aria-label="fingerprint" color="secondary" onClick={() => navigate("/login")}>
+                    <LoginIcon />
                   </IconButton>
-                  ) : (
-                  <Tooltip title="Login" arrow>
-                    <IconButton aria-label="fingerprint" color="secondary" onClick={() => navigate("/login")}>
-                      <LoginIcon />
-                    </IconButton>
-                  </Tooltip>
-                  )
-                }
+                </Tooltip>
+              )
+              }
               <Menu
                 sx={{mt: "45px"}}
                 id="menu-appbar"

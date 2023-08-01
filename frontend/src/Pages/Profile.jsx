@@ -80,7 +80,7 @@ const StyledInputBase = styled(InputBase)(({theme}) => ({
 
 function Profile() {
   useEffect(() => {
-    document.title = 'Profile';
+    document.title = "Profile";
   }, []);
   const [ChangePasswordOpen, setChangePasswordOpen] = React.useState(false);
   const {setter, getter} = useContext(Context);
@@ -138,7 +138,7 @@ function Profile() {
         setCurrImage(reader.result.replace(/^data:image\/[a-z]+;base64,/, ""),);
         const data = {
           "base64": reader.result.replace(/^data:image\/[a-z]+;base64,/, ""),
-        }
+        };
         CallApiWithToken("/users/reset/photo", "PUT", data) .then((res) => {
           if (res.status === 200) {
             setter.showNotification(res.data.message, NotificationType.Success);
@@ -170,7 +170,7 @@ function Profile() {
         setter.showNotification("Unknown error: " + res.data.message, NotificationType.Error);
       }
     });
-  }
+  };
   return (
     <>
 
@@ -182,7 +182,7 @@ function Profile() {
               <label htmlFor="contained-button-file">
                 <IconButton component="span">
                   <Avatar alt={name}
-                          src={`data:image/png;base64,${currImage}`} sx={{ width: 150, height: 150 }}/>
+                    src={`data:image/png;base64,${currImage}`} sx={{ width: 150, height: 150 }}/>
                 </IconButton>
               </label>
               <input accept="image/*" id="contained-button-file" hidden multiple type="file" onChange={updateImage}/>
@@ -193,26 +193,26 @@ function Profile() {
               alignItems="center"
               spacing={2}
               marginTop="10px" padding="15px">
-                <Grid item container alignItems="center">
-                  <Grid item marginLeft="30%">
-                    <BadgeIcon sx={{ fontSize: 30 }} color="white"/>
-                  </Grid>
-                  <Grid item marginLeft="25px">
-                    <EditForm label="Name" value={name} setValue={setName} saveValue={saveName}/>
-                  </Grid>
+              <Grid item container alignItems="center">
+                <Grid item marginLeft="30%">
+                  <BadgeIcon sx={{ fontSize: 30 }} color="white"/>
                 </Grid>
+                <Grid item marginLeft="25px">
+                  <EditForm label="Name" value={name} setValue={setName} saveValue={saveName}/>
+                </Grid>
+              </Grid>
                 
-                <Grid item container alignItems="center">
-                  <Grid item marginLeft="30%">
-                    <EmailIcon sx={{ fontSize: 30 }} color="white"/>
-                  </Grid>
-                  <Grid item marginLeft="22px">
-                    <Typography>
-                      {email}
-                    </Typography>
-                  </Grid>
+              <Grid item container alignItems="center">
+                <Grid item marginLeft="30%">
+                  <EmailIcon sx={{ fontSize: 30 }} color="white"/>
                 </Grid>
-                {/* <Grid item container alignItems="center">
+                <Grid item marginLeft="22px">
+                  <Typography>
+                    {email}
+                  </Typography>
+                </Grid>
+              </Grid>
+              {/* <Grid item container alignItems="center">
                   <Grid item marginLeft="29.8%">
                     <PersonIcon sx={{ fontSize: 32 }} color="white" />
                   </Grid>

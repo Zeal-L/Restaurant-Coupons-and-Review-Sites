@@ -29,7 +29,7 @@ export default function VoucherVerify() {
             userId: res.data.info[i].owner_id,
             time: Date(res.data.info[i].code_time * 1000),
             voucher: res.data.info[i].template_id
-          })
+          });
         }
         setData(data => [...data, ...NewData]);
       } else {
@@ -37,7 +37,7 @@ export default function VoucherVerify() {
       }
       setLoading(false);
     });
-  }
+  };
 
   useEffect(() => {
     loadHistory();
@@ -45,28 +45,28 @@ export default function VoucherVerify() {
 
   useEffect(() => {
     // /vouchers/get/verified_voucher_list/count/by_restaurant
-    CallApiWithToken(`/vouchers/get/verified_voucher_list/count/by_restaurant`, "GET").then((res) => {
-        if (res.status === 200) {
-            setTotalData(res.data.count);
-            setTotalPages(Math.ceil(res.data.count / page.pageSize));
-        } else {
-            setter.showNotification(res.data.message, NotificationType.Error);
-        }
-    })
+    CallApiWithToken("/vouchers/get/verified_voucher_list/count/by_restaurant", "GET").then((res) => {
+      if (res.status === 200) {
+        setTotalData(res.data.count);
+        setTotalPages(Math.ceil(res.data.count / page.pageSize));
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
   }, [data]);
   const verify = () => {
     CallApiWithToken(`/vouchers/verify/${inputCode}`, "POST").then((res) => {
-        if (res.status === 200) {
-          setter.showNotification(res.data.message, NotificationType.Success);
-          setInputCode("");
-          setPopupId(res.data.template_id);
-          setPopupOpen(true);
-          loadHistory();
-        } else {
-          setter.showNotification(res.data.message, NotificationType.Error);
-        }
-    })
-  }
+      if (res.status === 200) {
+        setter.showNotification(res.data.message, NotificationType.Success);
+        setInputCode("");
+        setPopupId(res.data.template_id);
+        setPopupOpen(true);
+        loadHistory();
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -82,7 +82,7 @@ export default function VoucherVerify() {
             userId: res.data.info[i].owner_id,
             time: Date(res.data.info[i].code_time * 1000),
             voucher: res.data.info[i].template_id
-          })
+          });
         }
         setData(NewData);
       } else {
@@ -135,7 +135,7 @@ export default function VoucherVerify() {
               onChange={(e) => setInputCode(e.target.value)}
             />
             <Button variant="text"
-                    onClick={verify}
+              onClick={verify}
             >Verify</Button>
           </Paper>
         </Grid>

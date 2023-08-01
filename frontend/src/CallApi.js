@@ -4,7 +4,7 @@ export function CallApi(path, type, data) {
   if (data !== undefined) {
     data = JSON.stringify(data);
   }
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let statusCode;
     fetch(`${backendUrl}/${path}`, {
       method: type,
@@ -24,7 +24,7 @@ export function CallApi(path, type, data) {
           data: data
         });
       })
-      .catch(error => {
+      .catch(() => {
         // console.log(error);
         resolve({
           status: 404,
@@ -43,7 +43,7 @@ export function CallApiWithToken(path, type, data) {
   if (data !== undefined) {
     data = JSON.stringify(data);
   }
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let statusCode;
     fetch(`${backendUrl}/${path}`, {
       method: type,
@@ -64,13 +64,13 @@ export function CallApiWithToken(path, type, data) {
           data: data
         });
       })
-      .catch(error => {
+      .catch(() => {
         // console.log(error);
         resolve({
-            status: 404,
-            data: {
-                message: "Not Found"
-            }
+          status: 404,
+          data: {
+            message: "Not Found"
+          }
         });
       });
   });

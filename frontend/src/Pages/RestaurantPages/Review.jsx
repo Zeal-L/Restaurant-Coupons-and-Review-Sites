@@ -126,7 +126,7 @@ const Comment = ({
 
   return (
     <Box display="flex" alignItems="flex-start" marginBottom={2}
-         sx={{padding: 2, borderRadius: 4, boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"}}>
+      sx={{padding: 2, borderRadius: 4, boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"}}>
       <Avatar src={`data:image/png;base64,${user.avatar}`} alt={user.name}/>
       <Box marginLeft={2} flexGrow={1}>
         <Typography variant="subtitle1">{user.name}</Typography>
@@ -229,7 +229,7 @@ const Comment = ({
               }}
             >
               <Avatar src={"https://example.com/avatar2.jpg"}
-                      alt={isAnonymous ? "Anonymous" : "Jane Smith"} /*Anonymous Setting*/ />
+                alt={isAnonymous ? "Anonymous" : "Jane Smith"} /*Anonymous Setting*/ />
               <Box marginLeft={2} flexGrow={1}>
                 <Typography variant="subtitle2">{isAnonymous ? "Anonymous" : "Jane Smith"}</Typography>
                 <Box display="flex" alignItems="center">
@@ -260,20 +260,20 @@ const Comment = ({
                     content,
                     anonymity,
                   }).then((res) => {
-                      setReply("");
-                      setShowReplies(false);
-                      setter.showNotification("Reply added successfully!", NotificationType.Success);
+                    setReply("");
+                    setShowReplies(false);
+                    setter.showNotification("Reply added successfully!", NotificationType.Success);
 
-                      // CallApiWithToken(`/replies/get/by_id/${res.data.reply_id}`, "GET").then((res) => {
-                      //   if (res.status === 200) {
-                      //     const newReply = res.data.reply;
-                      //     const newAllComments = [...allComments];
-                      //     const commentIndex = newAllComments.findIndex((comment) => comment.comment_id === comment_id);
-                      //     newAllComments[commentIndex].reviews.push(res.data);
-                      //     setCurrentComment(newAllComments[commentIndex]);
-                      //   }
-                      // });
-                    }
+                    // CallApiWithToken(`/replies/get/by_id/${res.data.reply_id}`, "GET").then((res) => {
+                    //   if (res.status === 200) {
+                    //     const newReply = res.data.reply;
+                    //     const newAllComments = [...allComments];
+                    //     const commentIndex = newAllComments.findIndex((comment) => comment.comment_id === comment_id);
+                    //     newAllComments[commentIndex].reviews.push(res.data);
+                    //     setCurrentComment(newAllComments[commentIndex]);
+                    //   }
+                    // });
+                  }
                   );
                 }} sx={{marginTop: 1}}>
                   Submit
@@ -291,7 +291,7 @@ const Comment = ({
 
 function Review(props) {
   const restaurantId = props.id;
-  const {getter, setter} = useContext(Context);
+  const {setter} = useContext(Context);
   const [ratingValue, setRatingValue] = useState(5);
   const [comment, setComment] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -302,7 +302,6 @@ function Review(props) {
   const [userName, setUserName] = useState(userDetail.name);
   const [userImage, setUserImage] = useState(userDetail.image);
   const [comments, setComments] = useState([]);
-  const [numberOfComments, setNumberOfComments] = useState(0);
   const [maxComments, setMaxComments] = useState(0);
   const [sort, setSort] = useState("by_date");
   const [isAtBottom, setIsAtBottom] = useState(false);
@@ -318,7 +317,7 @@ function Review(props) {
   }, []);
 
   React.useEffect(() => {
-    CallApiWithToken(`/users/get/by_token`, "GET",).then((response) => {
+    CallApiWithToken("/users/get/by_token", "GET",).then((response) => {
       if (response.status === 200) {
         setUserName(response.data.name);
         setUserImage(response.data.photo);
@@ -332,17 +331,17 @@ function Review(props) {
     const end = start + 5 < maxComments ? start + 5 : maxComments;
     console.log("starttttt: " + start + " end: " + end);
     if (end === 0 || start >= end) return;
-    CallApiWithToken(`/comments/get/by_restaurant/`+sort
+    CallApiWithToken("/comments/get/by_restaurant/"+sort
       , "POST", {restaurant_id, start, end}).then((response) => {
       if (response.status === 200) {
         const comment_ids = response.data.comment_ids;
         getReviews(comment_ids).then((reviews) => {
-            setComments((comments) => [...comments, ...reviews]);
-            setLoading(false);
+          setComments((comments) => [...comments, ...reviews]);
         });
       } else {
         setter.showNotification(response.data.message, NotificationType.Error);
       }
+      setLoading(false);
     });
   };
 
@@ -358,7 +357,7 @@ function Review(props) {
     const end = 5 < maxComments ? 5 : maxComments;
     console.log("start: " + start + " end: " + end);
     if (end === 0 || start >= end) return;
-    CallApiWithToken(`/comments/get/by_restaurant/`+sort
+    CallApiWithToken("/comments/get/by_restaurant/"+sort
       , "POST", {restaurant_id, start, end}).then((response) => {
       if (response.status === 200) {
         const comment_ids = response.data.comment_ids;
@@ -445,12 +444,12 @@ function Review(props) {
             sx={{marginTop: 1}}
           />
           <Button variant="contained" color="primary" onClick={() => {
-            CallApiWithToken(`/comments/new`, "POST", {
-                restaurant_id: restaurantId,
-                content: comment,
-                rate: ratingValue,
-                anonymity: isAnonymous,
-              }
+            CallApiWithToken("/comments/new", "POST", {
+              restaurant_id: restaurantId,
+              content: comment,
+              rate: ratingValue,
+              anonymity: isAnonymous,
+            }
             ).then((response) => {
               if (response.status === 200) {
                 let comment = response.data;
@@ -469,9 +468,9 @@ function Review(props) {
         </Box>
       </Box>
       <Grid container
-            alignItems="center"
-            justifyContent="center"
-            sx={{marginTop: 2}}>
+        alignItems="center"
+        justifyContent="center"
+        sx={{marginTop: 2}}>
         <Grid item xs={12} md={3} sx={{textAlign: "center"}}>
           <Typography variant="h6">
             Sort by
@@ -485,7 +484,7 @@ function Review(props) {
               name="sort_option"
               value={sort}
               onChange={(event) => {
-                  setSort(event.target.value);
+                setSort(event.target.value);
               }}
             >
               <Grid container alignItems="center">
@@ -563,12 +562,14 @@ function Review(props) {
           setCurrentComment={setComments}
         />
       ))}
-      <Box sx={{ display: 'flex' , justifyContent: 'center', marginTop: 2, width: '100%'}}>
+      {loading && (
+      <Box sx={{ display: "flex" , justifyContent: "center", marginTop: 2, width: "100%"}}>
         <CircularProgress />
       </Box>
+        )}
     </div>
   );
-};
+}
 
 
 async function getReview(comment_id) {
@@ -603,7 +604,7 @@ async function getReview(comment_id) {
   repliceCount = repliceCount.data.count;
 
   if (repliceCount !== 0) {
-    const repliceList = await CallApiWithToken(`/replies/get/by_comment`, "POST", {
+    const repliceList = await CallApiWithToken("/replies/get/by_comment", "POST", {
       comment_id,
       start: 0,
       end: repliceCount
@@ -634,14 +635,14 @@ async function getReview(comment_id) {
 }
 
 async function getReviews(comment_id_list) {
-    let comments = [];
-    for (let i = 0; i < comment_id_list.length; i++) {
-        const comment = await getReview(comment_id_list[i]);
-        if (comment !== null) {
-          comments.push(comment);
-        }
+  let comments = [];
+  for (let i = 0; i < comment_id_list.length; i++) {
+    const comment = await getReview(comment_id_list[i]);
+    if (comment !== null) {
+      comments.push(comment);
     }
-    return comments;
+  }
+  return comments;
 }
 
 Review.propTypes = {

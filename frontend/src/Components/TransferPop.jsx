@@ -6,7 +6,7 @@ import {Context, NotificationType, useContext} from "../context.js";
 import {LoadingButton} from "@mui/lab";
 
 function TransforPop(props) {
-  const {setter, getter} = useContext(Context);
+  const {setter} = useContext(Context);
   const [transferTarget, setTansferTarget] = React.useState("");
   const [transferid, setTransgerId] = React.useState("");
   const [loading, setLoading] = React.useState(false);

@@ -11,7 +11,7 @@ import Review from "./RestaurantPages/Review";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
-import {CallApi, CallApiWithToken} from "../CallApi";
+import {CallApi} from "../CallApi";
 
 function Restaurant(props) {
   const {restaurantId} = useParams();
@@ -34,7 +34,7 @@ function Restaurant(props) {
       } else {
         navigate("/");
       }
-    })
+    });
   }, [restaurantId]);
   const handleAlignment = (event, newAlignment) => {
     if (newAlignment !== null) {
@@ -79,7 +79,7 @@ function Restaurant(props) {
         >
           <Grid item>
             <Typography variant="h2" fontFamily="Helvetica" fontWeight="400">
-                {data.name}
+              {data.name}
             </Typography>
           </Grid>
           <Grid item>
@@ -87,7 +87,7 @@ function Restaurant(props) {
           </Grid>
           <Grid item>
             <Typography variant="h6" fontFamily="Helvetica" fontWeight="400">
-                {data.rating} ({data.comment_count}+ Reviews)
+              {data.rating} ({data.comment_count}+ Reviews)
             </Typography>
           </Grid>
           <Grid item>

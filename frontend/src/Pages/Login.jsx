@@ -9,11 +9,10 @@ import {LoadingButton} from "@mui/lab";
 
 function Login() {
   useEffect(() => {
-    document.title = 'Login';
+    document.title = "Login";
   }, []);
   // eslint-disable-next-line no-unused-vars
-  const {getter, setter} = useContext(Context);
-  const navigate = useNavigate();
+  const {setter} = useContext(Context);
   const [loading, setLoading] = React.useState(false);
   const submit = (form) => {
     setLoading(true);

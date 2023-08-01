@@ -10,7 +10,7 @@ import {LoadingButton} from "@mui/lab";
 
 function Register() {
   useEffect(() => {
-    document.title = 'Register';
+    document.title = "Register";
   }, []);
   // eslint-disable-next-line no-unused-vars
   const {setter, getter} = useContext(Context);

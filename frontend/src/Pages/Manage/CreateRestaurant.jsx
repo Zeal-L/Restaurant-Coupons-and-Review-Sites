@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useRef, useState} from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import {useNavigate} from "react-router-dom";
 import {
   Box,
@@ -19,7 +19,7 @@ import {
   Link
 } from "@mui/material";
 import {createSvgIcon} from "@mui/material/utils";
-import { NumericFormat } from 'react-number-format';
+import { NumericFormat } from "react-number-format";
 import MenuCard from "../../Components/menuCard";
 import {Context, NotificationType, useContext} from "../../context.js";
 import {styles} from "../../styles.js";
@@ -37,7 +37,7 @@ const PlusIcon = createSvgIcon(
   </svg>,
   "Plus",
 );
-const steps = ['Edit restaurant information', 'Edit restaurant menu'];
+const steps = ["Edit restaurant information", "Edit restaurant menu"];
 function TabPanel(props) {
   const {children, value, index, ...other} = props;
 
@@ -100,42 +100,42 @@ function CreateRestaurant() {
   const [editMenu, setEditMenu] = useState({});
   const [restaurantImgUrl, setRestaurantImgUrl] = useState("");
   const [menuImgUrl, setMenuImgUrl] = useState("");
-  const [restaurantId, setRestaurantId] = useState("")
-  const [forceRender, setForceRender] = useState(false)
-  const [restaurantInfo, setRestaurantInfo] = useState({})
+  const [restaurantId, setRestaurantId] = useState("");
+  const [forceRender, setForceRender] = useState(false);
+  const [restaurantInfo, setRestaurantInfo] = useState({});
   const formRef = useRef(null);
 
   const queryMenuList = (id) => {
     CallApi(`/dishes/get/by_restaurant/${id}`, "GET").then((ress) => {
       if(ress.status === 200) {
         const ids = ress.data.dish_ids;
-        setMenuList(ids)
-        setForceRender(!forceRender)
+        setMenuList(ids);
+        setForceRender(!forceRender);
       }
-    })
-  }
+    });
+  };
 
   useEffect(() => {
     CallApiWithToken("/restaurants/get/by_token", "GET").then((res) => {
       if (res.status === 200) {
-        setRestaurantId(res.data.restaurant_id)
-        queryMenuList(res.data.restaurant_id)
-        setRestaurantInfo(res.data)
-        setRestaurantImgUrl(`data:image/png;base64,${res.data.image}`)
+        setRestaurantId(res.data.restaurant_id);
+        queryMenuList(res.data.restaurant_id);
+        setRestaurantInfo(res.data);
+        setRestaurantImgUrl(`data:image/png;base64,${res.data.image}`);
       }
-    })
-  }, [])
+    });
+  }, []);
 
   const submit = () => {
     const name = formRef.current.name.value;
     const address = formRef.current.address.value;
     const image = restaurantImgUrl.replace(/^data:image\/[a-z]+;base64,/, "");
     if (restaurantId) {
-      CallApiWithToken(`/restaurants/reset/address/${address}`, "PUT")
-      CallApiWithToken(`/restaurants/reset/image`, "PUT", {
+      CallApiWithToken(`/restaurants/reset/address/${address}`, "PUT");
+      CallApiWithToken("/restaurants/reset/image", "PUT", {
         base64: image
-      })
-      CallApiWithToken(`/restaurants/reset/name/${name}`, "PUT")
+      });
+      CallApiWithToken(`/restaurants/reset/name/${name}`, "PUT");
       setter.showNotification("edit Success!", NotificationType.Success);
     } else {
       if (name && address && image) {
@@ -149,7 +149,7 @@ function CreateRestaurant() {
           } else {
             setter.showNotification(res.data.message, NotificationType.Error);
           }
-        })
+        });
       } else {
         setter.showNotification("Incomplete information!", NotificationType.Error);
       }
@@ -162,31 +162,31 @@ function CreateRestaurant() {
     if (isAdd) {
       CallApiWithToken("/dishes/new", "POST", {
         name: form.target.name.value,
-        price: parseFloat(form.target.price.value.replace('$', '')),
+        price: parseFloat(form.target.price.value.replace("$", "")),
         description: form.target.description.value,
         image: menuImgUrl.replace(/^data:image\/[a-z]+;base64,/, ""),
       }).then((res) => {
         if (res.status === 200) {
-          setter.showNotification('Success!', NotificationType.Success);
-          queryMenuList(restaurantId)
+          setter.showNotification("Success!", NotificationType.Success);
+          queryMenuList(restaurantId);
         } else {
           setter.showNotification(res.data.message, NotificationType.Error);
         }
-      })
+      });
     } else {
       CallApiWithToken(`/dishes/reset/info/${editMenu.dish_id}`, "PUT", {
         name: form.target.name.value,
-        price: parseFloat(form.target.price.value.replace('$', '')),
+        price: parseFloat(form.target.price.value.replace("$", "")),
         description: form.target.description.value,
         image: menuImgUrl.replace(/^data:image\/[a-z]+;base64,/, ""),
       }).then((res) => {
         if (res.status === 200) {
-          setter.showNotification('Success!', NotificationType.Success);
-          queryMenuList(restaurantId)
+          setter.showNotification("Success!", NotificationType.Success);
+          queryMenuList(restaurantId);
         } else {
           setter.showNotification(res.data.message, NotificationType.Error);
         }
-      })
+      });
     }
     setUpdateMenuVis(false);
   };
@@ -201,7 +201,7 @@ function CreateRestaurant() {
       };
       fr.readAsDataURL(files[0]);
     }
-  }
+  };
 
   const handleMenuImageChange = (e) => {
     let files = e.target.files;
@@ -218,9 +218,9 @@ function CreateRestaurant() {
   const onDelete = (id, index) => {
     CallApiWithToken(`/dishes/delete/by_id/${id}`, "DELETE").then((res) => {
       if (res.status === 200) {
-        queryMenuList(restaurantId)
+        queryMenuList(restaurantId);
       }
-    })
+    });
   };
 
   const modalStyle = {
@@ -253,11 +253,11 @@ function CreateRestaurant() {
       const address = formRef.current.address.value;
       const image = restaurantImgUrl.replace(/^data:image\/[a-z]+;base64,/, "");
       if (restaurantId && name && address && image) {
-        CallApiWithToken(`/restaurants/reset/address/${address}`, "PUT")
-        CallApiWithToken(`/restaurants/reset/image`, "PUT", {
+        CallApiWithToken(`/restaurants/reset/address/${address}`, "PUT");
+        CallApiWithToken("/restaurants/reset/image", "PUT", {
           base64: image
-        })
-        CallApiWithToken(`/restaurants/reset/name/${name}`, "PUT")
+        });
+        CallApiWithToken(`/restaurants/reset/name/${name}`, "PUT");
         setter.showNotification("edit Success!", NotificationType.Success);
         let newSkipped = skipped;
         if (isStepSkipped(activeStep)) {
@@ -275,7 +275,7 @@ function CreateRestaurant() {
           }).then((res) => {
             if (res.status === 200) {
               setter.showNotification("Create Success!", NotificationType.Success);
-              setRestaurantId(res.data.restaurant_id)
+              setRestaurantId(res.data.restaurant_id);
               let newSkipped = skipped;
               if (isStepSkipped(activeStep)) {
                 newSkipped = new Set(newSkipped.values());
@@ -286,7 +286,7 @@ function CreateRestaurant() {
             } else {
               setter.showNotification(res.data.message, NotificationType.Error);
             }
-          })
+          });
         } else {
           setter.showNotification("Incomplete information!", NotificationType.Error);
         }
@@ -300,7 +300,7 @@ function CreateRestaurant() {
   
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
       setSkipped(newSkipped);
-      setter.setCurrentUserRestaurantId(restaurantId)
+      setter.setCurrentUserRestaurantId(restaurantId);
     }
   };
 
@@ -326,7 +326,7 @@ function CreateRestaurant() {
   const handleReset = () => {
     setActiveStep(0);
   };
-  console.log(menuImgUrl)
+  console.log(menuImgUrl);
   return (
     <Fragment>
       <Grid container direction="column" alignItems="center" justifyContent="center" style={{minHeight: "100vh"}}>
@@ -334,7 +334,7 @@ function CreateRestaurant() {
           <Card variant="outlined" sx={{maxWidth: 600, backgroundColor: "rgb(255, 243, 209)", minWidth: 600}}>
             <CardContent>
               <h2 style={{display: "flex", justifyContent: "center", marginTop: "0"}}>Create Your Restaurant</h2>
-              <Box sx={{ width: '100%' }}>
+              <Box sx={{ width: "100%" }}>
                 <Stepper activeStep={activeStep}>
                   {steps.map((label, index) => {
                     const stepProps = {};
@@ -355,8 +355,8 @@ function CreateRestaurant() {
                       <br />
                       Click <Link href={`/restaurant/${restaurantId}`}>here</Link> to view your restaurant.
                     </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                      <Box sx={{ flex: '1 1 auto' }} />
+                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                      <Box sx={{ flex: "1 1 auto" }} />
                       <Button onClick={handleReset}>Re edit</Button>
                     </Box>
                   </React.Fragment>
@@ -364,125 +364,126 @@ function CreateRestaurant() {
                   <React.Fragment>
                     {
                       activeStep === 0 ? <>
-                      <Grid container direction="row" sx={{marginBottom: "10px", justifyContent: "center"}}>
-                        <Grid item xs={7} sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>
-                          <form onSubmit={submit} ref={formRef}>
-                            <Grid container direction="column" justifyContent="center" spacing={2}>
-                              <Grid item alignItems="center">
-                                <TextField
-                                  key={restaurantInfo.name}
-                                  id="name"
-                                  label="Restaurant Name"
-                                  variant="outlined"
-                                  name="name"
-                                  sx={styles.sameWidth}
-                                  required
-                                  defaultValue={restaurantInfo.name}
-                                />
+                        <Grid container direction="row" sx={{marginBottom: "10px", justifyContent: "center"}}>
+                          <Grid item xs={7} sx={{display: "flex", justifyContent: "center", paddingTop: "10px"}}>
+                            <form onSubmit={submit} ref={formRef}>
+                              <Grid container direction="column" justifyContent="center" spacing={2}>
+                                <Grid item alignItems="center">
+                                  <TextField
+                                    key={restaurantInfo.name}
+                                    id="name"
+                                    label="Restaurant Name"
+                                    variant="outlined"
+                                    name="name"
+                                    sx={styles.sameWidth}
+                                    required
+                                    defaultValue={restaurantInfo.name}
+                                  />
+                                </Grid>
+                                <Grid item>
+                                  <TextField
+                                    key={restaurantInfo.address}
+                                    id="address"
+                                    label="Restaurant Address"
+                                    multiline
+                                    rows={4}
+                                    sx={styles.sameWidth}
+                                    required
+                                    defaultValue={restaurantInfo.address}
+                                  />
+                                </Grid>
                               </Grid>
-                              <Grid item>
-                                <TextField
-                                  key={restaurantInfo.address}
-                                  id="address"
-                                  label="Restaurant Address"
-                                  multiline
-                                  rows={4}
-                                  sx={styles.sameWidth}
-                                  required
-                                  defaultValue={restaurantInfo.address}
-                                />
-                              </Grid>
-                            </Grid>
-                          </form>
-                        </Grid>
-                        <Grid item xs={5}>
-                          <Button
-                            component="label"
-                            name="thumbnail-upload-input"
-                            fullWidth
-                          >
-                            {restaurantImgUrl === "" || restaurantImgUrl === undefined
-                              ? (
-                                <Box
-                                  sx={{
-                                    width: "100%",
-                                    height: "100%",
-                                    paddingTop: "100%",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    bgcolor: "grey.300",
-                                    color: "grey.600",
-                                    borderRadius: "4px",
-                                  }}
-                                >
-                                  <PlusIcon
+                            </form>
+                          </Grid>
+                          <Grid item xs={5}>
+                            <Button
+                              component="label"
+                              name="thumbnail-upload-input"
+                              fullWidth
+                            >
+                              {restaurantImgUrl === "" || restaurantImgUrl === undefined
+                                ? (
+                                  <Box
                                     sx={{
-                                      position: "absolute",
-                                      top: "50%",
-                                      left: "50%",
-                                      transform: "translate(-50%, -50%)",
+                                      width: "100%",
+                                      height: "100%",
+                                      paddingTop: "100%",
+                                      display: "flex",
+                                      justifyContent: "center",
+                                      alignItems: "center",
+                                      bgcolor: "grey.300",
                                       color: "grey.600",
+                                      borderRadius: "4px",
+                                    }}
+                                  >
+                                    <PlusIcon
+                                      sx={{
+                                        position: "absolute",
+                                        top: "50%",
+                                        left: "50%",
+                                        transform: "translate(-50%, -50%)",
+                                        color: "grey.600",
+                                      }}
+                                    />
+                                  </Box>
+                                )
+                                : (
+                                  <img style={{width: "auto", height: "auto", maxWidth: "100%", maxHeight: "100%"}}
+                                    src={restaurantImgUrl} alt="thumbnail"/>
+                                )}
+                              <input hidden accept="image/*" type="file" onChange={uploadFileHandle}/>
+                            </Button>
+                          </Grid>
+                        </Grid>
+                      </> : <>
+                        <Grid container>
+                          <Box sx={{width: "100%"}}>
+                            <Box sx={{borderBottom: 1, borderColor: "divider"}}>
+                              <Tabs value={0} aria-label="basic tabs example">
+                                <Tab label="MENU" id="simple-tab-0" aria-controls="simple-tabpanel-0"/>
+                                <div style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  flexDirection: "column",
+                                  cursor: "pointer",
+                                  marginLeft: "20px"
+                                }}>
+                                  <Tooltip title="add menu"><PlusIcon onClick={() => {
+                                    setUpdateMenuVis(true);
+                                    setIsAdd(true);
+                                    setMenuImgUrl("");
+                                  }}/></Tooltip>
+                                </div>
+                              </Tabs>
+                            </Box>
+                            <TabPanel value={0} index={0} style={{overflow: "auto", maxHeight: 250}}>
+                              {
+                                menuList.map((id, index) => (
+                                  <MenuCard
+                                    key={id}
+                                    forceRender={forceRender}
+                                    id={id}
+                                    onDelete={() => onDelete(id, index)}
+                                    onEdit={() => {
+                                      setIsAdd(false);
+                                      // setUpdateMenuVis(true);
+                                      CallApi(`/dishes/get/by_id/${id}`, "GET").then((res) => {
+                                        if (res.status === 200) {
+                                          setEditMenu(res.data);
+                                          setMenuImgUrl(res.data.image);
+                                          setUpdateMenuVis(true);
+                                        }
+                                      });
                                     }}
                                   />
-                                </Box>
-                              )
-                              : (
-                                <img style={{width: "auto", height: "auto", maxWidth: "100%", maxHeight: "100%"}}
-                                  src={restaurantImgUrl} alt="thumbnail"/>
-                              )}
-                            <input hidden accept="image/*" type="file" onChange={uploadFileHandle}/>
-                          </Button>
-                        </Grid>
-                      </Grid>
-                      </> : <>
-                      <Grid container>
-                        <Box sx={{width: "100%"}}>
-                          <Box sx={{borderBottom: 1, borderColor: "divider"}}>
-                            <Tabs value={0} aria-label="basic tabs example">
-                              <Tab label="MENU" id="simple-tab-0" aria-controls="simple-tabpanel-0"/>
-                              <div style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                flexDirection: "column",
-                                cursor: "pointer",
-                                marginLeft: "20px"
-                              }}>
-                                <Tooltip title="add menu"><PlusIcon onClick={() => {
-                                  setUpdateMenuVis(true);
-                                  setIsAdd(true);
-                                  setMenuImgUrl("");
-                                }}/></Tooltip>
-                              </div>
-                            </Tabs>
+                                ))
+                              }
+                            </TabPanel>
                           </Box>
-                          <TabPanel value={0} index={0} style={{overflow: "auto", maxHeight: 250}}>
-                            {
-                              menuList.map((id, index) => (
-                                <MenuCard
-                                  forceRender={forceRender}
-                                  id={id}
-                                  onDelete={() => onDelete(id, index)}
-                                  onEdit={() => {
-                                    setIsAdd(false);
-                                    // setUpdateMenuVis(true);
-                                    CallApi(`/dishes/get/by_id/${id}`, "GET").then((res) => {
-                                      if (res.status === 200) {
-                                        setEditMenu(res.data)
-                                        setMenuImgUrl(res.data.image);
-                                        setUpdateMenuVis(true);
-                                      }
-                                    })
-                                  }}
-                                />
-                              ))
-                            }
-                          </TabPanel>
-                        </Box>
-                      </Grid>
+                        </Grid>
                       </>
                     }
-                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                       <Button
                         color="inherit"
                         disabled={activeStep === 0}
@@ -491,7 +492,7 @@ function CreateRestaurant() {
                       >
                         Back
                       </Button>
-                      <Box sx={{ flex: '1 1 auto' }} />
+                      <Box sx={{ flex: "1 1 auto" }} />
                       {isStepOptional(activeStep) && (
                         <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
                           Skip
@@ -499,7 +500,7 @@ function CreateRestaurant() {
                       )}
 
                       <Button onClick={handleNext}>
-                        {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                        {activeStep === steps.length - 1 ? "Finish" : "Next"}
                       </Button>
                     </Box>
                   </React.Fragment>
@@ -593,7 +594,7 @@ function CreateRestaurant() {
                         <img style={{width: "auto", height: "auto", maxWidth: "100%", maxHeight: "100%"}}
                           // src={menuImgUrl.includes(/^data:image\/[a-z]+;base64,/) ? menuImgUrl : `data:image/png;base64,${menuImgUrl}`}
                           src={menuImgUrl}
-                         alt="thumbnail"/>
+                          alt="thumbnail"/>
                       )}
                     <input hidden accept="image/*" type="file" onChange={handleMenuImageChange}/>
                   </Button>

@@ -35,9 +35,8 @@ import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import EditIcon from "@mui/icons-material/Edit";
-import {useParams} from "react-router-dom";
 import PropTypes from "prop-types";
-import {CallApi, CallApiWithToken} from "../../CallApi";
+import {CallApiWithToken} from "../../CallApi";
 import {Context, NotificationType} from "../../context";
 
 function VoucherRest(props) {
@@ -54,22 +53,23 @@ function VoucherRest(props) {
       } else {
         setIsOwner(false);
       }
-    })
-  }, []);
-  const {getter, setter} = useContext(Context);
-  React.useEffect(() => {
-    CallApiWithToken("/vouchers/get/template/by_restaurant/" + restaurantId, "GET").then((res) => {
-        if (res.status === 200) {
-            setMenuItems(res.data.info);
-            console.log(res.data.info);
-        } else {
-          setter.showNotification(res.data.message, NotificationType.Error);
-        }
     });
   }, []);
+  const {setter} = useContext(Context);
+  React.useEffect(() => {
+    CallApiWithToken("/vouchers/get/template/by_restaurant/" + restaurantId, "GET").then((res) => {
+      if (res.status === 200) {
+        setMenuItems(res.data.info.filter((item) => item.remain_amount > 0));
+        console.log(res.data.info);
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
+  }, []);
+
   const addVoucher = (voucher) => {
     setMenuItems([...menuItems, voucher]);
-  }
+  };
   return (
     <>
       <Grid
@@ -95,7 +95,21 @@ function VoucherRest(props) {
                 }}>
                   <EditIcon color="white"/>
                 </IconButton>
-                <IconButton sx={{position: "relative"}} id="iconButtonS">
+                <IconButton sx={{position: "relative"}} id="iconButtonS" onClick={() => {
+                  // /vouchers/reset/template
+                  const remain_amount = 0;
+                  const total_amount = item.total_amount - item.remain_amount;
+                  CallApiWithToken("/vouchers/reset/template", "PUT",
+                    {template_id: item.template_id, remain_amount, total_amount})
+                    .then((res) => {
+                      if (res.status === 200) {
+                        setter.showNotification("Reset voucher successfully", NotificationType.Success);
+                        setMenuItems(menuItems.filter((i) => i.template_id !== item.template_id));
+                      } else {
+                        setter.showNotification(res.data.message, NotificationType.Error);
+                      }
+                  });
+                }}>
                   <DeleteIcon color="white"/>
                 </IconButton>
               </>
@@ -201,7 +215,7 @@ const options = {
 
 VoucherRest.propTypes = {
   id : PropTypes.string.isRequired
-}
+};
 
 const keys = ["Free", "CFree", "Fixed_Amount", "Percentage"];
 
@@ -310,14 +324,14 @@ function VoucherDialog(props) {
         </LocalizationProvider>
 
         <FormControlLabel control={<Switch checked={props.isAutoRelease}
-                                           disabled={props.editable === false}
-                                           onClick={(event) => {
-          props.setIsAutoRelease(event.target.checked);
-        }}/>} label="Auto Release" sx={{marginLeft: 1}}/>
+          disabled={props.editable === false}
+          onClick={(event) => {
+            props.setIsAutoRelease(event.target.checked);
+          }}/>} label="Auto Release" sx={{marginLeft: 1}}/>
         <FormControlLabel control={<Switch checked={props.Shareable}
-                                           onClick={(event) => {
-          props.setShareable(event.target.checked);
-        }}/>} label="is Shareable" sx={{marginLeft: 1}}/>
+          onClick={(event) => {
+            props.setShareable(event.target.checked);
+          }}/>} label="is Shareable" sx={{marginLeft: 1}}/>
         {props.isAutoRelease &&
           <>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -398,7 +412,7 @@ function VoucherDialog(props) {
                 <Box component="form" sx={{display: "flex", flexWrap: "wrap"}}>
                   <FormControl sx={{m: 1, minWidth: 120}}>
                     <TextField label="days" type="number"
-                     disabled={props.editable === false}
+                      disabled={props.editable === false}
                       value={ReleasePeriodDay}
                       onChange={(e) => {
                         if (e.target.value < 0) {
@@ -424,7 +438,7 @@ function VoucherDialog(props) {
                       }}
                     >
                       {Array.from(Array(24).keys()).map((i) => {
-                        return <option value={i}>{i}</option>;
+                        return <option key={i} value={i}>{i}</option>;
                       })}
                     </Select>
                   </FormControl>
@@ -442,7 +456,7 @@ function VoucherDialog(props) {
                       }}
                     >
                       {Array.from(Array(60).keys()).map((i) => {
-                        return <option value={i}>{i}</option>;
+                        return <option key={i} value={i}>{i}</option>;
                       })}
                     </Select>
                   </FormControl>
@@ -484,7 +498,7 @@ function VoucherDialog(props) {
 }
 
 function CreateVoucher(props) {
-  const {getter, setter} = useContext(Context);
+  const {setter} = useContext(Context);
   const [selectedOption, setSelectedOption] = useState("Free");
   const [condition, setCondition] = useState(options[selectedOption].defV.condition);
   const [discount, setDiscount] = useState(options[selectedOption].defV.discount);
@@ -525,14 +539,14 @@ function CreateVoucher(props) {
       expire: dayjs(expire).unix(),
       shareable: isShareable,
       total_amount: count,
-    }
+    };
     if (isAutoRelease) {
-        body.auto_release = {
-            amount: autoReleaseCount,
-            start_date: autoReleaseStart.unix(),
-            end_date: autoReleaseEnd.unix(),
-            interval: autoReleaseTimeRange,
-        }
+      body.auto_release = {
+        amount: autoReleaseCount,
+        start_date: autoReleaseStart.unix(),
+        end_date: autoReleaseEnd.unix(),
+        interval: autoReleaseTimeRange,
+      };
     }
     console.log(expire);
     console.log(expire.unix());
@@ -630,7 +644,7 @@ function CreateVoucher(props) {
 }
 
 function EditVoucher(props) {
-  const {getter, setter} = useContext(Context);
+  const {setter} = useContext(Context);
   const handleSubmit = () => {
     // TODO
     console.log(props.defV.remain_amount);
@@ -640,13 +654,13 @@ function EditVoucher(props) {
     const template_id = props.defV.template_id;
     const description = props.defV.description;
     CallApiWithToken("/vouchers/reset/template", "PUT", { template_id, remain_amount, shareable, description }).then((res) => {
-        if (res.status === 200) {
-            props.onClose();
-            setter.showNotification("success", NotificationType.Success);
-            console.log(res);
-        } else {
-            setter.showNotification(res.data.message, NotificationType.Error);
-        }
+      if (res.status === 200) {
+        props.onClose();
+        setter.showNotification("success", NotificationType.Success);
+        console.log(res);
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
     });
   };
 
@@ -687,18 +701,11 @@ function EditVoucher(props) {
       autoReleaseCount={props.defV.auto_release_info.amount !== null ? props.defV.auto_release_info.amount : 10}
       autoReleaseStart={props.defV.auto_release_info.amount !== null ? dayjs.unix(props.defV.auto_release_info.start_date) : dayjs()}
       autoReleaseEnd={props.defV.auto_release_info.amount !== null ? dayjs.unix(props.defV.auto_release_info.end_date) : dayjs.unix(props.defV.expire)}
-      setIsAutoRelease={(e) => {
-      }}
-      setAutoReleaseTimeRange={(e) => {
-      }}
-      setAutoReleaseCount={(e) => {
-      }}
-      setAutoReleaseStart={(e) => {
-      }
-      }
-      setAutoReleaseEnd={(e) => {
-      }
-    }
+      setIsAutoRelease={() => {}}
+      setAutoReleaseTimeRange={() => {}}
+      setAutoReleaseCount={() => {}}
+      setAutoReleaseStart={() => {}}
+      setAutoReleaseEnd={() => {}}
     >
       <Grid item key={props.defV.template_id}>
         <Voucher
