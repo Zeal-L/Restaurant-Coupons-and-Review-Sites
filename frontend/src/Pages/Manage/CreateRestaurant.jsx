@@ -1,7 +1,23 @@
 import React, {Fragment, useEffect, useRef, useState} from "react";
 import PropTypes from 'prop-types';
 import {useNavigate} from "react-router-dom";
-import { Box, Button, Card, CardContent, Grid, Modal, Tab, Tabs, TextField, Tooltip, Typography, Stepper, Step, StepLabel  } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  Modal,
+  Tab,
+  Tabs,
+  TextField,
+  Tooltip,
+  Typography,
+  Stepper,
+  Step,
+  StepLabel,
+  Link
+} from "@mui/material";
 import {createSvgIcon} from "@mui/material/utils";
 import { NumericFormat } from 'react-number-format';
 import MenuCard from "../../Components/menuCard";
@@ -336,6 +352,8 @@ function CreateRestaurant() {
                   <React.Fragment>
                     <Typography sx={{ mt: 2, mb: 1 }}>
                       Congratulations, your restaurant has been successfully created!
+                      <br />
+                      Click <Link href={`/restaurant/${restaurantId}`}>here</Link> to view your restaurant.
                     </Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
                       <Box sx={{ flex: '1 1 auto' }} />
@@ -573,7 +591,9 @@ function CreateRestaurant() {
                       )
                       : (
                         <img style={{width: "auto", height: "auto", maxWidth: "100%", maxHeight: "100%"}}
-                          src={menuImgUrl.includes('data:image/png;base64') ? menuImgUrl : `data:image/png;base64,${menuImgUrl}`} alt="thumbnail"/>
+                          // src={menuImgUrl.includes(/^data:image\/[a-z]+;base64,/) ? menuImgUrl : `data:image/png;base64,${menuImgUrl}`}
+                          src={menuImgUrl}
+                         alt="thumbnail"/>
                       )}
                     <input hidden accept="image/*" type="file" onChange={handleMenuImageChange}/>
                   </Button>
