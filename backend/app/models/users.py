@@ -150,7 +150,11 @@ class Users(db.Model):
             or restaurant_id not in self.favorite_restaurants
         ):
             return False
-        self.favorite_restaurants = self.favorite_restaurants.remove(restaurant_id)
+        
+        temp = self.favorite_restaurants.copy()
+        temp.remove(restaurant_id)
+        self.favorite_restaurants = temp
+
         db.session.commit()
         return True
 
