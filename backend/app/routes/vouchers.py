@@ -183,19 +183,19 @@ class NewVoucherTemplate(Resource):
 
         if not info.get("auto_release"):
             return {
-            "template_id": template_res.template_id,
-            "restaurant_id": template_res.restaurant_id,
-            "restaurant_name": template_res.restaurant.name,
-            "type": template_res.type,
-            "discount": template_res.discount,
-            "condition": template_res.condition,
-            "description": template_res.description,
-            "expire": template_res.expire,
-            "shareable": template_res.shareable,
-            "is_collected": False,
-            "remain_amount": template_res.remain_amount,
-            "total_amount": template_res.total_amount,
-            "auto_release_info": None,
+                "template_id": template_res.template_id,
+                "restaurant_id": template_res.restaurant_id,
+                "restaurant_name": template_res.restaurant.name,
+                "type": template_res.type,
+                "discount": template_res.discount,
+                "condition": template_res.condition,
+                "description": template_res.description,
+                "expire": template_res.expire,
+                "shareable": template_res.shareable,
+                "is_collected": False,
+                "remain_amount": template_res.remain_amount,
+                "total_amount": template_res.total_amount,
+                "auto_release_info": None,
             }, 200
 
         auto_release_res = services.vouchers.create_auto_release_voucher_v1(
@@ -394,28 +394,28 @@ class ResetTemplate(Resource):
         if template.restaurant.owner_id != user.user_id:
             return {"message": "Unauthorized"}, 401
 
-        if info.get("type"):
+        if "type" in info:
             template.set_type(info["type"])
 
-        if info.get("discount"):
+        if "discount" in info:
             template.set_discount(info["discount"])
 
-        if info.get("condition"):
+        if "condition" in info:
             template.set_condition(info["condition"])
 
-        if info.get("description"):
+        if "description" in info:
             template.set_description(info["description"])
 
-        if info.get("expire"):
+        if "expire" in info:
             template.set_expire(info["expire"])
 
-        if info.get("shareable"):
+        if "shareable" in info:
             template.set_shareable(info["shareable"])
 
-        if info.get("remain_amount"):
+        if "remain_amount" in info:
             template.set_remain_amount(info["remain_amount"])
 
-        if info.get("total_amount"):
+        if "total_amount" in info:
             template.set_total_amount(info["total_amount"])
 
         return {"message": "Success"}, 200
@@ -877,7 +877,9 @@ class GetVerifiedVoucherList(Resource):
 
         return {"info": info}, 200
 
+
 ############################################################
+
 
 @api.route("/get/verified_voucher_list/count/by_restaurant")
 @api.param(
