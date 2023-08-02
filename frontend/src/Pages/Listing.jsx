@@ -67,21 +67,21 @@ function Listing() {
   const [restaurantsList, setRestaurantsList] = useState([]);
   const [maxWidth, setMaxWidth] = useState(1051);
   const [width, setWidth] = useState();
-  const [cardStatus, forceRenderCard] = useState(false)
+  const [cardStatus, forceRenderCard] = useState(false);
   const [sortValue, setSortValue] = React.useState("default");
   const navigate = useNavigate();
   const [isAtBottom, setIsAtBottom] = useState(false);
-  const [pageNum, setPageNum] = useState(1)
+  const [pageNum, setPageNum] = useState(1);
 
   useEffect(() => {
     const div = scrollDivRef.current;
     if (div) {
-      div.addEventListener('scroll', handleScroll);
+      div.addEventListener("scroll", handleScroll);
     }
 
     return () => {
       if (div) {
-        div.removeEventListener('scroll', handleScroll);
+        div.removeEventListener("scroll", handleScroll);
       }
     };
   }, []);
@@ -90,8 +90,8 @@ function Listing() {
     const div = scrollDivRef.current;
     if (div) {
       const atBottom = div.scrollHeight - div.scrollTop - div.clientHeight < 1;
-      console.log('atBottom:', atBottom)
-      setIsAtBottom(atBottom)
+      console.log("atBottom:", atBottom);
+      setIsAtBottom(atBottom);
     }
   };
   // auto load
@@ -109,20 +109,20 @@ function Listing() {
       end: (num || pageNum) * 10
     }).then((res) => {
       if (res.status === 200) {
-        setRestaurantsList(res.data.Restaurants || [])
+        setRestaurantsList(res.data.Restaurants || []);
       }
-    })
-  }, [pageNum])
+    });
+  }, [pageNum]);
 
   useEffect(() => {
-    document.title = 'Listing';
-    getRestInfo()
+    document.title = "Listing";
+    getRestInfo();
   }, []);
 
   const handleSort = (event, data) => {
     setSortValue(data);
     if (data === "default") {
-      getRestInfo()
+      getRestInfo();
     } else if (data === "rate") {
       CallApi("/restaurants/get/list/by_rating", "POST", {
         ascending_order: true,
@@ -130,9 +130,9 @@ function Listing() {
         end: 10
       }).then((res) => {
         if (res.status === 200) {
-          setRestaurantsList(res.data.Restaurants || [])
+          setRestaurantsList(res.data.Restaurants || []);
         }
-      })
+      });
     }
   };
 
@@ -162,18 +162,18 @@ function Listing() {
 
   // collect/delete collect
   const collect = (type, id) => {
-    if (type === 'collect') {
+    if (type === "collect") {
       CallApiWithToken(`/users/favorites/add/${id}`, "POST").then((res) => {
         if (res.status === 200) {
-          forceRenderCard(!cardStatus)
+          forceRenderCard(!cardStatus);
         }
-      })
+      });
     } else {
       CallApiWithToken(`/users/favorites/remove/${id}`, "DELETE").then((res) => {
         if (res.status === 200) {
-          forceRenderCard(!cardStatus)
+          forceRenderCard(!cardStatus);
         }
-      })
+      });
     }
   };
 
@@ -201,9 +201,9 @@ function Listing() {
       end: 10
     }).then((res) => {
       if (res.status === 200) {
-        setRestaurantsList(res.data.Restaurants || [])
+        setRestaurantsList(res.data.Restaurants || []);
       }
-    })
+    });
   }, 800);
 
   const sortBoxStyle = {

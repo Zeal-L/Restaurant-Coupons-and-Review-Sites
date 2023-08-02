@@ -14,7 +14,7 @@ import Listing from "./Pages/Listing";
 import VoucherUse from "./Pages/VoucherUse";
 import Profile from "./Pages/Profile";
 import {createTheme, ThemeProvider} from "@mui/material";
-import {EMailVerification, ResetPassword} from "./Pages/FindPassword";
+import {EMailVerification} from "./Pages/FindPassword";
 import Collect from "./Pages/Collect";
 
 function App() {
@@ -27,6 +27,7 @@ function App() {
   const [login, setLogin] = React.useState(initialValue.login);
   const [listings, setListings] = React.useState(initialValue.listing);
   const [listShow, setListShow] = React.useState(initialValue.listingShow);
+  const [currentUserRestaurantId, setCurrentUserRestaurantId] = React.useState("");
 
   function showNotification(content, type) {
     setNotificationPopMessage(content);
@@ -42,7 +43,8 @@ function App() {
     notificationType,
     login,
     listings,
-    listShow
+    listShow,
+    currentUserRestaurantId
   };
   const setter = {
     setPopOpen,
@@ -53,7 +55,8 @@ function App() {
     setLogin,
     setListings,
     setListShow,
-    showNotification
+    showNotification,
+    setCurrentUserRestaurantId
   };
 
   const theme = createTheme({
@@ -73,7 +76,7 @@ function App() {
           <Route path="login" element={<Login/>}/>
           <Route path="register" element={<Register/>}/>
           <Route path="/findPassword/identity" element={<EMailVerification/>}/>
-          <Route path="/findPassword/reset" element={<ResetPassword/>}/>
+          {/*<Route path="/findPassword/reset" element={<ResetPassword/>}/>*/}
           <Route path="/manage/voucher" element={<VoucherVerify/>}/>
           <Route path="/restaurant/:restaurantId" element={<Restaurant subPage="Menu"/>}/>
           <Route path="/restaurant/:restaurantId/menu" element={<Restaurant subPage="Menu"/>}/>

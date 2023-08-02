@@ -16,7 +16,7 @@ export default function VoucherVerify() {
   const [popupId, setPopupId] = useState(-1);
   const [totalData, setTotalData] = useState(0);
 
-  useEffect(() => {
+  const loadHistory = () => {
     setLoading(true);
     const startIndex = (page.page-1) * page.pageSize;
     const endIndex = startIndex + page.pageSize;
@@ -29,7 +29,7 @@ export default function VoucherVerify() {
             userId: res.data.info[i].owner_id,
             time: Date(res.data.info[i].code_time * 1000),
             voucher: res.data.info[i].template_id
-          })
+          });
         }
         setData(data => [...data, ...NewData]);
       } else {
@@ -37,31 +37,36 @@ export default function VoucherVerify() {
       }
       setLoading(false);
     });
+  };
+
+  useEffect(() => {
+    loadHistory();
   }, []);
 
   useEffect(() => {
     // /vouchers/get/verified_voucher_list/count/by_restaurant
-    CallApiWithToken(`/vouchers/get/verified_voucher_list/count/by_restaurant`, "GET").then((res) => {
-        if (res.status === 200) {
-            setTotalData(res.data.count);
-            setTotalPages(Math.ceil(res.data.count / page.pageSize));
-        } else {
-            setter.showNotification(res.data.message, NotificationType.Error);
-        }
-    })
+    CallApiWithToken("/vouchers/get/verified_voucher_list/count/by_restaurant", "GET").then((res) => {
+      if (res.status === 200) {
+        setTotalData(res.data.count);
+        setTotalPages(Math.ceil(res.data.count / page.pageSize));
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
   }, [data]);
   const verify = () => {
     CallApiWithToken(`/vouchers/verify/${inputCode}`, "POST").then((res) => {
-        if (res.status === 200) {
-          setter.showNotification(res.data.message, NotificationType.Success);
-          setInputCode("");
-          setPopupId(res.data.template_id);
-          setPopupOpen(true);
-        } else {
-          setter.showNotification(res.data.message, NotificationType.Error);
-        }
-    })
-  }
+      if (res.status === 200) {
+        setter.showNotification(res.data.message, NotificationType.Success);
+        setInputCode("");
+        setPopupId(res.data.template_id);
+        setPopupOpen(true);
+        loadHistory();
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -77,7 +82,7 @@ export default function VoucherVerify() {
             userId: res.data.info[i].owner_id,
             time: Date(res.data.info[i].code_time * 1000),
             voucher: res.data.info[i].template_id
-          })
+          });
         }
         setData(NewData);
       } else {
@@ -130,7 +135,7 @@ export default function VoucherVerify() {
               onChange={(e) => setInputCode(e.target.value)}
             />
             <Button variant="text"
-                    onClick={verify}
+              onClick={verify}
             >Verify</Button>
           </Paper>
         </Grid>
@@ -141,7 +146,7 @@ export default function VoucherVerify() {
           columns={columns}
           loading={loading}
           pagination
-          rowCount={totalData} // 假设总共有1000条数据
+          rowCount={totalData}
           paginationMode="server"
           onPaginationModelChange={handlePageChange}
           paginationModel={page}

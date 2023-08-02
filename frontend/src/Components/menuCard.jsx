@@ -7,16 +7,16 @@ import { CallApi } from "../CallApi";
 
 function MenuCard(props) {
   const {onEdit, onDelete, id, forceRender} = props;
-  const [dishInfo, setDishInfo] = useState({})
-  const { name, price, image, description } = dishInfo
+  const [dishInfo, setDishInfo] = useState({});
+  const { name, price, image, description } = dishInfo;
 
   useEffect(() => {
     CallApi(`/dishes/get/by_id/${id}`, "GET").then((res) => {
       if (res.status === 200) {
-        setDishInfo(res.data)
+        setDishInfo(res.data);
       }
-    })
-  }, [forceRender])
+    });
+  }, [forceRender]);
 
   return (
     <Card sx={{width: 163, display: "inline-block", marginRight: "5px"}}>

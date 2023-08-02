@@ -10,8 +10,7 @@ function VoucherUse() {
   useEffect(() => {
     document.title = "Voucher";
   }, []);
-  const {getter, setter} = useContext(Context);
-  const [editPopOpen, setEditPopopen] = React.useState(false);
+  const {setter} = useContext(Context);
   const {voucherId} = useParams();
   //const [voucherList, setVoucherList] = React.useState([]);
   const [timeLeft, setTimeLeft] = React.useState(Date.now());
@@ -85,103 +84,103 @@ function VoucherUse() {
   };
   return (
     loading ? (
-        <Backdrop
-          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={loading}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     ) :
-    (<>
-      <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
-        <Grid item alignItems="center">
-          <Voucher
-            type={info.type}
-            condition={info.condition}
-            discount={info.discount}
-            expire={info.expire}
-            pop={false}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body2" style={descriptionStyle}>
-            This voucher is provided by{" "}
-            <Link
-              href={`/restaurant/${info.restaurant_id}`}
-              sx={linkStyle}
-            >
-              {info.restaurant_name}
-            </Link>
-            .
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body2" style={descriptionStyle}>
-            Discount is applicable only when you meet the following condition: {info.condition}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body2" style={descriptionStyle}>
-            This voucher will expire on {dayjs.unix(info.expire).format("DD/MM/YYYY")}.
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body2" style={{color: colors.grey[500]}}>
-            *{info.description}
-          </Typography>
-        </Grid>
-      </Grid>
-      {/*    show time as red and 加粗*/}
-      <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
-        <Grid item xs={12}>
-          <Typography variant="body2"
-                      sx={{...descriptionStyle, fontWeight: "bold", color: "red", fontSize: "36px"}}>
-            Time left: {getTime()}
-          </Typography>
-        </Grid>
-      </Grid>
-
-      <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
-        <Grid item xs={12}>
-          <Box sx={{bgcolor: "#f5f5f5", padding: "24px", borderRadius: "8px", textAlign: "center"}}>
-            <Typography variant="h4" sx={{fontWeight: "bold", color: "#333", mb: 2}}>
-              Voucher Code
-            </Typography>
-            <Typography variant="h3" sx={{fontWeight: "bold", color: "red"}}>
-              {code}
-            </Typography>
-            <Typography variant="body1" sx={{color: "#666", mt: 2}}>
-              Show this code to the staff to claim your voucher.
-            </Typography>
-          </Box>
-        </Grid>
-      </Grid>
-      {timeLeft <= 0 && (
+      (<>
         <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
+          <Grid item alignItems="center">
+            <Voucher
+              type={info.type}
+              condition={info.condition}
+              discount={info.discount}
+              expire={info.expire}
+              pop={false}
+            />
+          </Grid>
           <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              onClick={() => {
-                CallApiWithToken(`/vouchers/use/${voucherId}`, "POST").then((res) => {
-                  if (res.status === 200) {
-                    setCode(res.data.code);
-                    const expTime = new Date(res.data.code_time * 1000);
-                    setTimeLeft(expTime - Date.now());
-                  } else {
-                    setTimeLeft(new Date(0) - Date.now());
-                    setter.showNotification(res.data.message, NotificationType.Error);
-                  }
-                });
-              }}
-            >
-              Reacquire
-            </Button>
+            <Typography variant="body2" style={descriptionStyle}>
+            This voucher is provided by{" "}
+              <Link
+                href={`/restaurant/${info.restaurant_id}`}
+                sx={linkStyle}
+              >
+                {info.restaurant_name}
+              </Link>
+            .
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body2" style={descriptionStyle}>
+            Discount is applicable only when you meet the following condition: {info.condition}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body2" style={descriptionStyle}>
+            This voucher will expire on {dayjs.unix(info.expire).format("DD/MM/YYYY")}.
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body2" style={{color: colors.grey[500]}}>
+            *{info.description}
+            </Typography>
           </Grid>
         </Grid>
-      )}
-    </>)
+        {/*    show time as red and 加粗*/}
+        <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
+          <Grid item xs={12}>
+            <Typography variant="body2"
+              sx={{...descriptionStyle, fontWeight: "bold", color: "red", fontSize: "36px"}}>
+            Time left: {getTime()}
+            </Typography>
+          </Grid>
+        </Grid>
+
+        <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
+          <Grid item xs={12}>
+            <Box sx={{bgcolor: "#f5f5f5", padding: "24px", borderRadius: "8px", textAlign: "center"}}>
+              <Typography variant="h4" sx={{fontWeight: "bold", color: "#333", mb: 2}}>
+              Voucher Code
+              </Typography>
+              <Typography variant="h3" sx={{fontWeight: "bold", color: "red"}}>
+                {code}
+              </Typography>
+              <Typography variant="body1" sx={{color: "#666", mt: 2}}>
+              Show this code to the staff to claim your voucher.
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
+        {timeLeft <= 0 && (
+          <Grid container justifyContent="center" alignItems="center" spacing={2} sx={{padding: "24px"}}>
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={() => {
+                  CallApiWithToken(`/vouchers/use/${voucherId}`, "POST").then((res) => {
+                    if (res.status === 200) {
+                      setCode(res.data.code);
+                      const expTime = new Date(res.data.code_time * 1000);
+                      setTimeLeft(expTime - Date.now());
+                    } else {
+                      setTimeLeft(new Date(0) - Date.now());
+                      setter.showNotification(res.data.message, NotificationType.Error);
+                    }
+                  });
+                }}
+              >
+              Reacquire
+              </Button>
+            </Grid>
+          </Grid>
+        )}
+      </>)
   );
 }
 

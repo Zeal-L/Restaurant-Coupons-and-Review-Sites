@@ -79,7 +79,7 @@ def invalid_token_callback(error):
     return (
         jsonify(
             {
-                "message": f"Signature verification failed.\n{error}",
+                "message": error,
             }
         ),
         401,
@@ -91,7 +91,7 @@ def missing_token_callback(error):
     return (
         jsonify(
             {
-                "message": f"Request does not contain an access token.\n{error}",
+                "message": error,
             }
         ),
         401,
@@ -111,7 +111,7 @@ def token_not_fresh_callback():
 
 
 @jwt.revoked_token_loader
-def revoked_token_callback():
+def revoked_token_callback(_jwt_header: dict, _jwt_payload: dict):
     return (
         jsonify(
             {

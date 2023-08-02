@@ -33,7 +33,7 @@ function ChangePasswordPop(props) {
     const data = {
       "old_password": oldPassword,   
       "new_password": password,
-    }
+    };
     CallApiWithToken("/users/reset/password/with_old_password", "PUT", data).then((res) => {
       if (res.status === 200) {
         props.setOpen(false);

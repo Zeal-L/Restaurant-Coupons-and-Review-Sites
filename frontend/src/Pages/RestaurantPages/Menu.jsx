@@ -23,7 +23,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import {TransitionUp} from "../../styles.js";
 import PropTypes from "prop-types";
-import {useParams} from "react-router-dom";
 import {CallApi, CallApiWithToken} from "../../CallApi";
 import {Context, NotificationType, useContext} from "../../context";
 import {LoadingButton} from "@mui/lab";
@@ -31,7 +30,7 @@ import {LoadingButton} from "@mui/lab";
 function Menu(props) {
   const restaurantId = props.id;
   const [menuItems, setMenuItems] = useState([]);
-  const {getter, setter} = useContext(Context);
+  const {setter} = useContext(Context);
   const [popImage, setPopImage] = React.useState("");
   const [popName, setPopName] = React.useState("");
   const [popPrice, setPopPrice] = React.useState(0);
@@ -45,33 +44,32 @@ function Menu(props) {
 
   React.useEffect(() => {
     CallApiWithToken("/restaurants/get/by_token", "GET").then((res) => {
-        if (res.status === 200) {
-          setIsOwner(res.data.restaurant_id.toString() === restaurantId);
-        } else {
-          setIsOwner(false);
-        }
-    })
+      if (res.status === 200) {
+        setIsOwner(res.data.restaurant_id.toString() === restaurantId);
+      } else {
+        setIsOwner(false);
+      }
+    });
   }, []);
 
   React.useEffect(() => {
     setMenuItems([]);
-    let mi = [];
     CallApi(`/dishes/get/by_restaurant/${restaurantId}`, "GET").then((res) => {
-        if (res.status === 200) {
-          const dish_ids = res.data.dish_ids;
-          for (let i = 0; i < dish_ids.length; i++) {
-            CallApi(`/dishes/get/by_id/${dish_ids[i]}`, "GET").then((res) => {
-              if (res.status === 200) {
-                console.log(res.data);
-                setMenuItems((prev) => [...prev, res.data]);
-              } else {
-                setter.showNotification(res.data.message, NotificationType.Error);
-              }
-            });
-          }
-        } else {
-          setter.showNotification(res.data.message, NotificationType.Error);
+      if (res.status === 200) {
+        const dish_ids = res.data.dish_ids;
+        for (let i = 0; i < dish_ids.length; i++) {
+          CallApi(`/dishes/get/by_id/${dish_ids[i]}`, "GET").then((res) => {
+            if (res.status === 200) {
+              console.log(res.data);
+              setMenuItems((prev) => [...prev, res.data]);
+            } else {
+              setter.showNotification(res.data.message, NotificationType.Error);
+            }
+          });
         }
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
     });
   }, []);
   const EditDish = (id, image, name, price, description) => {
@@ -93,17 +91,20 @@ function Menu(props) {
     });
   };
   const AddDish = (image, name, price, description) => {
-    setPopLoading(true)
+    setPopLoading(true);
     image = image.replace(/^data:image\/[a-z]+;base64,/, "");
     CallApiWithToken("/dishes/new", "POST", { image, name, price, description }).then((res) => {
       if (res.status === 200) {
         setter.showNotification(res.data.message, NotificationType.Success);
-        setMenuItems((prev) => [...prev, { image, name, price, description }]);
+
+        setMenuItems((prev) => [...prev, {
+          dish_id: res.data.dish_id,
+          image, name, price, description }]);
         setPopOpen(false);
       } else {
         setter.showNotification(res.data.message, NotificationType.Error);
       }
-      setPopLoading(false)
+      setPopLoading(false);
     });
   };
 
@@ -170,7 +171,7 @@ function Menu(props) {
               setPopName("");
               setPopPrice(0);
               setPopDescription("");
-                setPopType("Add Dish");
+              setPopType("Add Dish");
               setPopOpen(true);
             }}
           />
@@ -188,11 +189,11 @@ function Menu(props) {
             setDescription={setPopDescription}
             loading={popLoading}
             handleSubmit={() => {
-                if (popType === "Add Dish") {
-                    AddDish(popImage, popName, popPrice, popDescription);
-                } else {
-                    EditDish(popDishId, popImage, popName, popPrice, popDescription);
-                }
+              if (popType === "Add Dish") {
+                AddDish(popImage, popName, popPrice, popDescription);
+              } else {
+                EditDish(popDishId, popImage, popName, popPrice, popDescription);
+              }
             }}
           />
         </>
@@ -202,8 +203,8 @@ function Menu(props) {
 }
 
 Menu.propTypes = {
-    id: PropTypes.string.isRequired,
-}
+  id: PropTypes.string.isRequired,
+};
 
 const MenuDialog = (props) => {
   const updateImage = (e) => {
@@ -299,7 +300,7 @@ const MenuDialog = (props) => {
   );
 };
 
-MenuDialog.prototype = {
+MenuDialog.protoType = {
   open: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
   image: PropTypes.string.isRequired,

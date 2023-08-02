@@ -112,18 +112,44 @@ function Profile() {
                 </Grid>
                 <Grid item marginLeft="25px">
                   <EditForm label="Name" value={name} setValue={setName} saveValue={saveName}/>
+<<<<<<< HEAD
                 </Grid>
               </Grid>
               <Grid item container alignItems="center">
                 <Grid item marginLeft="30%">
                   <EmailIcon sx={{ fontSize: 30 }} color="white"/>
                 </Grid>
+=======
+                </Grid>
+              </Grid>
+                
+              <Grid item container alignItems="center">
+                <Grid item marginLeft="30%">
+                  <EmailIcon sx={{ fontSize: 30 }} color="white"/>
+                </Grid>
+>>>>>>> a93ae5e7644de23101715eaaca9b1c52fac45126
                 <Grid item marginLeft="22px">
                   <Typography>
                     {email}
                   </Typography>
                 </Grid>
               </Grid>
+<<<<<<< HEAD
+=======
+              {/* <Grid item container alignItems="center">
+                  <Grid item marginLeft="29.8%">
+                    <PersonIcon sx={{ fontSize: 32 }} color="white" />
+                  </Grid>
+                  <Grid item marginLeft="25px">
+                    <EditForm label="Gender" value={gender} setValue={setGender} saveValue={setGender}/>
+                  </Grid>
+                </Grid> */}
+              {/* <Grid item direction="column" marginTop="15px">
+                  <Button type="button" variant="contained"  sx={styles.sameWidth} onClick={() => {
+                      setEditPopopen(true)
+                  }}>Edit</Button>
+              </Grid> */}
+>>>>>>> a93ae5e7644de23101715eaaca9b1c52fac45126
               <Grid item direction="column" marginTop="15px">
                 <Button type="button" variant="contained" sx={styles.sameWidth} onClick={() => {
                   setChangePasswordOpen(true);

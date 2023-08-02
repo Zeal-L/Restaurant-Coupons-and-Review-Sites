@@ -90,7 +90,9 @@ class Comments(db.Model):
         if self.liked_by is None or user_id not in self.liked_by:
             return False
 
-        self.liked_by = self.liked_by.remove(user_id)
+        temp = self.liked_by.copy()
+        temp.remove(user_id)
+        self.liked_by = temp
         db.session.commit()
         return True
 
@@ -129,7 +131,10 @@ class Comments(db.Model):
         if self.disliked_by is None or user_id not in self.disliked_by:
             return False
 
-        self.disliked_by = self.disliked_by.remove(user_id)
+        temp = self.disliked_by.copy()
+        temp.remove(user_id)
+        self.disliked_by = temp
+
         db.session.commit()
         return True
 

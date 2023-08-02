@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Context, NotificationType, useContext} from "../context.js";
 import {useNavigate} from "react-router-dom";
 import {Button, Card, CardContent, Grid, Link, TextField} from "@mui/material";
@@ -8,7 +8,7 @@ import {LoadingButton} from "@mui/lab";
 import {CallApi} from "../CallApi";
 
 export function EMailVerification() {
-  const {getter, setter} = useContext(Context);
+  const {setter} = useContext(Context);
   const navigate = useNavigate();
   const [codeSent, setCodeSent] = React.useState(false);
   const [sended, setSended] = React.useState(false);
@@ -22,15 +22,13 @@ export function EMailVerification() {
     console.log(form.target.email.value);
     setLoading(true);
     form.preventDefault();
-    console.log(form.target.email.value);
-    const email = form.target.email.value;
     CallApi("/users/reset/password/send_reset_code/" + form.target.email.value, "PUT").then((res) => {
       if (res.status === 200) {
         setter.showNotification("Code sent.", NotificationType.Success);
       } else {
         setter.showNotification("Code sent failed.", NotificationType.Error);
       }
-        setLoading(false);
+      setLoading(false);
     });
   };
   const submit = (form) => {
@@ -40,14 +38,14 @@ export function EMailVerification() {
     const new_password = form.target.password.value;
     const reset_code = form.target.code.value;
     CallApi("/users/reset/password/verify_reset_code", "PUT", {email, new_password, reset_code}).then((res) => {
-        setLoading(false);
-        if (res.status === 200) {
-            setter.showNotification("Password reset success.", NotificationType.Success);
-            navigate("/login");
-        } else {
-            setter.showNotification(res.body, NotificationType.Error);
-        }
-    })
+      setLoading(false);
+      if (res.status === 200) {
+        setter.showNotification("Password reset success.", NotificationType.Success);
+        navigate("/login");
+      } else {
+        setter.showNotification(res.data.message, NotificationType.Error);
+      }
+    });
 
   };
 
@@ -77,10 +75,10 @@ export function EMailVerification() {
                 <Grid item>
                   <TextField id="email" label="Email" variant="outlined" type="Email" name="email"
                     disabled={codeSent}
-                   value={email}
+                    value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     sx={styles.sameWidth}
-                             required/>
+                    required/>
                 </Grid>
                 <Grid item>
                   <Button
@@ -103,8 +101,8 @@ export function EMailVerification() {
 
                 <Grid item>
                   <TextField id="password" label="New Password" variant="outlined" type="password" name="password"
-                             disabled={!sended}
-                             sx={styles.sameWidth} required/>
+                    disabled={!sended}
+                    sx={styles.sameWidth} required/>
                 </Grid>
 
                 <Grid item>
@@ -129,44 +127,44 @@ export function EMailVerification() {
   );
 }
 
-export function ResetPassword() {
-  useEffect(() => {
-    document.title = 'Reset Password';
-  }, []);
-  const {getter, setter} = useContext(Context);
-  const navigate = useNavigate();
-  const submit = (form) => {
-    form.preventDefault();
-    console.log(form.target.email.value);
-    console.log(form.target.password.value);
-  };
-  return (
-    <Grid container direction="column" alignItems="center" justifyContent="center" style={{minHeight: "100vh"}}>
-      <Grid item xs={3} sx={styles.sameColor}>
-        <Card variant="outlined" sx={{maxWidth: 345, backgroundColor: "rgb(255, 243, 209)"}}>
-          <CardContent>
-            <Grid container justifyContent="center">
-              <Logo style={{width: "200px", height: "200px"}}/>
-            </Grid>
-            <form onSubmit={submit}>
-              <Grid container direction="column" justifyContent="center" alignItems="center" spacing={2}>
-                <Grid item>
-                  <TextField id="password" label="Password" variant="outlined" type="Password" name="password"
-                    sx={styles.sameWidth} required/>
-                </Grid>
-                <Grid item>
-                  <TextField id="ConfirmPassword" label="Confirm Password" variant="outlined" type="Password"
-                    name="Confirm Password"
-                    sx={styles.sameWidth} required/>
-                </Grid>
-                <Grid item>
-                  <Button type="submit" variant="contained" sx={styles.sameWidth}>Submit</Button>
-                </Grid>
-              </Grid>
-            </form>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
-  );
-}
+// export function ResetPassword() {
+//   useEffect(() => {
+//     document.title = "Reset Password";
+//   }, []);
+//   const {getter, setter} = useContext(Context);
+//   const navigate = useNavigate();
+//   const submit = (form) => {
+//     form.preventDefault();
+//     console.log(form.target.email.value);
+//     console.log(form.target.password.value);
+//   };
+//   return (
+//     <Grid container direction="column" alignItems="center" justifyContent="center" style={{minHeight: "100vh"}}>
+//       <Grid item xs={3} sx={styles.sameColor}>
+//         <Card variant="outlined" sx={{maxWidth: 345, backgroundColor: "rgb(255, 243, 209)"}}>
+//           <CardContent>
+//             <Grid container justifyContent="center">
+//               <Logo style={{width: "200px", height: "200px"}}/>
+//             </Grid>
+//             <form onSubmit={submit}>
+//               <Grid container direction="column" justifyContent="center" alignItems="center" spacing={2}>
+//                 <Grid item>
+//                   <TextField id="password" label="Password" variant="outlined" type="Password" name="password"
+//                     sx={styles.sameWidth} required/>
+//                 </Grid>
+//                 <Grid item>
+//                   <TextField id="ConfirmPassword" label="Confirm Password" variant="outlined" type="Password"
+//                     name="Confirm Password"
+//                     sx={styles.sameWidth} required/>
+//                 </Grid>
+//                 <Grid item>
+//                   <Button type="submit" variant="contained" sx={styles.sameWidth}>Submit</Button>
+//                 </Grid>
+//               </Grid>
+//             </form>
+//           </CardContent>
+//         </Card>
+//       </Grid>
+//     </Grid>
+//   );
+// }
