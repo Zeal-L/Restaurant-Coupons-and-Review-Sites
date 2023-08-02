@@ -1,6 +1,5 @@
 import React, {useEffect} from "react";
 import {Context, NotificationType, useContext} from "../context.js";
-import {useNavigate} from "react-router-dom";
 import {Card, CardContent, Grid, Link, TextField} from "@mui/material";
 import {ReactComponent as Logo} from "../Resource/logo.svg";
 import {styles} from "../styles.js";

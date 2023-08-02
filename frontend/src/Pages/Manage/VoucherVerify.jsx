@@ -6,11 +6,10 @@ import {Context, NotificationType} from "../../context";
 import VoucherInfoPop from "../../Components/VoucherInfoPop";
 
 export default function VoucherVerify() {
-  const {getter, setter} = useContext(Context);
+  const {setter} = useContext(Context);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState({ page: 1, pageSize: 10 });
-  const [totalPages, setTotalPages] = useState(0);
   const [inputCode, setInputCode] = useState("");
   const [popupOpen, setPopupOpen] = useState(false);
   const [popupId, setPopupId] = useState(-1);
@@ -48,7 +47,7 @@ export default function VoucherVerify() {
     CallApiWithToken("/vouchers/get/verified_voucher_list/count/by_restaurant", "GET").then((res) => {
       if (res.status === 200) {
         setTotalData(res.data.count);
-        setTotalPages(Math.ceil(res.data.count / page.pageSize));
+        // setTotalPages(Math.ceil(res.data.count / page.pageSize));
       } else {
         setter.showNotification(res.data.message, NotificationType.Error);
       }
@@ -163,9 +162,4 @@ export default function VoucherVerify() {
       }
     </>
   );
-}
-
-function getTime(time) {
-  const date = new Date(time);
-  return date.toLocaleString();
 }

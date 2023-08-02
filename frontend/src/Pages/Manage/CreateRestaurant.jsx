@@ -92,8 +92,7 @@ function CreateRestaurant() {
   useEffect(() => {
     document.title = "Create Restaurant";
   }, []);
-  const {setter, getter} = useContext(Context);
-  const navigate = useNavigate();
+  const {setter} = useContext(Context);
   const [menuList, setMenuList] = useState([]);
   const [updateMenuVis, setUpdateMenuVis] = useState(false);
   const [isAdd, setIsAdd] = useState(true);
@@ -215,7 +214,7 @@ function CreateRestaurant() {
     }
   };
 
-  const onDelete = (id, index) => {
+  const onDelete = (id) => {
     CallApiWithToken(`/dishes/delete/by_id/${id}`, "DELETE").then((res) => {
       if (res.status === 200) {
         queryMenuList(restaurantId);

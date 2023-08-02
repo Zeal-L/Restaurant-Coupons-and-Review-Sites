@@ -108,7 +108,7 @@ function VoucherRest(props) {
                       } else {
                         setter.showNotification(res.data.message, NotificationType.Error);
                       }
-                  });
+                    });
                 }}>
                   <DeleteIcon color="white"/>
                 </IconButton>

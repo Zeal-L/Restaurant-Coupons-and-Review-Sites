@@ -1,16 +1,11 @@
 import React, {useCallback, useEffect, useState, useRef} from "react";
 import {
   Box,
-  Card,
-  CardMedia,
   FormControl,
   FormControlLabel,
-  Grid,
   InputBase,
   Radio,
   RadioGroup,
-  Rating,
-  Tooltip
 } from "@mui/material";
 import {alpha, styled} from "@mui/material/styles";
 import { Restaurant, Search as SearchIcon, Sort } from "@mui/icons-material";
@@ -257,6 +252,7 @@ function Listing() {
               {
                 restaurantsList.map((item) => (
                   <ListingCard
+                    key={item.restaurant_id}
                     restaurantInfo={item}
                     restaurantDetail={restaurantDetail}
                     collect={collect}

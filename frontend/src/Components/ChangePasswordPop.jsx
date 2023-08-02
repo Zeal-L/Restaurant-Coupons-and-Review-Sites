@@ -9,11 +9,9 @@ function ChangePasswordPop(props) {
   const [oldPassword, setOldPassword] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [Cpassword, setCpassword] = React.useState("");
-  const [oldpasswordErr, setOldPasswordErr] = React.useState(false);
   const [passwordErr, setPasswordErr] = React.useState(false);
   const [confirmPasswordErr, setConfirmPasswordErr] = React.useState(false);
 
-  const currentPassword = props.currentPassword;
   const editProfile = () => {
     const isPasswordValid =
     password.length >= 8 &&
@@ -57,7 +55,6 @@ function ChangePasswordPop(props) {
             onChange={(e) => {
               setOldPassword(e.target.value);
             }}
-            error={oldpasswordErr}
           />
         </Grid>
         <Grid item xs={12}>
