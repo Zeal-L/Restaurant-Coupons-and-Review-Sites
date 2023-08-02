@@ -1,1 +1,1 @@
-# capstone-project-3900w18a-kurukuru
+# capstone-project-3900w18a-Zeal

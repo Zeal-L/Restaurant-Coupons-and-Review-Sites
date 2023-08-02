@@ -1,23 +1,135 @@
-import React from 'react';
-import { Context, useContext } from '../context.js';
+import React, {useEffect} from "react";
 import {useNavigate, useParams} from "react-router-dom";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import {BottomNavigation, BottomNavigationAction, Link, Rating} from "@mui/material";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import Grid from "@mui/material/Unstable_Grid2";
+import Menu from "./RestaurantPages/Menu";
+import VoucherRest from "./RestaurantPages/VoucherRest";
+import Review from "./RestaurantPages/Review";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
+import ReviewsIcon from "@mui/icons-material/Reviews";
+import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
+import {CallApi} from "../CallApi";
 
-function Restaurant() {
-    const { restaurantId } = useParams();
-    return (
-        <>
-            <div style={{ height: '64px' }}></div>
-            <a>restaurantId: {restaurantId}</a>
-            <a>展示餐厅的详细信息，菜单，每个菜单都有图片，还有所有评论，(（每一个评论应当包括打分，发表人，评论内容，发表日期，图片), 可以发表评论，包括上述内容，图片应该添加大小限制，不能超过2
-                mb，最多3张图片)
-
-                还有和这个餐厅所有的优惠卷，
-                如果是自己的餐厅，在优惠卷中应该添加，添加优惠卷的功能，在菜单中应该添加添加菜单的功能
-
-                优惠卷和菜单应该都是分开的页面，自己去App.js中添加路由，然后在这里添加链接，点击链接跳转到相应的页面,或者做成字页面
-            </a>
-        </>
-    )
+function Restaurant(props) {
+  const {restaurantId} = useParams();
+  const navigate = useNavigate();
+  const [alignment, setAlignment] = React.useState(props.subPage);
+  useEffect(() => {
+    document.title = "Restaurant";
+  }, []);
+  const [data, setData] = React.useState({
+    name: "",
+    rating: 0,
+    comment_count: 0,
+    address: "",
+    image: "",
+  });
+  useEffect(() => {
+    CallApi(`/restaurants/get/by_id/${restaurantId}`,"GET").then((res) => {
+      if (res.status === 200) {
+        setData(res.data);
+      } else {
+        navigate("/");
+      }
+    });
+  }, [restaurantId]);
+  const handleAlignment = (event, newAlignment) => {
+    if (newAlignment !== null) {
+      navigate(`/restaurant/${restaurantId}/${newAlignment}`);
+      setAlignment(newAlignment);
+    }
+  };
+  return (
+    <>
+      <Box
+        component="div"
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "300px",
+          overflow: "hidden",
+        }}
+      >
+        <Box
+          component="img"
+          src={`data:image/png;base64,${data.image}`}
+          alt="Restaurant Image"
+          width="100%"
+          height="100%"
+          style={{objectFit: "cover", filter: "blur(6px)"}}
+        />
+        <Grid
+          container
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            textAlign: "center",
+            width: "80%",
+            padding: "16px",
+            background: "rgba(255, 255, 255, 0.8)",
+          }}
+        >
+          <Grid item>
+            <Typography variant="h2" fontFamily="Helvetica" fontWeight="400">
+              {data.name}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Rating name="customized-10" value={data.rating} max={5} style={{margin: "10px 0"}} readOnly/>
+          </Grid>
+          <Grid item>
+            <Typography variant="h6" fontFamily="Helvetica" fontWeight="400">
+              {data.rating} ({data.comment_count}+ Reviews)
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              marginTop="16px"
+            >
+              <LocationOnIcon sx={{marginRight: "8px"}}/>
+              <Link
+                href={"https://www.google.com/maps/place/" + data.address}
+                target="_blank"
+                rel="noopener"
+                color="inherit"
+              >
+                {data.address}
+              </Link>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+      <BottomNavigation
+        key="BottomNavigation"
+        showLabels
+        value={alignment}
+        onChange={handleAlignment}
+      >
+        <BottomNavigationAction value="Menu" label="Menu" icon={<RestaurantMenuIcon/>}/>
+        <BottomNavigationAction value="Voucher" label="Voucher" icon={<ConfirmationNumberIcon/>}/>
+        <BottomNavigationAction value="Review" label="Review" icon={<ReviewsIcon/>}/>
+      </BottomNavigation>
+      {
+        alignment === "Menu" ?
+          <Menu id={restaurantId}/>
+          : alignment === "Voucher" ?
+            <VoucherRest id={restaurantId}/>
+            :
+            <Review id={restaurantId}/>
+      }
+    </>
+  );
 }
 
 export default Restaurant;

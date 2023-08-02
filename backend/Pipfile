@@ -1,0 +1,30 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = "*"
+retrying = "*"
+flask = "*"
+flask-cors = "*"
+flask-restx = "*"
+flask-jwt-extended = "*"
+flask-sqlalchemy = "*"
+sqlalchemy-utils = "*"
+psycopg2 = "*"
+flask-apscheduler = "*"
+
+[dev-packages]
+rich = "*"
+pylint = "*"
+pandas = "*"
+faker = "*"
+ipykernel = "*"
+faker-food = "*"
+tqdm = "*"
+pytest = "*"
+pytest-cov = "*"
+
+[requires]
+python_version = "3.11"
