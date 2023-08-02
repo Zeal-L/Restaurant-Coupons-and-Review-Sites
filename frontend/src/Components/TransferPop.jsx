@@ -8,22 +8,20 @@ import {LoadingButton} from "@mui/lab";
 function TransforPop(props) {
   const {setter} = useContext(Context);
   const [transferTarget, setTansferTarget] = React.useState("");
-  const [transferid, setTransgerId] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const transferVoucher = () => {
     setLoading(true);
     CallApi(`/users/get/by_email/${transferTarget}`, "GET").then((res) => {
       if (res.status === 200) {
-        setTransgerId(res.data.user_id);
-      } else {
-        setter.showNotification(res.data.message, NotificationType.Error);
-      }
-    });
-    CallApiWithToken(`/vouchers/transfer/${props.id}/${transferid}` + props.id, "POST").then((res) => {
-      if (res.status === 200) {
-        setter.showNotification(res.data.message, NotificationType.Success);
-        props.setOpen(false);
-        setLoading(false);
+        CallApiWithToken(`/vouchers/transfer/${props.id}/${res.data.user_id}` + props.id, "POST").then((res) => {
+          if (res.status === 200) {
+            setter.showNotification(res.data.message, NotificationType.Success);
+            props.setOpen(false);
+            setLoading(false);
+          } else {
+            setter.showNotification(res.data.message, NotificationType.Error);
+          }
+        });
       } else {
         setter.showNotification(res.data.message, NotificationType.Error);
       }

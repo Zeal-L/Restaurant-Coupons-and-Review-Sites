@@ -355,10 +355,10 @@ function CreateRestaurant() {
                       <br />
                       Click <Link href={`/restaurant/${restaurantId}`}>here</Link> to view your restaurant.
                     </Typography>
-                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                      <Box sx={{ flex: "1 1 auto" }} />
-                      <Button onClick={handleReset}>Re edit</Button>
-                    </Box>
+                    {/*<Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>*/}
+                    {/*  <Box sx={{ flex: "1 1 auto" }} />*/}
+                    {/*  <Button onClick={handleReset}>Re edit</Button>*/}
+                    {/*</Box>*/}
                   </React.Fragment>
                 ) : (
                   <React.Fragment>

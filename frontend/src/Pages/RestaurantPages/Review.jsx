@@ -428,9 +428,13 @@ function Review(props) {
           marginTop: 1,
         }}
       >
-        <Avatar src={`data:image/png;base64,${userImage}`} alt={userName}/>
+        <Avatar src={
+          isAnonymous ? "" : `data:image/png;base64,${userImage}`
+        } alt={ isAnonymous ? "Anonymous" : userName}/>
         <Box marginLeft={2} flexGrow={1}>
-          <Typography variant="subtitle2">{userName}</Typography>
+          <Typography variant="subtitle2">{
+            isAnonymous ? "Anonymous" : userName
+          }</Typography>
           <Box display="flex" alignItems="center">
             <Rating
               name="rating"
