@@ -35,6 +35,7 @@ const currentDateTime = () => {
 };
 
 const Comment = ({
+  currentUser,
   comment_id,
   user,
   rating,
@@ -207,7 +208,7 @@ const Comment = ({
                 marginTop: 1,
               }}
             >
-              <Avatar src={review.user.avatar} alt={review.user.name}/>
+              <Avatar src={`data:image/png;base64,${review.user.avatar}`} alt={review.user.name}/>
               <Box marginLeft={2}>
                 <Typography variant="subtitle2">{review.user.name}</Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -228,10 +229,10 @@ const Comment = ({
                 marginTop: 1,
               }}
             >
-              <Avatar src={"https://example.com/avatar2.jpg"}
-                alt={isAnonymous ? "Anonymous" : "Jane Smith"} /*Anonymous Setting*/ />
+              <Avatar src={isAnonymous ? "" : currentUser.avatar}
+                alt={isAnonymous ? "Anonymous" : currentUser.name}/>
               <Box marginLeft={2} flexGrow={1}>
-                <Typography variant="subtitle2">{isAnonymous ? "Anonymous" : "Jane Smith"}</Typography>
+                <Typography variant="subtitle2">{isAnonymous ? "Anonymous" : currentUser.name}</Typography>
                 <Box display="flex" alignItems="center">
                   <Typography variant="body2" color="text.secondary">
                     {currentDateTime()}
@@ -260,16 +261,35 @@ const Comment = ({
                     content,
                     anonymity,
                   }).then((res) => {
-                    setReply("");
-                    setShowReplies(false);
-                    setter.showNotification("Reply added successfully!", NotificationType.Success);
-
+                    if (res.status === 200) {
+                      setReply("");
+                      setShowReplies(false);
+                      setter.showNotification("Reply added successfully!", NotificationType.Success);
+                      //
+                      const newAllComments = [...allComments];
+                      const commentIndex = newAllComments.findIndex((comment) => comment.comment_id === comment_id);
+                      let newReply = {
+                        reply_id: 0,
+                        user: {
+                          name: isAnonymous ? "Anonymous" : currentUser.name,
+                          avatar: isAnonymous ? "" : currentUser.avatar,
+                        },
+                        comment_id,
+                        content,
+                        date: currentDateTime(),
+                        anonymity,
+                        report_by: [],
+                      };
+                      newAllComments[commentIndex].reviews.push(newReply);
+                      setCurrentComment([...newAllComments]);
+                    } else {
+                      setter.showNotification(res.data.message, NotificationType.Error);
+                    }
                     // CallApiWithToken(`/replies/get/by_id/${res.data.reply_id}`, "GET").then((res) => {
                     //   if (res.status === 200) {
                     //     const newReply = res.data.reply;
                     //     const newAllComments = [...allComments];
                     //     const commentIndex = newAllComments.findIndex((comment) => comment.comment_id === comment_id);
-                    //     newAllComments[commentIndex].reviews.push(res.data);
                     //     setCurrentComment(newAllComments[commentIndex]);
                     //   }
                     // });
@@ -306,6 +326,14 @@ function Review(props) {
   const [sort, setSort] = useState("by_date");
   const [isAtBottom, setIsAtBottom] = useState(false);
   const [loading, setLoading] = useState(false);
+  React.useEffect(() => {
+    CallApiWithToken("/users/get/by_token", "GET").then((response) => {
+      if (response.status === 200) {
+        setUserName(response.data.name);
+        setUserImage(response.data.photo);
+      }
+    });
+  });
   React.useEffect(() => {
     const handleScroll = () => {
       setIsAtBottom((window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight === document.documentElement.scrollHeight);
@@ -424,11 +452,11 @@ function Review(props) {
             <FormControlLabel control={<Switch value={isAnonymous} onClick={() => {
               setIsAnonymous(!isAnonymous);
               if (isAnonymous) {
-                setUserName(userDetail.name);
-                setUserImage(userDetail.image);
-              } else {
                 setUserName("Anonymous");
                 setUserImage("");
+              } else {
+                setUserName(userName);
+                setUserImage(userImage);
               }
             }}/>} label="Anonymous" sx={{marginLeft: 1}}/>
           </Box>
@@ -547,6 +575,10 @@ function Review(props) {
 
       {comments.map((comment) => (
         <Comment
+          currentUser={{
+            name: userName,
+            avatar: userImage
+          }}
           key={comment.comment_id}
           comment_id={comment.comment_id}
           user={comment.user}
@@ -563,10 +595,10 @@ function Review(props) {
         />
       ))}
       {loading && (
-      <Box sx={{ display: "flex" , justifyContent: "center", marginTop: 2, width: "100%"}}>
-        <CircularProgress />
-      </Box>
-        )}
+        <Box sx={{ display: "flex" , justifyContent: "center", marginTop: 2, width: "100%"}}>
+          <CircularProgress />
+        </Box>
+      )}
     </div>
   );
 }
@@ -613,16 +645,21 @@ async function getReview(comment_id) {
       const repliceIds = repliceList.data.reply_ids;
       for (let i = 0; i < repliceIds.length; i++) {
         const repliceResponse = await CallApiWithToken(`replies/get/by_id/${repliceIds[i]}`, "GET");
-        const userResponse = await CallApiWithToken(`users/get/by_id/${response.data.user_id}`, "GET");
+        const userResponse = await CallApiWithToken(`users/get/by_id/${repliceResponse.data.user_id}`, "GET");
         if (userResponse.status !== 200) {
           repliceResponse.data.user = {
             name: "Anonymous",
             avatar: "",
           };
-        } else {
+        } else if (repliceResponse.data.anonymity !== true) {
           repliceResponse.data.user = {
             name: userResponse.data.name,
             avatar: userResponse.data.photo,
+          };
+        } else {
+          repliceResponse.data.user = {
+            name: "Anonymous",
+            avatar: "",
           };
         }
         replice.push(repliceResponse.data);
@@ -642,6 +679,7 @@ async function getReviews(comment_id_list) {
       comments.push(comment);
     }
   }
+  console.log(comments);
   return comments;
 }
 
