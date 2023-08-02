@@ -1,6 +1,5 @@
 import React, {Fragment, useEffect, useRef, useState} from "react";
 import PropTypes from "prop-types";
-import {useNavigate} from "react-router-dom";
 import {
   Box,
   Button,
@@ -322,9 +321,9 @@ function CreateRestaurant() {
     });
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
+  // const handleReset = () => {
+  //   setActiveStep(0);
+  // };
   console.log(menuImgUrl);
   return (
     <Fragment>

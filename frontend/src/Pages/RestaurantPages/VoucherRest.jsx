@@ -227,7 +227,6 @@ function VoucherDialog(props) {
   const [ReleasePeriodHour, setReleasePeriodHour] = useState(0);
   const [ReleasePeriodMinute, setReleasePeriodMinute] = useState(0);
   useEffect(() => {
-    console.log(props.autoReleaseTimeRange);
     if (props.autoReleaseTimeRange === 30 * 24 * 60) {
       setReleasePeriod("M");
     } else if (props.autoReleaseTimeRange === 7 * 24 * 60) {
