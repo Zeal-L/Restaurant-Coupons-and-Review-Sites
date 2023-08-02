@@ -6,7 +6,7 @@ import {Context, NotificationType, useContext} from "../context.js";
 import {LoadingButton} from "@mui/lab";
 
 function TransforPop(props) {
-  const {setter, getter} = useContext(Context);
+  const {setter} = useContext(Context);
   const [transferTarget, setTansferTarget] = React.useState("");
   const [transferid, setTransgerId] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -46,7 +46,6 @@ function TransforPop(props) {
           />
         </Grid>
         <Grid item xs={12}>
-          {/* <div style={{ height: '10px' }}></div> */}
           <LoadingButton
             loadingPosition="start"
             loading={loading}
@@ -54,7 +53,6 @@ function TransforPop(props) {
               padding: "10px",
             }}
             variant="contained" onClick={transferVoucher} fullWidth>Transfer</LoadingButton>
-          {/* <div style={{ height: '10px' }}></div> */}
         </Grid>
         <Grid item xs={12}>
           <Button variant="text" color="primary" fullWidth onClick={() => props.setOpen(false)}>
