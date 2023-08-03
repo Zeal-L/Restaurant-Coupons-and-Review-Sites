@@ -14,17 +14,17 @@ flask-sqlalchemy = "*"
 sqlalchemy-utils = "*"
 psycopg2 = "*"
 flask-apscheduler = "*"
+faker = "*"
+faker-food = "*"
+tqdm = "*"
 
 [dev-packages]
 rich = "*"
 pylint = "*"
 pandas = "*"
-faker = "*"
 ipykernel = "*"
-faker-food = "*"
-tqdm = "*"
 pytest = "*"
 pytest-cov = "*"
 
 [requires]
-python_version = "3.11"
+python_version = "3.9"
