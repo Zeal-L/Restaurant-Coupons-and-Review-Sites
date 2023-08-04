@@ -777,7 +777,7 @@ class Transfer_voucher(Resource):
         body += f"discount: {template.discount}\n"
         body += f"condition: {template.condition}\n"
         body += f"description: {template.description}\n\n"
-        body += f"link: http://localhost:{config.port}/restaurant/{template.restaurant_id}/Voucher"
+        body += f"link: http://localhost:{config.frontend_port}/restaurant/{template.restaurant_id}/Voucher"
 
         services.util.send_email(
             receiver.email,
