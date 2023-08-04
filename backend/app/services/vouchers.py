@@ -179,7 +179,7 @@ def auto_release_publish(template_id: int, amount: int):
             body += f"discount: {template.discount}\n"
             body += f"condition: {template.condition}\n"
             body += f"description: {template.description}\n\n"
-            body += f"link: http://localhost:{config.port}/restaurant/{template.restaurant_id}/Voucher"
+            body += f"link: http://localhost:{config.frontend_port}/restaurant/{template.restaurant_id}/Voucher"
 
             restaurant = models.Restaurants.get_restaurant_by_id(template.restaurant_id)
 

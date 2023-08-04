@@ -1,13 +1,15 @@
 from datetime import timedelta
 
 
-# Set up host and port
+# Set up backend host and port
 host = "localhost"
 port = 5001
 url = f"http://{host}:{port}"
 
+# set up frontend port
+frontend_port = 3000
+
 # set up database
-host = "localhost"
 database = "backend3900"
 user = "zhangwenqian"
 password = "123456"
