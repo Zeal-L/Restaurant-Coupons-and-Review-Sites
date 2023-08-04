@@ -3,7 +3,7 @@ from datetime import timedelta
 
 # Set up backend host and port
 host = "localhost"
-port = 5000
+port = 5001
 url = f"http://{host}:{port}"
 
 # set up frontend port
@@ -11,7 +11,7 @@ frontend_port = 3000
 
 # set up database
 database = "backend3900"
-user = "postgres"
+user = "zhangwenqian"
 password = "123456"
 
 # set up email

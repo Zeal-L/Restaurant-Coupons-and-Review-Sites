@@ -22,7 +22,7 @@ def init_app(app: Flask) -> None:
 
 def create_voucher_template_v1(
     user: models.Users, info: dict
-) -> int | models.VoucherTemplate:
+) -> int or models.VoucherTemplate:
     """
     Create a voucher template for a restaurant.
 
@@ -69,7 +69,7 @@ def create_voucher_template_v1(
 
 def create_auto_release_voucher_v1(
     template: models.VoucherTemplate, info: dict
-) -> int | models.VouchersAutoReleaseTimer:
+) -> int or models.VouchersAutoReleaseTimer:
     """
     Create an auto-release voucher for a restaurant.
 
@@ -164,8 +164,8 @@ def auto_release_publish(template_id: int, amount: int):
             models.VoucherTemplate.get_voucher_template_by_id(template_id)
         )
 
-        template.set_remain_amount(template.remain_amount + amount)
-        template.set_total_amount(template.total_amount + amount)
+        template.set_remain_amount(template.remain_amount + int(amount))
+        template.set_total_amount(template.total_amount + int(amount))
 
         users = services.restaurants.get_all_user_who_favorite_v1(
             template.restaurant_id
