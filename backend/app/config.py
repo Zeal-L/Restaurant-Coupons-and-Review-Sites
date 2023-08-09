@@ -11,7 +11,7 @@ frontend_port = 3000
 
 # set up database
 database = "backend3900"
-user = "zhangwenqian"
+user = "postgres"
 password = "123456"
 
 # set up email
